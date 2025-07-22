@@ -1,5 +1,5 @@
 # Network_TeamProject
-PC 게임 Splatoon을 레퍼런스로 한 TPS 게임
+닌텐도 스위치 게임 Splatoon을 레퍼런스로 한 TPS 게임 (PC)
 ***
 # 룰셋
 ## 깃 컨벤션
