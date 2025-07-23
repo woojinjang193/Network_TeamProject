@@ -102,3 +102,5 @@ InitTestScene*.unity*
 /Assets/ExternalDependencyManager
 /Assets/Firebase
 /Assets/Plugins
+Assets/google-services.json
+Assets/google-services.json.meta
