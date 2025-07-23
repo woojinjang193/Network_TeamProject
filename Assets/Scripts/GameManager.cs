@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : Singleton<GameManager>
 {
     public static GameManager GetInstance() => Instance;
-    private void Awake()
+    protected override void Awake()
     {
         base.Awake();
         DontDestroyOnLoad(gameObject);

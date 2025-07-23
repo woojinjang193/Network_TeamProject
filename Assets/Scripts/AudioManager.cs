@@ -5,7 +5,7 @@ using UnityEngine;
 public class AudioManager : Singleton<AudioManager>
 {
     public static AudioManager GetInstance() => Instance;
-    private void Awake()
+    protected override void Awake()
     {
         base.Awake();
         DontDestroyOnLoad(gameObject);
