@@ -23,29 +23,31 @@ public class PaintableObj : MonoBehaviour
         splatMap = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBFloat);
         //잉크가 최종으로 저장될 텍스쳐 생성
 
-        tempMap = new RenderTexture(splatMap.width, splatMap.height, 0, RenderTextureFormat.ARGBFloat);//
+        tempMap = new RenderTexture(splatMap.width, splatMap.height, 0, RenderTextureFormat.ARGBFloat);
         //임시 텍스쳐 생성 splatMap과 같은 크기로 생성
 
-        splatMaterial = new Material(Shader.Find("Unlit/SplatMask"));//
+        splatMaterial = new Material(Shader.Find("Unlit/SplatMask"));
         // 쉐이더를 넣어서 splatMaterial 생성
 
         blendMaterial = new Material(Shader.Find("Unlit/Blend"));
         // 쉐이더를 넣어서 blendMaterial 생성
 
-        visualMeterial = GetComponent<Renderer>().material;//
+        visualMeterial = GetComponent<Renderer>().material;
         // 오브젝트 표면에 잉크효과를 표시하기위해 메터리얼 정보 가져옴
 
-        visualMeterial.SetTexture("_Splatmap", splatMap);//
+        visualMeterial.SetTexture("_Splatmap", splatMap);
         //오브젝트의 텍스쳐를 splatMap로 지정
 
-        buffer = new CommandBuffer();//
+        buffer = new CommandBuffer();
         //그래픽 명령어를 담아둘 공간
     }
 
     public void DrawInk(Vector3 worldPos, float radius, float hardness, float strength, Team team) //그리기 함수
     {
         Color teamColor = FindObjectOfType<TeamColorInfo>().GetTeamColor(team);
+        teamColor.a = 1;
         //팀정보를 토대로 팀컬러를 가져옴
+
 
         splatMaterial.SetFloat(Shader.PropertyToID("_Radius"), radius);  //반지름 
         splatMaterial.SetFloat(Shader.PropertyToID("_Hardness"), hardness); // 선명도
