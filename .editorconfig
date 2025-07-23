@@ -1,0 +1,10 @@
+# 최상위 editorconfig 파일임을 명시
+root = true
+
+# 모든 파일에 적용
+[*]
+charset = utf-8         # UTF-8 인코딩
+end_of_line = crlf      # Windows 스타일 줄바꿈
+indent_style = space    # 들여쓰기: 공백
+indent_size = 4         # 공백 4칸
+insert_final_newline = true  # 마지막 줄 개행 삽입
