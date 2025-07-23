@@ -26,22 +26,22 @@ public class InkProjectile : MonoBehaviour
     {
         if (collision.gameObject.TryGetComponent<PaintableObj>(out PaintableObj paintableObj))
         {
-            Debug.Log($"ÆäÀÎÆ® °¡´É ¿ÀºêÁ§Æ® : {paintableObj.name}");
+            Debug.Log($"í˜ì¸íŠ¸ ê°€ëŠ¥ ì˜¤ë¸Œì íŠ¸ : {paintableObj.name}");
         }
 
         if (collision.gameObject.TryGetComponent<PlayerTestController>(out PlayerTestController player))
         {
             if(player.MyTeam != myTeam)
             {
-                Debug.Log("Àû¿¡°Ô ¸íÁß");
+                Debug.Log("ì ì—ê²Œ ëª…ì¤‘");
             }
             else
             {
-                Debug.Log("¾Æ±º ¿¡°Ô ¸íÁß");
+                Debug.Log("ì•„êµ° ì—ê²Œ ëª…ì¤‘");
             }
         }
 
-        Destroy(gameObject); //Ç®·Î ¸®ÅÏÇÒ ¿¹Á¤
+        Destroy(gameObject); //í’€ë¡œ ë¦¬í„´í•  ì˜ˆì •
     }
 
 }
