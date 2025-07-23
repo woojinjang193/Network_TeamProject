@@ -103,3 +103,5 @@ InitTestScene*.unity*
 /Assets/Firebase
 /Assets/Plugins
 /Assets/TextMesh Pro/Resources/Fonts & Materials
+Assets/google-services.json
+Assets/google-services.json.meta
