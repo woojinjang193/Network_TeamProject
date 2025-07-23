@@ -7,7 +7,8 @@ using UnityEngine.Android;
 public class InkParticleGun : MonoBehaviourPun
 {
     private TeamColorInfo teamColorInfo;
-    [SerializeField] private ParticleSystem particleSys;
+    [SerializeField] private ParticleSystem mainParticle;
+    [SerializeField] private ParticleSystem fireEffect;
     [SerializeField] private InkParticleCollision particle;
     private Team myTeam;
 
@@ -18,22 +19,34 @@ public class InkParticleGun : MonoBehaviourPun
 
     private void Start()
     {
-        ParticleSystem.EmissionModule emission = particleSys.emission;
+        ParticleSystem.EmissionModule emission = mainParticle.emission;
+        ParticleSystem.EmissionModule fireEffectEmission = fireEffect.emission;
         emission.enabled = false;
+        fireEffectEmission.enabled = false;
+
     }
 
     [PunRPC]
     public void FireParticle(Team team, bool mouseButtonDown)
     {
-        //ƒ√∑Ø º≥¡§
+        //ÌååÌã∞ÌÅ¥ on off ÏÑ§Ï†ï
+        ParticleSystem.EmissionModule emission = mainParticle.emission;
+        ParticleSystem.EmissionModule fireEffectEmission = fireEffect.emission;
+        emission.enabled = mouseButtonDown;
+        fireEffectEmission.enabled = mouseButtonDown;
+
+        //Ïª¨Îü¨ ÏÑ§Ï†ï
         myTeam = team;
         Color teamColor = teamColorInfo.GetTeamColor(myTeam);
-        ParticleSystemRenderer renderer = particleSys.GetComponent<ParticleSystemRenderer>();
-        renderer.material.color = teamColor;
+        teamColor.a = 1f;
 
-        //∆ƒ∆º≈¨ on off º≥¡§
-        ParticleSystem.EmissionModule emission = particleSys.emission;
-        emission.enabled = mouseButtonDown;
+        ParticleSystem[] particles = mainParticle.GetComponentsInChildren<ParticleSystem>();
+        for (int i = 0; i < particles.Length; i++)
+        {
+            ParticleSystem partSys = particles[i];
+            ParticleSystem.MainModule main = partSys.main;
+            main.startColor = teamColor;
+        }
 
         particle.SetTeam(myTeam);
     }

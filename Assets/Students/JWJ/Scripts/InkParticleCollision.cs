@@ -6,9 +6,17 @@ public class InkParticleCollision : MonoBehaviour
 {
     private TeamColorInfo teamColorInfo;
     private Team myTeam;
+    private ParticleSystem particleSys;
+    List<ParticleCollisionEvent> events = new();  //íŒŒí‹°í´ ì¶©ëŒ ì´ë²¤íŠ¸ëŠ” ë¦¬ìŠ¤íŠ¸ë¡œ ë„£ì–´ì•¼í•¨
+
+    [SerializeField] private float radius;
+    [SerializeField] private float hardness;
+    [SerializeField] private float strength;
+
     private void Awake()
     {
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
+        particleSys = GetComponent<ParticleSystem>();
     }
 
     public void SetTeam(Team team)
@@ -18,20 +26,30 @@ public class InkParticleCollision : MonoBehaviour
 
     private void OnParticleCollision(GameObject other)
     {
-        if (other.gameObject.TryGetComponent<PaintableObj>(out PaintableObj paintableObj))
+        if (!other.gameObject.TryGetComponent<PaintableObj>(out PaintableObj paintableObj))
         {
-            Debug.Log($"ÆäÀÎÆ® °¡´É ¿ÀºêÁ§Æ® : {paintableObj.name}");
+            return;
+        }
+
+        events.Clear();
+
+        int count = particleSys.GetCollisionEvents(other, events);
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 hitPos = events[i].intersection;
+            paintableObj.DrawInk(hitPos, radius, hardness, strength, myTeam);
+            //Debug.Log($"í˜ì¸íŠ¸ ê°€ëŠ¥ ì˜¤ë¸Œì íŠ¸ : {paintableObj.name}");
         }
 
         if (other.gameObject.TryGetComponent<PlayerTestController>(out PlayerTestController player))
         {
             if (player.MyTeam != myTeam)
             {
-                Debug.Log("Àû¿¡°Ô ¸íÁß");
+                Debug.Log("ì ì—ê²Œ ëª…ì¤‘");
             }
             else
             {
-                Debug.Log("¾Æ±º ¿¡°Ô ¸íÁß");
+                Debug.Log("ì•„êµ° ì—ê²Œ ëª…ì¤‘");
             }
         }
     }

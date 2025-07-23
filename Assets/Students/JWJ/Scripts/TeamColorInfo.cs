@@ -25,7 +25,5 @@ public class TeamColorInfo : MonoBehaviour
         }
         else
             return Color.gray;
-        
     }
-
 }
