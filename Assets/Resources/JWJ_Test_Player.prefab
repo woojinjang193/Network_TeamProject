@@ -10056,7 +10056,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainParticle: {fileID: 5509450797882254833}
   fireEffect: {fileID: 6214434835510814591}
-  particle: {fileID: 8915064683398671222}
+  particleCollision: {fileID: 8915064683398671222}
 --- !u!114 &3232822812147173135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10076,7 +10076,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 0
+  sceneViewId: 1
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &4537003710582098474
@@ -10096,7 +10096,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1018876069317797786
 Transform:
   m_ObjectHideFlags: 0
@@ -14983,6 +14983,7 @@ GameObject:
   - component: {fileID: 8053793555791274119}
   - component: {fileID: 3257333546365940766}
   - component: {fileID: 8900230614688956345}
+  - component: {fileID: 1635364846347097961}
   m_Layer: 0
   m_Name: PlayerBody
   m_TagString: Untagged
@@ -15052,7 +15053,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skinRenderer: {fileID: 3257333546365940766}
   cameraPivot: {fileID: 7542923073818744468}
-  moveSpeed: 5
+  moveSpeed: 10
   mouseSensitivity: 5
   cameraprefab: {fileID: 8055350959985201134, guid: 753e64bba3fdc614987f3d08568d0934, type: 3}
   inkParticleGun: {fileID: 850503459184940764}
@@ -15171,9 +15172,26 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 3670488657036499933}
-  sceneViewId: 0
+  - {fileID: 1635364846347097961}
+  sceneViewId: 2
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &1635364846347097961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6203996572771985635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64179f3720bbfe947b7724caa67b7c1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizeVelocity: 1
+  m_SynchronizeAngularVelocity: 1
+  m_TeleportEnabled: 0
+  m_TeleportIfDistanceGreaterThan: 3
 --- !u!1 &6699207889478656091
 GameObject:
   m_ObjectHideFlags: 0

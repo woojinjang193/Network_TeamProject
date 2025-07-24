@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "122919309965",
+    "project_id": "networkteamproject-32f9e",
+    "storage_bucket": "networkteamproject-32f9e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122919309965:android:c0841a3b9da8c0165488c4",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.Network_TeamProject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8TT7iMnN_gEpP9NE8FZ_Ge8Hgs9K4Zfw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
