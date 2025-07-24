@@ -15053,7 +15053,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skinRenderer: {fileID: 3257333546365940766}
   cameraPivot: {fileID: 7542923073818744468}
-  moveSpeed: 5
+  moveSpeed: 10
   mouseSensitivity: 5
   cameraprefab: {fileID: 8055350959985201134, guid: 753e64bba3fdc614987f3d08568d0934, type: 3}
   inkParticleGun: {fileID: 850503459184940764}

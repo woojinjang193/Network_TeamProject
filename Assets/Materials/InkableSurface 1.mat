@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: InkableSurface
+  m_Name: InkableSurface 1
   m_Shader: {fileID: -6465566751694194690, guid: af82faa0e86a12146a26d84ddabfd9ab, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -37,7 +37,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - Texture2D_d5eef962d1c14d359542b6658910d8c2:
-        m_Texture: {fileID: 2800000, guid: 0651201fb85fbd04d95587662e80338e, type: 3}
+        m_Texture: {fileID: 10309, guid: 0000000000000000f000000000000000, type: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_d5eef962d1c14d359542b6658910d8c2_1:
