@@ -22,7 +22,9 @@ MonoBehaviour:
   m_missingGlyphCharacter: 0
   m_warningsDisabled: 0
 
+
   m_defaultFontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+
 
   m_defaultFontAssetPath: Fonts & Materials/
   m_defaultFontSize: 36
@@ -32,15 +34,18 @@ MonoBehaviour:
   m_defaultTextMeshProUITextContainerSize: {x: 200, y: 50}
   m_autoSizeTextContainer: 0
 
+
   m_fallbackFontAssets: []
   m_matchMaterialPreset: 1
   m_defaultSpriteAsset: {fileID: 11400000, guid: c41005c129ba4d66911b75229fd70b45,
     type: 2}
 
+
   m_defaultSpriteAssetPath: Sprite Assets/
   m_enableEmojiSupport: 1
   m_MissingCharacterSpriteUnicode: 0
   m_defaultColorGradientPresetsPath: Color Gradient Presets/
+
 
   m_defaultStyleSheet: {fileID: 11400000, guid: f952c082cb03451daed3ee968ac6c63e,
     type: 2}
