@@ -10056,7 +10056,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainParticle: {fileID: 5509450797882254833}
   fireEffect: {fileID: 6214434835510814591}
-  particle: {fileID: 8915064683398671222}
+  particleCollision: {fileID: 8915064683398671222}
 --- !u!114 &3232822812147173135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10076,7 +10076,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 0
+  sceneViewId: 1
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &4537003710582098474
@@ -15173,7 +15173,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 3670488657036499933}
   - {fileID: 1635364846347097961}
-  sceneViewId: 0
+  sceneViewId: 2
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &1635364846347097961

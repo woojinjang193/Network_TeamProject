@@ -20,7 +20,7 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
     private TeamColorInfo teamColorInfo;
     private Rigidbody rigid;
     private Camera cam;
-    private PhotonView weaponView;
+    private PhotonView weaponView; ////////////
 
     float cameraRotationX = 0;
     float cameraRotationY = 0;

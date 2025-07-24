@@ -178,6 +178,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Mountain 2 '
       objectReference: {fileID: 0}
+    - target: {fileID: 7725382070131304987, guid: ad2e499151a0627469e6752051229209, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -194,6 +198,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 850503459184940764, guid: bb44c71ec8af10a4f8fb90dc8abaa289, type: 3}
+      propertyPath: particleCollision
+      value: 
+      objectReference: {fileID: 372659257}
     - target: {fileID: 2175236673469671928, guid: bb44c71ec8af10a4f8fb90dc8abaa289, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -381,6 +389,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Car 1 '
       objectReference: {fileID: 0}
+    - target: {fileID: 1202561854835830196, guid: 163210dddc5038c469594285e970e3f0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3301772411682046595, guid: 163210dddc5038c469594285e970e3f0, type: 3}
       propertyPath: m_LocalScale.x
       value: 2
@@ -489,6 +501,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 672670f05dc2d4841b36b2c61b4f8a55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &372659257 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8915064683398671222, guid: bb44c71ec8af10a4f8fb90dc8abaa289, type: 3}
+  m_PrefabInstance: {fileID: 78348895}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15de207409c239a45a33e377cd16fb78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &552301489
@@ -986,6 +1009,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Tree 1 '
       objectReference: {fileID: 0}
+    - target: {fileID: 930026083976683566, guid: 8b63f536dcb9512418bb18c53c2565c6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1427944135446658717, guid: 8b63f536dcb9512418bb18c53c2565c6, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -1340,6 +1367,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'Mill '
       objectReference: {fileID: 0}
+    - target: {fileID: 6545576631236773151, guid: fc5c037b45f7cb24894a869b0cbb858e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1403,6 +1434,10 @@ PrefabInstance:
     - target: {fileID: 5700643129348156977, guid: 249ebbaae21002c499f1c8a7925c1905, type: 3}
       propertyPath: m_Name
       value: 'Stairs '
+      objectReference: {fileID: 0}
+    - target: {fileID: 5700643129348156977, guid: 249ebbaae21002c499f1c8a7925c1905, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

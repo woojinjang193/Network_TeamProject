@@ -52,7 +52,6 @@ public class PaintableObj : MonoBehaviour
         teamColor.a = 1;
         //팀정보를 토대로 팀컬러를 가져옴
 
-
         splatMaterial.SetFloat(Shader.PropertyToID("_Radius"), radius);  //반지름 
         splatMaterial.SetFloat(Shader.PropertyToID("_Hardness"), hardness); // 선명도
         splatMaterial.SetFloat(Shader.PropertyToID("_Strength"), strength); // 강도
