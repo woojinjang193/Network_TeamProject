@@ -23,6 +23,10 @@ public class PaintableObj : MonoBehaviour
         splatMap = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBFloat);
         //잉크가 최종으로 저장될 텍스쳐 생성
 
+        //RenderTexture.active = splatMap;
+        splatMap.Create();
+        //GPU에 할당해줌
+
         tempMap = new RenderTexture(splatMap.width, splatMap.height, 0, RenderTextureFormat.ARGBFloat);
         //임시 텍스쳐 생성 splatMap과 같은 크기로 생성
 
@@ -66,7 +70,7 @@ public class PaintableObj : MonoBehaviour
         // 임시맵에 그리고 splatMap을 타겟으로 설정
 
         buffer.Blit(tempMap, splatMap, blendMaterial);
-        // alphaCombiner을 이용해 temMap에 있는걸 splatMap에 합침
+        // blendMaterial을 이용해 temMap에 있는걸 splatMap에 합침
 
         Graphics.ExecuteCommandBuffer(buffer);
         //그래픽 작업 실행

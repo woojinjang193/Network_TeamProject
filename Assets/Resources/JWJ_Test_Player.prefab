@@ -10096,7 +10096,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1018876069317797786
 Transform:
   m_ObjectHideFlags: 0
@@ -14983,6 +14983,7 @@ GameObject:
   - component: {fileID: 8053793555791274119}
   - component: {fileID: 3257333546365940766}
   - component: {fileID: 8900230614688956345}
+  - component: {fileID: 1635364846347097961}
   m_Layer: 0
   m_Name: PlayerBody
   m_TagString: Untagged
@@ -15171,9 +15172,26 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 3670488657036499933}
+  - {fileID: 1635364846347097961}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &1635364846347097961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6203996572771985635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64179f3720bbfe947b7724caa67b7c1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizeVelocity: 1
+  m_SynchronizeAngularVelocity: 1
+  m_TeleportEnabled: 0
+  m_TeleportIfDistanceGreaterThan: 3
 --- !u!1 &6699207889478656091
 GameObject:
   m_ObjectHideFlags: 0
