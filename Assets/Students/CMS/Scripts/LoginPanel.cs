@@ -1,10 +1,11 @@
+using Firebase.Auth;
+using Firebase.Extensions;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using Firebase.Extensions;
-using Firebase.Auth;
 
 public class LoginPanel : MonoBehaviour
 {
@@ -33,44 +34,43 @@ public class LoginPanel : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void Login() 
-    { 
+    private void Login()
+    {
         FirebaseManager.Auth.SignInWithEmailAndPasswordAsync(idInput.text, passwordInput.text)
             .ContinueWithOnMainThread(task =>
             {
-                if (task.IsCanceled)
+                if (task.IsCanceled || task.IsFaulted)
                 {
-                    Debug.LogError("로그인 작업이 취소되었습니다.");
+                    Debug.LogError($"로그인 실패: {task.Exception}");
                     return;
                 }
-                if (task.IsFaulted)
-                {
-                    Debug.LogError($"로그인 중 오류 발생: {task.Exception}");
-                    return;
-                }
-                Debug.Log("로그인 성공!");
 
                 FirebaseUser user = task.Result.User;
-                if(user.IsEmailVerified == true)
-                {
-                    if(user.DisplayName == "")
-                    {
-                        nicknamePanel.SetActive(true);
-                    }
-                    else
-                    {
-                        lobbyPanel.SetActive(true);
-                    }
-                    gameObject.SetActive(false);
-                }
-                else
+                Debug.Log("로그인 성공!");
+
+                if (!user.IsEmailVerified)
                 {
                     emailPanel.SetActive(true);
-                    gameObject.SetActive(false); 
+                    gameObject.SetActive(false);
+                    return;
                 }
-  
-            });
 
+                if (string.IsNullOrEmpty(user.DisplayName))
+                {
+                    nicknamePanel.SetActive(true);
+                    gameObject.SetActive(false);
+                    return;
+                }
+
+                // Firebase 닉네임을 Photon에 등록
+                PhotonNetwork.NickName = user.DisplayName;
+
+                //네트워크 연결 시도
+                PhotonNetwork.ConnectUsingSettings();
+
+                //로딩 패널 표시
+                NetworkManager.Instance.ShowLoading();  // 아래에 구현
+            });
     }
 
     private void ResetPassword()
