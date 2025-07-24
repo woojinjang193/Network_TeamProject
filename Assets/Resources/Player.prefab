@@ -51,10 +51,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a128e42a12a49ed42a615a94409aef82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  humanAnimator: {fileID: 0}
+  squidAnimator: {fileID: 0}
   rig: {fileID: 0}
   input: {fileID: 0}
   col: {fileID: 0}
   tpsCamera: {fileID: 0}
+  mainCamera: {fileID: 0}
   humanModel: {fileID: 3997674216597739597}
   squidModel: {fileID: 4322107737467862600}
   turnSensitivity: 200
@@ -85,7 +88,7 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 3269185156740101088}
-  sceneViewId: 1
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &592276882897477744
@@ -634,3 +637,4 @@ MonoBehaviour:
   yMin: -6
   xSensitivity: 0.2
   ySensitivity: 0.1
+  invertY: 0
