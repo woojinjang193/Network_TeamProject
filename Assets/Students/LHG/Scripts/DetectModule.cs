@@ -20,6 +20,11 @@ public class DetectModule
         Collider[] hits = Physics.OverlapSphere(_controller.transform.position, 10f);
         Target = hits.FirstOrDefault(c => c.CompareTag("Player"))?.transform;
 
+        if(Target != null)
+        {
+            Debug.Log("Player 태그 감지됨");
+        }
+
         //TODO 중립 또는 적 타일을 탐지
     }
 }

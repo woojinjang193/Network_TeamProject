@@ -9,9 +9,11 @@ public class AIController : MonoBehaviour
     public DetectModule DetectModule {  get; private set; }
     public AIStateMachine StateMachine {  get; private set; }
 
+    [SerializeField] public float moveSpeed = 5;
+
     private void Awake()
     {
-        //statedic대신 모듈로 개별 스크립트로 관리
+        //statedic대신 모듈화한 개별 스크립트로 관리
         MoveModule = new MoveModule(this);
         FireModule = new FireModule(this);
         DetectModule = new DetectModule(this);

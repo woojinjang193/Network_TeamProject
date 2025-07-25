@@ -21,5 +21,8 @@ public class MoveModule
     public void MoveTo(Vector3 targetPos)
     {
         //타겟위치로 이동
+        Vector3 direction = (targetPos - _controller.transform.position).normalized;
+        _controller.transform.position += direction * _controller.moveSpeed * Time.deltaTime;
+        _controller.transform.LookAt(targetPos);
     }
 }

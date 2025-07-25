@@ -13,7 +13,7 @@ public class FireModule
 
     public void FireAt(Transform target)
     {
-        //TODO 플레이어 기능의 물감발사를 가져오자
-        Debug.Log("타겟에게 발사");
+        //TODO 플레이어 기능의 물감발사를 가져오자 + 발사간격
+        Debug.Log("타겟에게 발사, 타겟 위치:" + target.position);
     }
 }
