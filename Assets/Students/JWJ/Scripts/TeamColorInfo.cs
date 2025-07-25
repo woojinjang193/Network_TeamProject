@@ -13,6 +13,9 @@ public class TeamColorInfo : MonoBehaviour
     [SerializeField] private Color team1Color;
     [SerializeField] private Color team2Color;
 
+    public Color Team1Color => team1Color;
+    public Color Team2Color => team2Color;
+
     public Color GetTeamColor(Team team)
     {
         if (team == Team.Team1)
