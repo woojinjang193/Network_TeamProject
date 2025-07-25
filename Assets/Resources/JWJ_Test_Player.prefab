@@ -4957,9 +4957,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15de207409c239a45a33e377cd16fb78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 5
+  radius: 3
   hardness: 0
-  strength: 0.1
+  strength: 0.2
 --- !u!1 &1497930883175639059
 GameObject:
   m_ObjectHideFlags: 0
@@ -10076,7 +10076,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 1
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &4537003710582098474
@@ -15173,7 +15173,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 3670488657036499933}
   - {fileID: 1635364846347097961}
-  sceneViewId: 2
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &1635364846347097961
