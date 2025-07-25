@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using static Unity.Burst.Intrinsics.X86.Avx;
 
 public class PaintableObj : MonoBehaviour
 {
@@ -10,16 +9,19 @@ public class PaintableObj : MonoBehaviour
     private Material splatMaterial; // 그려질 넓이, 강도 등 계산하는 메터리얼 (붓 같은 용도)
     private Material visualMeterial; // 플레이어에게 보여질 메터리얼
 
-    private RenderTexture splatMap; //최종적으로 그려질 텍스쳐
+    public RenderTexture splatMap; //최종적으로 그려질 텍스쳐
     private RenderTexture tempMap; // 합치기전 임시로 그릴 텍스쳐
 
     private CommandBuffer buffer;  // 그래픽 명령 (명령을 모아서 한번에 작업함)
 
     private int textureSize = 1024;
 
+    private TeamColorInfo teamColorInfo;
 
     private void Start()
     {
+        teamColorInfo = FindObjectOfType<TeamColorInfo>();
+
         splatMap = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBFloat);
         //잉크가 최종으로 저장될 텍스쳐 생성
 
@@ -48,15 +50,22 @@ public class PaintableObj : MonoBehaviour
 
     public void DrawInk(Vector3 worldPos, float radius, float hardness, float strength, Team team) //그리기 함수
     {
-        Color teamColor = FindObjectOfType<TeamColorInfo>().GetTeamColor(team);
-        teamColor.a = 1;
-        //팀정보를 토대로 팀컬러를 가져옴
+        //팀정보를 토대로 팀 인풋컬러를 가져옴
+        Color teamInputColor = teamColorInfo.GetTeamInputColor(team);
+
+        //visualMetarial에 넣어줄 팀컬러
+        Color team1Color = teamColorInfo.Team1Color;
+        Color team2Color = teamColorInfo.Team2Color;
+        
+        //visualMeterial 컬러 세팅
+        visualMeterial.SetColor("Color1", team1Color);
+        visualMeterial.SetColor("Color2", team2Color);
 
         splatMaterial.SetFloat(Shader.PropertyToID("_Radius"), radius);  //반지름 
         splatMaterial.SetFloat(Shader.PropertyToID("_Hardness"), hardness); // 선명도
         splatMaterial.SetFloat(Shader.PropertyToID("_Strength"), strength); // 강도
         splatMaterial.SetVector(Shader.PropertyToID("_SplatPos"), worldPos); // 그릴 위치
-        splatMaterial.SetVector(Shader.PropertyToID("_InkColor"), teamColor); // 팀 색깔
+        splatMaterial.SetVector(Shader.PropertyToID("_InkColor"), teamInputColor); // 팀 인풋 색깔
 
 
         buffer.SetRenderTarget(tempMap);
@@ -76,7 +85,6 @@ public class PaintableObj : MonoBehaviour
 
         buffer.Clear();
         //작업 목록 비워줌
-
-
     }
+
 }

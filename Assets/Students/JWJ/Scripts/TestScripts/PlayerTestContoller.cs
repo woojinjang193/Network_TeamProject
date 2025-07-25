@@ -46,6 +46,9 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
 
     void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         rigid = GetComponent<Rigidbody>();
         cam = GetComponentInChildren<Camera>();
         weaponView = inkParticleGun.GetComponent<PhotonView>();
@@ -56,8 +59,7 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
             mycamera.transform.localPosition = new Vector3(1.2f, 0.8f, -3f);
             Debug.Log("카메라 생성");
         }
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+
     }
 
     void Update()
