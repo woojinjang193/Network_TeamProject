@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerInput : MonoBehaviour
@@ -9,8 +7,11 @@ public class PlayerInput : MonoBehaviour
     public bool IsJumpPressed { get; private set; }
     public bool IsSquidHeld { get; private set; }
     public bool IsRecenterPressed { get; private set; }
+    public bool IsFirePressed { get; private set; }
+    public bool IsFireReleased { get; private set; }
+    public bool IsFireHeld { get; private set; }
 
-    private PlayerControls playerControls; 
+    private PlayerControls playerControls;
 
     private void Awake()
     {
@@ -34,5 +35,8 @@ public class PlayerInput : MonoBehaviour
         IsJumpPressed = playerControls.Player.Jump.WasPressedThisFrame();
         IsSquidHeld = playerControls.Player.Squid.IsPressed();
         IsRecenterPressed = playerControls.Player.RecenterCamera.WasPressedThisFrame();
+        IsFirePressed = playerControls.Player.Fire.WasPressedThisFrame();
+        IsFireReleased = playerControls.Player.Fire.WasReleasedThisFrame();
+        IsFireHeld = playerControls.Player.Fire.IsPressed();
     }
 }
