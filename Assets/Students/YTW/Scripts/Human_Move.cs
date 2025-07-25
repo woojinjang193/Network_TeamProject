@@ -36,7 +36,14 @@ public class Human_Move : PlayerState
     public override void FixedUpdate()
     {
         SetMove(player.moveSpeed);
-        SetPlayerRotation();
+        if (player.input.IsFireHeld)
+        {
+            player.LookAround(); // 카메라 방향을 보도록 PlayerController의 함수 호출
+        }
+        else
+        {
+            SetPlayerRotation(); // 이동 방향을 보도록 PlayerState의 함수 호출
+        }
         UpdateAnimationParameters();
     }
     private void UpdateAnimationParameters()

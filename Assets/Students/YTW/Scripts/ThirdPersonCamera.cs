@@ -68,5 +68,12 @@ public class ThirdPersonCamera : MonoBehaviour
         cameraTransform.rotation = rotation;
         _yRotation = cameraTransform.rotation.eulerAngles.y;
     }
+
+    public void Recenter(Vector3 targetForward)
+    {
+        float targetYRotation = Quaternion.LookRotation(targetForward).eulerAngles.y;
+        _offsetX = targetYRotation;
+        _offsetY = 15.0f;
+    }
 }
 
