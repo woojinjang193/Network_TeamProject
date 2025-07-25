@@ -1,9 +1,13 @@
 using Photon.Pun;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using UnityEngine;
+
+public enum InkStatus { NONE, OUR_TEAM, ENEMY_TEAM }
 
 public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 {
+
     public StateMachine stateMachine { get; private set; }
     public Dictionary<HighState, PlayerState> highStateDic { get; private set; }
 
@@ -29,7 +33,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public SkinnedMeshRenderer squidRenderer;
 
     [Header("플레이어 설정")]
-    public float turnSensitivity = 200f;
     public LayerMask groundLayer;
     public float moveSpeed = 5f;
     public float humanJumpForce = 15f;
@@ -48,6 +51,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private TeamColorInfo teamColorInfo;
     public Team myTeam { get; private set; } = Team.None;
 
+    [Header("잉크 상호작용 설정")]
+    [Tooltip("잉크가 칠해질 수 있는 오브젝트의 레이어")]
+    public LayerMask inkableLayer;
+    [Tooltip("적 팀 잉크 위에서의 이동 속도 감소 배율")]
+    [Range(0.1f, 1f)]
+    public float enemyInkSpeedModifier = 0.5f;
+
     // 네트워크
     private Vector3 networkPosition;
     private Quaternion networkRotation;
@@ -55,6 +65,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private float networkMoveX = 0f;
     private float networkMoveZ = 0f;
 
+    // 잉크 감지 시스템
+    public bool IsGrounded { get; private set; } = false;
+    public InkStatus CurrentGroundInkStatus { get; private set; } = InkStatus.NONE;
+    public InkStatus CurrentWallInkStatus { get; private set; } = InkStatus.NONE;
+    public bool IsOnWalkableWall { get; private set; } = false;
+    public Vector3 WallNormal { get; private set; } = Vector3.zero;
 
     void Awake()
     {
@@ -81,6 +97,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             rig.isKinematic = true;
         }
+
     }
 
     void Start()
@@ -119,6 +136,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (photonView.IsMine)
         {
+            GroundAndInkCheck();
+
             if (stateMachine != null)
             {
                 stateMachine.Update();
@@ -133,6 +152,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                     tpsCamera.Recenter(transform.forward);
                 }
             }
+
         }
         else
         {
@@ -152,6 +172,99 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         
         UpdatePlayerColor();
     }
+
+    private void GroundAndInkCheck()
+    {
+        LayerMask combinedLayer = groundLayer | inkableLayer;
+        Vector3 groundRayStart = transform.position + Vector3.up * 0.1f;
+        float groundRayDistance = 0.3f; // Raycast 길이를 안정적으로 수정
+
+        Debug.DrawRay(groundRayStart, Vector3.down * groundRayDistance, Color.red);
+
+        // 바닥 체크
+        if (Physics.Raycast(groundRayStart, Vector3.down, out RaycastHit groundHit, groundRayDistance, combinedLayer))
+        {
+            IsGrounded = true;
+            if (groundHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
+            {
+                // 잉크 색상은 비동기로 읽어오므로, 이 값은 약간의 딜레이가 있을 수 있음
+                SplatmapReader.ReadPixel(paintableObj.splatMap, groundHit.textureCoord, OnGroundColorRead);
+            }
+            else
+            {
+                CurrentGroundInkStatus = InkStatus.NONE;
+            }
+        }
+        else
+        {
+            IsGrounded = false;
+            CurrentGroundInkStatus = InkStatus.NONE;
+        }
+
+        // 벽 체크
+        Vector3 wallRayStart = transform.position + Vector3.up * 0.5f;
+        float wallRayDistance = 1f;
+        Debug.DrawRay(wallRayStart, transform.forward * wallRayDistance, Color.blue);
+
+        if (Physics.Raycast(wallRayStart, transform.forward, out RaycastHit wallHit, wallRayDistance, inkableLayer))
+        {
+            if (wallHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
+            {
+                SplatmapReader.ReadPixel(paintableObj.splatMap, wallHit.textureCoord, OnWallColorRead);
+            }
+            else
+            {
+                CurrentWallInkStatus = InkStatus.NONE;
+                IsOnWalkableWall = false;
+            }
+        }
+        else
+        {
+            CurrentWallInkStatus = InkStatus.NONE;
+            IsOnWalkableWall = false;
+        }
+    }
+
+
+    private void OnGroundColorRead(Color color)
+    {
+        Debug.Log($"<color=yellow>읽어온 바닥 색상 (RGBA): ({color.r}, {color.g}, {color.b}, {color.a})</color>");
+        CurrentGroundInkStatus = GetInkStatusFromColor(color);
+        Debug.Log($"<color=green>최종 바닥 잉크 상태: {CurrentGroundInkStatus}</color>");
+    }
+
+    private void OnWallColorRead(Color color)
+    {
+        CurrentWallInkStatus = GetInkStatusFromColor(color);
+        IsOnWalkableWall = (CurrentWallInkStatus == InkStatus.OUR_TEAM);
+    }
+
+    private InkStatus GetInkStatusFromColor(Color color)
+    {
+        if (color.a < 0.1f) return InkStatus.NONE;
+
+        Color myTeamInputColor = teamColorInfo.GetTeamInputColor(myTeam);
+
+        Team enemyTeam = (myTeam == Team.Team1) ? Team.Team2 : Team.Team1;
+        if (myTeam == Team.None) enemyTeam = Team.None;
+        Color enemyTeamInputColor = teamColorInfo.GetTeamInputColor(enemyTeam);
+
+        float diffToMyTeam = Mathf.Abs(color.r - myTeamInputColor.r) + Mathf.Abs(color.g - myTeamInputColor.g) + Mathf.Abs(color.b - myTeamInputColor.b);
+        float diffToEnemyTeam = Mathf.Abs(color.r - enemyTeamInputColor.r) + Mathf.Abs(color.g - enemyTeamInputColor.g) + Mathf.Abs(color.b - enemyTeamInputColor.b);
+
+        // 더 가까운 색상의 팀으로 판정하되, 색상 차이가 일정 임계값(0.1f)보다 작아야 함
+        if (diffToMyTeam < 0.1f && diffToMyTeam < diffToEnemyTeam)
+        {
+            return InkStatus.OUR_TEAM;
+        }
+        else if (diffToEnemyTeam < 0.1f && diffToEnemyTeam < diffToMyTeam)
+        {
+            return InkStatus.ENEMY_TEAM;
+        }
+
+        return InkStatus.NONE;
+    }
+
 
     void LateUpdate()
     {
@@ -177,6 +290,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         transform.eulerAngles = playerRotation;
     }
 
+    // test용
     private void HandleTeamSelection()
     {
         if (Input.GetKeyDown(KeyCode.Z))

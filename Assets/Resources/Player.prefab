@@ -5054,10 +5054,9 @@ MonoBehaviour:
   squidModel: {fileID: 4322107737467862600}
   playerRenderer: {fileID: 0}
   squidRenderer: {fileID: 0}
-  turnSensitivity: 200
   groundLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 64
   moveSpeed: 10
   humanJumpForce: 15
   squidJumpForce: 15
@@ -5066,6 +5065,10 @@ MonoBehaviour:
   fallingGravityScale: 7
   inkParticleGun: {fileID: 7913461193663327876}
   weaponView: {fileID: 0}
+  inkableLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  enemyInkSpeedModifier: 0.5
 --- !u!114 &2401178482321953882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5086,7 +5089,7 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 3269185156740101088}
-  sceneViewId: 2
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &592276882897477744
@@ -10636,7 +10639,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 1
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &5879017347163355587

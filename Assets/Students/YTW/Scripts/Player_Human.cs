@@ -37,9 +37,17 @@ public class Player_Human : PlayerState
 
         HandleShooting();
 
-        if (IsGrounded() && player.input.IsSquidHeld)
+        if (player.input.IsSquidHeld)
         {
-            this.stateMachine.ChangeState(player.highStateDic[HighState.SquidForm]);
+            // 땅에 있고 우리팀 잉크 위일 때만 변신
+            if (player.IsGrounded && player.CurrentGroundInkStatus == InkStatus.OUR_TEAM)
+            {
+                this.stateMachine.ChangeState(player.highStateDic[HighState.SquidForm]);
+            }
+            else if (player.input.IsSquidHeld)
+            {
+                Debug.Log("<color=orange>오징어 변신 실패: 우리 팀 잉크 위가 아닙니다.</color>");
+            }
         }
 
     }

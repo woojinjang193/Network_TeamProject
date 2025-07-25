@@ -35,14 +35,20 @@ public class Human_Move : PlayerState
 
     public override void FixedUpdate()
     {
-        SetMove(player.moveSpeed);
+        float currentSpeed = player.moveSpeed;
+        if (player.CurrentGroundInkStatus == InkStatus.ENEMY_TEAM)
+        {
+            currentSpeed *= player.enemyInkSpeedModifier;
+        }
+        SetMove(currentSpeed);
+
         if (player.input.IsFireHeld)
         {
-            player.LookAround(); // 카메라 방향을 보도록 PlayerController의 함수 호출
+            player.LookAround();
         }
         else
         {
-            SetPlayerRotation(); // 이동 방향을 보도록 PlayerState의 함수 호출
+            SetPlayerRotation();
         }
         UpdateAnimationParameters();
     }
