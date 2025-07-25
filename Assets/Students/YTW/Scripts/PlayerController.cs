@@ -177,7 +177,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         LayerMask combinedLayer = groundLayer | inkableLayer;
         Vector3 groundRayStart = transform.position + Vector3.up * 0.1f;
-        float groundRayDistance = 0.3f; // Raycast 길이를 안정적으로 수정
+        float groundRayDistance = 1.5f; // Raycast 길이를 안정적으로 수정
 
         Debug.DrawRay(groundRayStart, Vector3.down * groundRayDistance, Color.red);
 
