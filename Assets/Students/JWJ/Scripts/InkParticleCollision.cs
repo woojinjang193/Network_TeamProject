@@ -10,7 +10,7 @@ public class InkParticleCollision : MonoBehaviour
     List<ParticleCollisionEvent> events = new();  //파티클 충돌 이벤트, 파티클 충돌 이벤트는 리스트로 넣어야함
 
     [SerializeField] private float radius;  //반지름
-    [SerializeField] private float hardness; // 강도
+    [SerializeField] private float hardness; // 원 선명도
     [SerializeField] private float strength; // 강도?
 
     private void Awake()

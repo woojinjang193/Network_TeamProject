@@ -4959,7 +4959,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 3
   hardness: 0
-  strength: 0.2
+  strength: 0.5
 --- !u!1 &1497930883175639059
 GameObject:
   m_ObjectHideFlags: 0

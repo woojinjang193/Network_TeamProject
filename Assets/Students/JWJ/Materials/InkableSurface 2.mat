@@ -20,8 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: InkableSurface 1
-  m_Shader: {fileID: -6465566751694194690, guid: af82faa0e86a12146a26d84ddabfd9ab, type: 3}
+  m_Name: InkableSurface 2
+  m_Shader: {fileID: -6465566751694194690, guid: 8fcfafac6d61c594aa07f3a31fa17dc8, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -41,15 +41,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_d5eef962d1c14d359542b6658910d8c2_1:
-        m_Texture: {fileID: 2800000, guid: f0086dae6c3e1014e8a2ccd19939521c, type: 3}
+        m_Texture: {fileID: 2800000, guid: 12060e93480d589449e6a442a70691c6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_d5eef962d1c14d359542b6658910d8c2_2:
-        m_Texture: {fileID: 2800000, guid: f0086dae6c3e1014e8a2ccd19939521c, type: 3}
+        m_Texture: {fileID: 2800000, guid: 12060e93480d589449e6a442a70691c6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_d5eef962d1c14d359542b6658910d8c2_3:
-        m_Texture: {fileID: 2800000, guid: f0086dae6c3e1014e8a2ccd19939521c, type: 3}
+        m_Texture: {fileID: 2800000, guid: 12060e93480d589449e6a442a70691c6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_e8340a2afea5458f9edc914beb601c62:
@@ -65,7 +65,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Splatmap:
-        m_Texture: {fileID: 8400000, guid: 194ae1d86b4c3b341b0772515319ffd5, type: 2}
+        m_Texture: {fileID: 8400000, guid: 8ee24612610e05a46b477a566c78b5a5, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - splatmap:
@@ -91,8 +91,6 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - Color1: {r: 0.19424175, g: 0.31033012, b: 0.9150943, a: 0}
-    - Color2: {r: 0.8962264, g: 0.8029305, b: 0.16487186, a: 0}
     - Color_243c94d567a6495a86b9b3c52087cf64: {r: 0.21007515, g: 0.16487186, b: 0.8962264, a: 0}
     - Color_28cde616faab479d80713dc8ad4c24c9: {r: 0.23641238, g: 0.8396226, b: 0.17822176, a: 0}
     - Color_69c341b3c9484738b42da460ae0c200f: {r: 0.8191194, g: 0.8490566, b: 0.19624422, a: 0}
