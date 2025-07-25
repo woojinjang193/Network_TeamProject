@@ -84,9 +84,10 @@ public class InkParticleCollision : MonoBehaviour
             //충돌한 파티클 수 만큼 반복
         {
             Vector3 hitPos = enter[i].position;
+            Debug.Log($"Pos {hitPos.x}, {hitPos.y}, {hitPos.z}");
             //충돌 위치
 
-            Collider[] colliders = Physics.OverlapSphere(hitPos, 0.1f);
+            Collider[] colliders = Physics.OverlapSphere(hitPos, 0.5f);
             //충돌 위치 주변 콜라이더 탐색
 
             foreach (Collider collider in colliders)
