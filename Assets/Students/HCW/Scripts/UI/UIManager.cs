@@ -6,56 +6,60 @@ public class UIManager : MonoBehaviour
 {
     [SerializeField] private List<BaseUI> uiPanels;
     [SerializeField] private BaseUI startPanel;
-    private BaseUI currentActivePanel;
 
-    // 시작시 모든 UI 패널 비활성화
+    private Stack<BaseUI> uiStack = new Stack<BaseUI>();
+
     private void Awake()
     {
+        // 모든 UI 패널을 비활성화 상태로 초기화
         foreach (var panel in uiPanels)
         {
-            panel.Close();
+            panel.gameObject.SetActive(false);
         }
     }
 
     private void Start()
     {
-        // 시작 패널을 활성화
         if (startPanel != null)
         {
             ShowUI(startPanel.GetType());
         }
     }
 
-    // UI 활성화 메서드
+    // 새 UI를 열고 스택에 추가
     public void ShowUI(System.Type uiType)
     {
-        // 중복 방지
-        if (currentActivePanel != null && currentActivePanel.GetType() == uiType)
+        // 현재 활성화된 UI가 있다면 비활성화
+        if (uiStack.Count > 0)
         {
-            return;
+            BaseUI currentUI = uiStack.Peek();
+            if (currentUI.GetType() == uiType) return; // 이미 열려있으면 무시
+            currentUI.Close();
         }
-        // 열고자 하는 UI 타입과 일치하는 패널을 리스트에서 찾음
+
         BaseUI uiToShow = uiPanels.FirstOrDefault(panel => panel.GetType() == uiType);
 
         if (uiToShow != null)
         {
-            if (currentActivePanel != null)
-            {
-                currentActivePanel.Close();
-            }
-            // 새 UI을 열고 현재 활성화 패널로 등록
             uiToShow.Open();
-            currentActivePanel = uiToShow;
+            uiStack.Push(uiToShow);
         }
     }
 
-    // 열려있는 UI 비활성화 메서드
+    // 현재 UI를 닫고 이전 UI를 다시 활성화
     public void CloseCurrentUI()
     {
-        if (currentActivePanel != null)
+        if (uiStack.Count > 0)
         {
-            currentActivePanel.Close();
-            currentActivePanel = null;
+            BaseUI uiToClose = uiStack.Pop();
+            uiToClose.Close();
+
+            // 스택에 다른 UI가 남아있다면, 가장 위의 UI를 다시 활성화
+            if (uiStack.Count > 0)
+            {
+                BaseUI previousUI = uiStack.Peek();
+                previousUI.Open();
+            }
         }
     }
 }
