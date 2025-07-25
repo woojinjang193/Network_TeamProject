@@ -54,11 +54,11 @@ public class ThirdPersonCamera : MonoBehaviour
         _offsetX += mouseX * xSensitivity;
         if (invertY)
         {
-            _offsetY += mouseY * ySensitivity; // 마우스를 내리면 위로 (반전 O)
+            _offsetY += mouseY * ySensitivity;
         }
         else
         {
-            _offsetY -= mouseY * ySensitivity; // 마우스를 내리면 아래로 (반전 X, 기본값)
+            _offsetY -= mouseY * ySensitivity; 
         }
         _offsetY = Mathf.Clamp(_offsetY, yMin, yMax);
         Vector3 targetPosition = followTransform.position + Vector3.up * heightOffset;
@@ -67,6 +67,13 @@ public class ThirdPersonCamera : MonoBehaviour
         cameraTransform.position = targetPosition + (rotation * direction);
         cameraTransform.rotation = rotation;
         _yRotation = cameraTransform.rotation.eulerAngles.y;
+    }
+
+    public void Recenter(Vector3 targetForward)
+    {
+        float targetYRotation = Quaternion.LookRotation(targetForward).eulerAngles.y;
+        _offsetX = targetYRotation;
+        _offsetY = 15.0f;
     }
 }
 

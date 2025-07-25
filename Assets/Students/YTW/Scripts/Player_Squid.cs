@@ -7,6 +7,9 @@ public class Player_Squid : PlayerState
     private StateMachine subStateMachine;
     public Dictionary<LowState, BaseState> lowStateDic { get; private set; }
 
+    private float revertTimer = 0f;
+    private const float REVERT_DELAY = 0.2f;
+
     public Player_Squid(PlayerController player, StateMachine stateMachine) : base(player, stateMachine)
     {
         HasPhysics = true;
@@ -28,6 +31,7 @@ public class Player_Squid : PlayerState
         player.rig.useGravity = false;
         player.rig.velocity = Vector3.zero;
 
+        revertTimer = 0f;
         subStateMachine.Initialize(lowStateDic[LowState.Idle]);
     }
 
@@ -38,8 +42,25 @@ public class Player_Squid : PlayerState
         if (!player.input.IsSquidHeld)
         {
             this.stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
+            return;
+        }
+
+        bool onOurInk = player.CurrentGroundInkStatus == InkStatus.OUR_TEAM || player.IsOnWalkableWall;
+
+        if (onOurInk)
+        {
+            revertTimer = 0f;
+        }
+        else
+        {
+            revertTimer += Time.deltaTime;
+            if (revertTimer >= REVERT_DELAY)
+            {
+                this.stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
+            }
         }
     }
+    
 
     public override void FixedUpdate()
     {

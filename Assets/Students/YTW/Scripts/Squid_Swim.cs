@@ -17,6 +17,24 @@ public class Squid_Swim : PlayerState
     }
     public override void FixedUpdate()
     {
+        if (player.IsOnWalkableWall && player.input.MoveInput.y > 0.1f)
+        {
+            ClimbWall();
+        }
+        else
+        {
+            SwimOnGround();
+        }
+    }
+
+    private void ClimbWall()
+    {
+        Vector3 wallClimbVelocity = Vector3.up * player.squidSpeed;
+        player.rig.velocity = wallClimbVelocity;
+    }
+
+    private void SwimOnGround()
+    {
         SetMove(player.squidSpeed);
         SetPlayerRotation();
     }

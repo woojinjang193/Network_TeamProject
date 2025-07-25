@@ -48,12 +48,7 @@ public class PlayerState : BaseState
 
     protected bool IsGrounded()
     {
-        float rayDistance = 1.1f;
-        bool isGrounded = Physics.Raycast(player.transform.position, Vector3.down, rayDistance, player.groundLayer);
-
-        Debug.DrawRay(player.transform.position, Vector3.down * rayDistance, Color.red);
-
-        return isGrounded;
+        return player.IsGrounded;
     }
 
     protected void Die()
