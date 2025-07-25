@@ -6,5 +6,6 @@ public class Manager
 {
     public static GameManager Game => GameManager.GetInstance();
     public static AudioManager Audio => AudioManager.GetInstance();
+    public static GridManager Grid => GridManager.GetInstance();
 
 }

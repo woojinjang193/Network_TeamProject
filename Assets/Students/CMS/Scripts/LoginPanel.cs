@@ -36,7 +36,14 @@ public class LoginPanel : MonoBehaviour
 
     private void Login()
     {
-        FirebaseManager.Auth.SignInWithEmailAndPasswordAsync(idInput.text, passwordInput.text)
+        Debug.Log("로그인 버튼 클릭됨");
+
+        string email = idInput.text;
+        string password = passwordInput.text;
+
+        Debug.Log($"입력된 이메일: {email}, 비밀번호 길이: {password.Length}");
+
+        FirebaseManager.Auth.SignInWithEmailAndPasswordAsync(email, password)
             .ContinueWithOnMainThread(task =>
             {
                 if (task.IsCanceled || task.IsFaulted)
@@ -46,10 +53,13 @@ public class LoginPanel : MonoBehaviour
                 }
 
                 FirebaseUser user = task.Result.User;
-                Debug.Log("로그인 성공!");
+                Debug.Log("로그인 성공");
+                Debug.Log($"이메일 인증 여부: {user.IsEmailVerified}");
+                Debug.Log($"닉네임(DisplayName): {user.DisplayName}");
 
                 if (!user.IsEmailVerified)
                 {
+                    Debug.Log("이메일 인증 안 됨 이메일 인증 패널로 전환");
                     emailPanel.SetActive(true);
                     gameObject.SetActive(false);
                     return;
@@ -57,19 +67,28 @@ public class LoginPanel : MonoBehaviour
 
                 if (string.IsNullOrEmpty(user.DisplayName))
                 {
+                    Debug.Log("닉네임이 설정되지 않음 닉네임 설정 패널로 전환");
                     nicknamePanel.SetActive(true);
                     gameObject.SetActive(false);
                     return;
                 }
 
-                // Firebase 닉네임을 Photon에 등록
                 PhotonNetwork.NickName = user.DisplayName;
+                Debug.Log("Photon 닉네임 설정 완료");
 
-                //네트워크 연결 시도
-                PhotonNetwork.ConnectUsingSettings();
+                if (!PhotonNetwork.IsConnected)
+                {
+                    Debug.Log("Photon 서버에 연결되지 않음 연결 시도 중");
+                    PhotonNetwork.ConnectUsingSettings();
+                    NetworkManager.Instance.ShowLoading();
+                }
+                else
+                {
+                    Debug.Log("Photon 서버에 이미 연결됨 로비로 바로 이동");
+                    NetworkManager.Instance.ShowLobby();
+                }
 
-                //로딩 패널 표시
-                NetworkManager.Instance.ShowLoading();  // 아래에 구현
+                gameObject.SetActive(false);
             });
     }
 

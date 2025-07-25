@@ -50,27 +50,22 @@ public class PaintableObj : MonoBehaviour
 
     public void DrawInk(Vector3 worldPos, float radius, float hardness, float strength, Team team) //그리기 함수
     {
-        //팀정보를 토대로 팀컬러를 가져옴
-        Color teamcolor = teamColorInfo.GetTeamColor(team);
+        //팀정보를 토대로 팀 인풋컬러를 가져옴
+        Color teamInputColor = teamColorInfo.GetTeamInputColor(team);
 
         //visualMetarial에 넣어줄 팀컬러
         Color team1Color = teamColorInfo.Team1Color;
         Color team2Color = teamColorInfo.Team2Color;
-
-        //알파값
-        teamcolor.a = 0.45f;
-        team1Color.a = 0.45f;
-        team2Color.a = 0.45f;
         
         //visualMeterial 컬러 세팅
-        //visualMeterial.SetColor("Color1", team2Color);
-        //visualMeterial.SetColor("Color2", team1Color);
+        visualMeterial.SetColor("Color1", team1Color);
+        visualMeterial.SetColor("Color2", team2Color);
 
         splatMaterial.SetFloat(Shader.PropertyToID("_Radius"), radius);  //반지름 
         splatMaterial.SetFloat(Shader.PropertyToID("_Hardness"), hardness); // 선명도
         splatMaterial.SetFloat(Shader.PropertyToID("_Strength"), strength); // 강도
         splatMaterial.SetVector(Shader.PropertyToID("_SplatPos"), worldPos); // 그릴 위치
-        splatMaterial.SetVector(Shader.PropertyToID("_InkColor"), teamcolor); // 팀 색깔
+        splatMaterial.SetVector(Shader.PropertyToID("_InkColor"), teamInputColor); // 팀 인풋 색깔
 
 
         buffer.SetRenderTarget(tempMap);
