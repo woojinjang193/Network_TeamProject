@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Bullet
+  - Ink
+  - Grid
   layers:
   - Default
   - TransparentFX
@@ -13,9 +15,9 @@ TagManager:
   - Water
   - UI
   - Paintable
-  - 
-  - 
-  - 
+  - Ground
+  - Player
+  - Invincible
   - 
   - 
   - 

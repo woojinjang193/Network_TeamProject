@@ -102,5 +102,17 @@ InitTestScene*.unity*
 /Assets/ExternalDependencyManager
 /Assets/Firebase
 /Assets/Plugins
+
 Assets/google-services.json
 Assets/google-services.json.meta
+Assets/google-services-desktop.json
+Assets/google-services-desktop.json.meta
+Assets/StreamingAssets.meta
+Assets/StreamingAssets/google-services-desktop.json
+Assets/StreamingAssets/google-services-desktop.json.meta
+Assets/StreamingAssets/google-services.json
+Assets/StreamingAssets/google-services.json.meta
+Assets/StreamingAssets/google-services-desktop.json
+Assets/StreamingAssets/google-services-desktop.json.meta
+Assets/TextMesh Pro
+Assets/TextMesh Pro.meta

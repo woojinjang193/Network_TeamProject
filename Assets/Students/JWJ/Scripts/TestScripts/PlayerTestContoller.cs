@@ -20,7 +20,7 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
     private TeamColorInfo teamColorInfo;
     private Rigidbody rigid;
     private Camera cam;
-    private PhotonView weaponView;
+    private PhotonView weaponView; ////////////
 
     float cameraRotationX = 0;
     float cameraRotationY = 0;
@@ -32,11 +32,11 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
     {
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
     }
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) //¿Ã∞≈ ππ¿”?
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) //Ïù¥Í±∞ Î≠êÏûÑ?
     {
         if (stream.IsWriting)
         {
-            stream.SendNext((int)myTeam);  //¿Ã∞≈ int∑Œ ø÷ πŸ≤ﬁ?
+            stream.SendNext((int)myTeam);
         }
         else if (stream.IsReading)
         {
@@ -46,6 +46,9 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
 
     void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         rigid = GetComponent<Rigidbody>();
         cam = GetComponentInChildren<Camera>();
         weaponView = inkParticleGun.GetComponent<PhotonView>();
@@ -54,10 +57,9 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
         {
             GameObject mycamera = Instantiate(cameraprefab, cameraPivot);
             mycamera.transform.localPosition = new Vector3(1.2f, 0.8f, -3f);
-            Debug.Log("ƒ´∏ﬁ∂Û ª˝º∫");
+            Debug.Log("Ïπ¥Î©îÎùº ÏÉùÏÑ±");
         }
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+
     }
 
     void Update()
@@ -71,8 +73,8 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
 
             if (Input.GetMouseButtonDown(0))
             {
-                //photonView.RPC("FireInk", RpcTarget.AllViaServer, myTeam); //≈ıªÁ√ºπﬂªÁ
-                weaponView.RPC("FireParticle", RpcTarget.AllViaServer, myTeam, true); //∆ƒ∆º≈¨ ∞¯∞›
+                //photonView.RPC("FireInk", RpcTarget.AllViaServer, myTeam); //Ìà¨ÏÇ¨Ï≤¥Î∞úÏÇ¨
+                weaponView.RPC("FireParticle", RpcTarget.AllViaServer, myTeam, true); //ÌååÌã∞ÌÅ¥ Í≥µÍ≤©
 
             }
 
@@ -92,12 +94,12 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
             if (Input.GetKeyDown(KeyCode.Z))
             {
                 myTeam = Team.Team1;
-                Debug.Log($"∆¿∫Ø∞Ê: {myTeam}");
+                Debug.Log($"ÌåÄÎ≥ÄÍ≤Ω: {myTeam}");
             }
             if (Input.GetKeyDown(KeyCode.X))
             {
                 myTeam = Team.Team2;
-                Debug.Log($"∆¿∫Ø∞Ê: {myTeam}");
+                Debug.Log($"ÌåÄÎ≥ÄÍ≤Ω: {myTeam}");
             }
         }
         
