@@ -914,8 +914,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b09e724f1db35148970352d8eb6d9ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team1Color: {r: 0, g: 0.06795311, b: 1, a: 0}
-  team2Color: {r: 0, g: 1, b: 0, a: 0}
+  team1Color: {r: 1, g: 0, b: 0.9919772, a: 0}
+  team2Color: {r: 0, g: 0.10148144, b: 1, a: 0}
 --- !u!4 &820019270
 Transform:
   m_ObjectHideFlags: 0
