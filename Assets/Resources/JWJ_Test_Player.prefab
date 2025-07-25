@@ -4957,9 +4957,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15de207409c239a45a33e377cd16fb78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 5
+  radius: 3
   hardness: 0
-  strength: 0.1
+  strength: 0.5
 --- !u!1 &1497930883175639059
 GameObject:
   m_ObjectHideFlags: 0
@@ -14986,7 +14986,7 @@ GameObject:
   - component: {fileID: 1635364846347097961}
   m_Layer: 0
   m_Name: PlayerBody
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

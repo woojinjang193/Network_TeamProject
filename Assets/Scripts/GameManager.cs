@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
 {
+    public bool IsGameEnd {  get; private set; }
     public static GameManager GetInstance() => Instance;
     protected override void Awake()
     {
@@ -12,17 +13,18 @@ public class GameManager : Singleton<GameManager>
     }
     private void Start()
     {
-        Debug.Log("°ÔÀÓ¸Å´ÏÀú ½ºÅ¸Æ®");
+        Debug.Log("ê²Œì„ë§¤ë‹ˆì € ìŠ¤íƒ€íŠ¸");
     }
 
     public void GameStart()
     {
-        Debug.Log("°ÔÀÓ ½ºÅ¸Æ®");
+        Debug.Log("ê²Œì„ ìŠ¤íƒ€íŠ¸");
     }
 
     public void GameEnd()
     {
-        Debug.Log("°ÔÀÓ ¿£µå");
+        Debug.Log("ê²Œì„ ì—”ë“œ");
+        
     }
 
 
