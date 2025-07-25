@@ -18,6 +18,12 @@ public class ChaseState : AIBaseState
             return;
         }
 
+        float distance = Vector3.Distance(_controller.transform.position, target.position);
+        if(distance > 10f)
+        {
+            _controller.StateMachine.SetState(new IdleState(_controller));
+        }
+
         _controller.MoveModule.MoveTo(target.position);
         _controller.FireModule.FireAt(target);
     }
