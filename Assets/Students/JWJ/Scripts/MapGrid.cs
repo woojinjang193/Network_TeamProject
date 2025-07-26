@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Grid : MonoBehaviour
+public class MapGrid : MonoBehaviour
 {
     public Team team = Team.None;
 
@@ -10,7 +10,7 @@ public class Grid : MonoBehaviour
     {
         Manager.Grid.RegisterGrid(this);
         //그리드를 매니저에 등록
-        Debug.Log($"그리드등록 {this.name}");
+        //Debug.Log($"그리드등록 {this.name}");
     }
 
     public void SetGrid(Team newTeam)
