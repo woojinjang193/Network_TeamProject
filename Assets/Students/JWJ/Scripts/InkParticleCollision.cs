@@ -1,9 +1,11 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리하는 클래스
 {
+    private PhotonView photonView;
     private TeamColorInfo teamColorInfo;  //팀컬러 정보
     private Team myTeam; //팀 정보
     private ParticleSystem particleSys; // 충돌이벤트를 위한 파티클시스템 변수
@@ -22,6 +24,8 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
 
     private void Awake()
     {
+        photonView = GetComponent<PhotonView>();
+        //포톤뷰
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
         //팀컬러 정보를 가져옴
         particleSys = GetComponent<ParticleSystem>();
@@ -73,6 +77,10 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
 
     private void OnParticleCollision(GameObject other)
     {
+        if (!photonView.IsMine)
+        {
+            return;
+        }
         events.Clear(); //이벤트 실행전 초기화
         int count = particleSys.GetCollisionEvents(other, events);
         //충돌한 파티클 수

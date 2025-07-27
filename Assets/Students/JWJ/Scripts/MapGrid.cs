@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class MapGrid : MonoBehaviour
@@ -17,13 +18,15 @@ public class MapGrid : MonoBehaviour
     {
         if(team == newTeam) // 이미 같은팀의 그리드라면
         {
-            Debug.Log($"이미 {newTeam}의 영역입니다.");
+            //Debug.Log($"이미 {newTeam}의 영역입니다.");
             return;
         }
+        Team oldTeam = team;
+        //팀 정보 변경 전 원래 팀을 oldTeam에 저장
         team = newTeam;
-        Debug.Log($"{newTeam}으로 그리드 변경.");
-        Manager.Grid.UpdateCoverageRate();
+        //새 팀을 업데이트
+        //Debug.Log($"{newTeam}으로 그리드 변경.");
+        Manager.Grid.ChangeGridTeam(oldTeam, newTeam);
         //변경사항 업데이트
-
     }
 }

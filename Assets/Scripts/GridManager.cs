@@ -42,40 +42,50 @@ public class GridManager : Singleton<GridManager>
         return gridDic[obj.name];
     }    
 
-    public List<MapGrid> GetAllGrids()
+    public List<MapGrid> GetAllGrids() //InkParticleCollision 에서 한번 호출
     {
         return gridDic.Values.ToList();
         //딕셔너리를 리스트로 바꿔서 반환
     }
 
-    public void UpdateCoverageRate()
+    public void ChangeGridTeam(Team oldTeam, Team newTeam)
     {
-        int total = gridDic.Count;
-        int team1 = 0;
-        int team2 = 0;
-        int none = 0;
-
-        foreach (MapGrid grid in gridDic.Values)  //그리드에서 이벤트로 ++ 넘겨줌 수정 해야함
+        if(oldTeam == Team.Team1)
         {
-            if (grid.team == Team.Team1)
-            {
-                team1++;
-            }
-            else if (grid.team == Team.Team2)
-            {
-                team2++;
-            }
-            else
-            {
-                none++;
-            }
+            countTeam1--;
+        }
+        else if (oldTeam == Team.Team2)
+        {
+            countTeam2--;
+        }
+        else
+        {
+            countNone--;
+            //처음 업데이트시
         }
 
-        float team1Rate = team1 / (float)total * 100f;
-        float team2Rate = team2 / (float)total * 100f;
-        float NoneRate = none / (float)total * 100f;
+        if (newTeam == Team.Team1)
+        {
+            countTeam1++;
+        }
+        else if (newTeam == Team.Team2)
+        {
+            countTeam2++;
+        }
+        else
+        {
+            countNone++;
+            //처음 업데이트시
+        }
 
-        teamRateText.text = $"Team1 : {(int)team1Rate}%    Team2 : {(int)team2Rate}%";
-        //Debug.Log($"팀1 : {team1Rate}, 팀2 : {team2Rate}");
+        UpdateUI();
+    }
+
+    private void UpdateUI()
+    {
+        int total = gridDic.Count;
+        float Team1Rate = countTeam1 / (float)total * 100f;
+        float Team2Rate = countTeam2 / (float)total * 100f;
+        teamRateText.text = $"Team1 : {Team1Rate.ToString("F2")}%    Team2 : {Team2Rate.ToString("F2")}%";
     }
 }

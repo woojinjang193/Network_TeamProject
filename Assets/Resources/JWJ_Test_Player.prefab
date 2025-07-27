@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5509450797882254833}
   - component: {fileID: 7481462781204539067}
   - component: {fileID: 8915064683398671222}
+  - component: {fileID: 4096699370385428804}
   m_Layer: 0
   m_Name: Main Effect
   m_TagString: Ink
@@ -4961,6 +4962,28 @@ MonoBehaviour:
   radius: 3
   hardness: 0
   strength: 0.5
+--- !u!114 &4096699370385428804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110392417305599365}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1497930883175639059
 GameObject:
   m_ObjectHideFlags: 0
@@ -10058,6 +10081,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainParticle: {fileID: 5509450797882254833}
   fireEffect: {fileID: 6214434835510814591}
+  floorInkEffect: {fileID: 7048545097189694779}
   particleCollision: {fileID: 8915064683398671222}
 --- !u!114 &3232822812147173135
 MonoBehaviour:
