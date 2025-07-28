@@ -13,7 +13,10 @@ public class Human_Jump : PlayerState
 
     public override void Enter()
     {
-        Jump(player.humanJumpForce);
+        if (player.input.IsJumpPressed)
+        {
+            Jump(player.humanJumpForce);
+        }
         // player.animator.SetTrigger("HumanJump");
     }
 

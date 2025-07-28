@@ -77,18 +77,6 @@ public class Player_Human : PlayerState
     public override void FixedUpdate()
     {
         subStateMachine.FixedUpdate();
-
-        if (!IsGrounded())
-        {
-            if (player.rig.velocity.y >= 0)
-            {
-                player.rig.velocity += Vector3.up * Physics.gravity.y * (player.gravityScale - 1) * Time.fixedDeltaTime;
-            }
-            else
-            {
-                player.rig.velocity += Vector3.up * Physics.gravity.y * (player.fallingGravityScale - 1) * Time.fixedDeltaTime;
-            }
-        }
     }
 
     public override void Exit()

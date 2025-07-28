@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,12 +15,16 @@ public class Human_Move : PlayerState
 
     public override void Enter()
     {
-        Debug.Log("Human Move Enter");
         // player.humanAnimator.SetBool("isMoving", true);
     }
 
     public override void Update()
     {
+        if (!IsGrounded())
+        {
+            stateMachine.ChangeState(humanState.lowStateDic[LowState.Jump]);
+            return;
+        }
         if (IsGrounded() && player.input.IsJumpPressed)
         {
             // if(player.humanAnimator != null) player.humanAnimator.SetTrigger("Jump");
@@ -40,16 +45,21 @@ public class Human_Move : PlayerState
         {
             currentSpeed *= player.enemyInkSpeedModifier;
         }
-        SetMove(currentSpeed);
 
-        if (player.input.IsFireHeld)
+        if (IsGrounded())
         {
-            player.LookAround();
+            SetMove(currentSpeed);
+
+            if (player.input.IsFireHeld)
+            {
+                player.LookAround();
+            }
+            else
+            {
+                SetPlayerRotation();
+            }
         }
-        else
-        {
-            SetPlayerRotation();
-        }
+
         UpdateAnimationParameters();
     }
     private void UpdateAnimationParameters()
