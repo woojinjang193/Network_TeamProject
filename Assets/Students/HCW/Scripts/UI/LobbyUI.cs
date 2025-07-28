@@ -3,16 +3,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+// 로비 UI를 관리하는 스크립트
 public class LobbyUI : BaseUI
 {
-    [Header("Main Lobby Panel")]
+    [Header("메인 로비 패널")]
     [SerializeField] private GameObject mainLobbyPanel;
     [SerializeField] private Button createRoomButton;
     [SerializeField] private Button findRoomButton;
     [SerializeField] private Button logoutButton;
     [SerializeField] private GameObject characterDisplayPanel; // 캐릭터를 보여줄 패널
 
-    [Header("Room Panel")]
+    [Header("방 내부 패널")]
     [SerializeField] private GameObject roomPanel;
     [SerializeField] private TMP_Text roomNameText;
     [SerializeField] private Transform playerList;
@@ -21,12 +22,8 @@ public class LobbyUI : BaseUI
     [SerializeField] private Button startGameButton; // 방장만 활성화
     [SerializeField] private Button leaveRoomButton;
 
-    private UIManager uiManager;
-
     private void Awake()
     {
-        uiManager = FindObjectOfType<UIManager>();
-
         // 메인 로비 버튼 이벤트 연결
         createRoomButton.onClick.AddListener(OnCreateRoomButtonClicked);
         findRoomButton.onClick.AddListener(OnFindRoomButtonClicked);
@@ -67,45 +64,38 @@ public class LobbyUI : BaseUI
 
     private void OnCreateRoomButtonClicked()
     {
-        Debug.Log("방 생성 버튼 클릭");
+        Debug.Log("방 생성 버튼 클릭됨");
         // TODO: 방 생성 로직 (Photon 연동)
         ShowRoomUI("새로운 방"); // 임시로 방 화면 보여주기
     }
 
     private void OnFindRoomButtonClicked()
     {
-        Debug.Log("방 찾기 버튼 클릭");
-        if (uiManager != null)
-        {
-            uiManager.ShowUI(typeof(RoomListUI)); // RoomListUI를 띄우도록 변경
-        }
+        UIManager.Instance.PushUI(typeof(RoomListUI)); // RoomListUI를 띄우도록 변경
     }
 
     private void OnLogoutButtonClicked()
     {
-        Debug.Log("로그아웃 버튼 클릭");
-        // TODO: 로그아웃 로직 (Firebase 연동)
-        if (uiManager != null)
-        {
-            uiManager.ShowUI(typeof(LoginUI)); // 로그인 화면으로 돌아가기
-        }
+        Debug.Log("로그아웃 버튼 클릭됨");
+        Firebase.Auth.FirebaseAuth.DefaultInstance.SignOut(); // Firebase 로그아웃 처리
+        UIManager.Instance.ReplaceUI(typeof(LoginUI)); // 로그인 화면으로 돌아가기
     }
 
     private void OnReadyButtonClicked()
     {
-        Debug.Log("준비 버튼 클릭");
+        Debug.Log("준비 버튼 클릭됨");
         // TODO: 준비 상태 토글 로직 (Photon 연동)
     }
 
     private void OnStartGameButtonClicked()
     {
-        Debug.Log("게임 시작 버튼 클릭");
+        Debug.Log("게임 시작 버튼 클릭됨");
         // TODO: 게임 시작 로직 (방장만, Photon 연동)
     }
 
     private void OnLeaveRoomButtonClicked()
     {
-        Debug.Log("방 나가기 버튼 클릭");
+        Debug.Log("방 나가기 버튼 클릭됨");
         // TODO: 방 나가기 로직 (Photon 연동)
         ShowMainLobby(); // 메인 로비 화면으로 돌아가기
     }
