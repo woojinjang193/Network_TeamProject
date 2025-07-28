@@ -31,6 +31,9 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
     private void Awake()
     {
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
+        Collider col = GetComponent<Collider>();
+        Manager.Game.RegisterPlayer(col, this);
+        //생성시 플레이어의 콜라이더와 컨트롤러를 딕셔너리에 등록
     }
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) //이거 뭐임?
     {

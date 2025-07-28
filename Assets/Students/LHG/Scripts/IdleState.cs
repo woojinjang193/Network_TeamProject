@@ -18,8 +18,6 @@ public class IdleState : AIBaseState
         {
             _controller.FireModule.FireAt(_controller.DetectModule.Target);
         }
-
-
         
         if (_controller.DetectModule.HasEnemy)
         {

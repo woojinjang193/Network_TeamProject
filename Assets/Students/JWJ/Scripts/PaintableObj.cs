@@ -18,6 +18,13 @@ public class PaintableObj : MonoBehaviour
 
     private TeamColorInfo teamColorInfo;
 
+    //쉐이더 프로퍼티들을 캐싱 한번만 생성하면 되니까 static으로 
+    private static int RadiusID = Shader.PropertyToID("_Radius");  //반지름 
+    private static int HardnessID = Shader.PropertyToID("_Hardness"); // 선명도
+    private static int StrengthID = Shader.PropertyToID("_Strength"); // 강도
+    private static int SplatPosID = Shader.PropertyToID("_SplatPos"); // 그릴 위치
+    private static int InkColorID = Shader.PropertyToID("_InkColor"); // 팀 인풋 색깔
+
     private void Start()
     {
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
@@ -61,12 +68,12 @@ public class PaintableObj : MonoBehaviour
         visualMeterial.SetColor("Color1", team1Color);
         visualMeterial.SetColor("Color2", team2Color);
 
-        splatMaterial.SetFloat(Shader.PropertyToID("_Radius"), radius);  //반지름 
-        splatMaterial.SetFloat(Shader.PropertyToID("_Hardness"), hardness); // 선명도
-        splatMaterial.SetFloat(Shader.PropertyToID("_Strength"), strength); // 강도
-        splatMaterial.SetVector(Shader.PropertyToID("_SplatPos"), worldPos); // 그릴 위치
-        splatMaterial.SetVector(Shader.PropertyToID("_InkColor"), teamInputColor); // 팀 인풋 색깔
-
+        //받아온 값들을 넣어줌
+        splatMaterial.SetFloat(RadiusID, radius);
+        splatMaterial.SetFloat(HardnessID, hardness);
+        splatMaterial.SetFloat(StrengthID, strength);
+        splatMaterial.SetVector(SplatPosID, worldPos);
+        splatMaterial.SetVector(InkColorID, teamInputColor);
 
         buffer.SetRenderTarget(tempMap);
         // tempMap맵에 먼저 그리기위해 타겟으로 설정 

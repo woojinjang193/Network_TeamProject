@@ -12,7 +12,7 @@ public class MoveModule
 
     public void Wander()
     {
-        //Wander가 필요한가?
+        //Wander가 필요한가? Random방향이동
         //필요하다면 탐지시 중립타일도, 적타일도, 적도 없을 때 필요한데..
         //탐지범위를 확장하는게 낫지 않을까?
         //랜덤방향이동
