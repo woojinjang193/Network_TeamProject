@@ -18,9 +18,16 @@ public class TeamColorInfo : MonoBehaviour
 
     private Color team1InputColor = new Color(1f, 0f, 0f, 1f);
     private Color team2InputColor = new Color(0f, 1f, 0f, 1f);
+    private Color teamNonColor = Color.gray;
     public Color Team1InputColor => team1InputColor;
     public Color Team2InputColor => team2InputColor;
 
+    private void Awake()
+    {
+        team1Color.a = 1f;
+        team2Color.a = 1f;
+        teamNonColor.a = 1f;
+    }
     public Color GetTeamColor(Team team)
     {
         if (team == Team.Team1)
@@ -32,7 +39,7 @@ public class TeamColorInfo : MonoBehaviour
             return team2Color;
         }
         else
-            return Color.gray;
+            return teamNonColor;
     }
 
     public Color GetTeamInputColor(Team team)
