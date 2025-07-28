@@ -3190,10 +3190,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: JWJ_Test_Player
       objectReference: {fileID: 0}
-    - target: {fileID: 6699207889478656091, guid: bb44c71ec8af10a4f8fb90dc8abaa289, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8900230614688956345, guid: bb44c71ec8af10a4f8fb90dc8abaa289, type: 3}
       propertyPath: sceneViewId
       value: 3
