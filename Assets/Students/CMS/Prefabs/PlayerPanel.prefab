@@ -91,6 +91,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nameText: {fileID: 5132647429768207230}
+  readyText: {fileID: 2603284736428460041}
+  hostImage: {fileID: 7435030237702785178, guid: 78d0e3541e8a95945a3dbc6ea128fc7e, type: 3}
+  readyButton: {fileID: 4730139271090586991}
 --- !u!1 &5549710473648187958
 GameObject:
   m_ObjectHideFlags: 0
@@ -103,7 +106,7 @@ GameObject:
   - component: {fileID: 8921809143006295667}
   - component: {fileID: 2603284736428460041}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Ready
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -358,7 +361,7 @@ GameObject:
   - component: {fileID: 989244431062583897}
   - component: {fileID: 5132647429768207230}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: NicknameText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
