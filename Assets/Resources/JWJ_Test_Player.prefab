@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7481462781204539067}
   - component: {fileID: 8915064683398671222}
   - component: {fileID: 4096699370385428804}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Main Effect
   m_TagString: Ink
   m_Icon: {fileID: 0}
@@ -4051,7 +4051,7 @@ ParticleSystem:
         m_RotationOrder: 4
     maxLights: 20
   TrailModule:
-    enabled: 0
+    enabled: 1
     mode: 1
     ratio: 1
     lifetime:
@@ -4895,6 +4895,7 @@ ParticleSystemRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 4948bbbf6fbd5b84a87d930e1ed27c04, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5040,7 +5041,7 @@ GameObject:
   - component: {fileID: 6860802292739650365}
   - component: {fileID: 7048545097189694779}
   - component: {fileID: 2391507178176282459}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Splash Particle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10079,6 +10080,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddfebcd9bf558f44e8c1cf8f0efebfbd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleSpeed: 20
   mainParticle: {fileID: 5509450797882254833}
   fireEffect: {fileID: 6214434835510814591}
   floorInkEffect: {fileID: 7048545097189694779}
@@ -10116,8 +10118,8 @@ GameObject:
   - component: {fileID: 1018876069317797786}
   - component: {fileID: 1067049555197825347}
   - component: {fileID: 3444910768268088259}
-  m_Layer: 0
-  m_Name: SubEmitter
+  m_Layer: 4
+  m_Name: Bouncy Particle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15233,7 +15235,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2175236673469671928
 Transform:
   m_ObjectHideFlags: 0
@@ -15262,7 +15264,7 @@ GameObject:
   - component: {fileID: 7943649831118373600}
   - component: {fileID: 6214434835510814591}
   - component: {fileID: 3480064968917796941}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Fire Effect
   m_TagString: Untagged
   m_Icon: {fileID: 0}

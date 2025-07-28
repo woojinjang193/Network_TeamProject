@@ -6,6 +6,7 @@ using UnityEngine.Android;
 
 public class InkParticleGun : MonoBehaviourPun
 {
+    [SerializeField] private float particleSpeed =20f;
     private TeamColorInfo teamColorInfo; //팀 컬러 정보
     [SerializeField] private ParticleSystem mainParticle; //잉크 줄기
     [SerializeField] private ParticleSystem fireEffect; // 무기 주변에 잉크가 튀는 연출
@@ -50,6 +51,7 @@ public class InkParticleGun : MonoBehaviourPun
     [PunRPC]
     public void FireParticle(Team team, bool mouseButtonDown) //활성화 
     {
+        mainParticleMain.startSpeed = particleSpeed;
         //파티클 on off 설정. 마우스가 클릭상태일땐 활성화
         mainEmission.enabled = mouseButtonDown;
         fireEmission.enabled = mouseButtonDown;
