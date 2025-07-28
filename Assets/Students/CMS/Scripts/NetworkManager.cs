@@ -31,7 +31,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         Debug.Log("Photon 연결 완료");
+
+        ShowLobby(); // 로비 화면 활성화
     }
+
     public override void OnDisconnected(DisconnectCause cause)
     {
         base.OnDisconnected(cause);
@@ -144,10 +147,17 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)   // 새 플레이어가 현재 방에 입장했을 때 호출
     {
-        Debug.Log($"플레이어 입장: {newPlayer.NickName}");
+        if (newPlayer != PhotonNetwork.LocalPlayer)
+            Debug.Log($"플레이어 입장: {newPlayer.NickName}");
 
         roomManager.PlayerPanelSpawn(newPlayer); // 새 플레이어 UI 생성
     }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        roomManager.PlayerPanelSpawn(otherPlayer);
+    }
+    
 
     public void LeaveRoom()   // 방 나가기 요청
     {
@@ -157,8 +167,19 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnLeftRoom()  // 방 나간 후 처리
     {
         Debug.Log("방 나감,로비로 이동");
+        roomManager.PlayerPanelRemove(PhotonNetwork.LocalPlayer); // 현재 플레이어 패널 제거
         roomPanel.SetActive(false);
         lobbyPanel.SetActive(true);
         lobbyPanelScript.OnReturnFromRoom();  // 로비 버튼 등 상태 복원
+    }
+
+    public override void OnPlayerPropertiesUpdate(Player target, ExitGames.Client.Photon.Hashtable changedProps)
+    {
+        if (changedProps.ContainsKey("Ready") && roomManager.playerPanels.TryGetValue(target.ActorNumber, out PlayerPanelItem item))
+        {
+            item.ReadyCheck(target);
+        }
+
+        roomManager.CheckAllReady(); // 모든 Ready 상태 재검사
     }
 }
