@@ -24,6 +24,9 @@ public class InkParticleGun : MonoBehaviourPun
 
     private Team currentTeam = Team.None;
 
+    private ParticleSystem.MinMaxCurve startSpeedCurve;///
+    private float lastParticleSpeed = 0;
+
     private void Awake()
     {
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
@@ -36,7 +39,9 @@ public class InkParticleGun : MonoBehaviourPun
         //main 들
         mainParticleMain = mainParticle.main;
         fireEffectMain = fireEffect.main;
-        floorInkEffectMain = floorInkEffect.main;
+        floorInkEffectMain = floorInkEffect.main;///
+
+        startSpeedCurve = new ParticleSystem.MinMaxCurve(particleSpeed, particleSpeed + 5);///
     }
 
     private void Start()
@@ -46,12 +51,16 @@ public class InkParticleGun : MonoBehaviourPun
         fireEmission.enabled = false;
         //비활성화
         SetTeamColor(currentTeam);
+
+        mainParticleMain.startSpeed = startSpeedCurve; ///
     }
 
     [PunRPC]
     public void FireParticle(Team team, bool mouseButtonDown) //활성화 
     {
-        mainParticleMain.startSpeed = particleSpeed;
+        UpdateStartSpeed();
+
+        //mainParticleMain.startSpeed = particleSpeed;
         //파티클 on off 설정. 마우스가 클릭상태일땐 활성화
         mainEmission.enabled = mouseButtonDown;
         fireEmission.enabled = mouseButtonDown;
@@ -77,5 +86,17 @@ public class InkParticleGun : MonoBehaviourPun
         mainParticleMain.startColor = teamColor;
         fireEffectMain.startColor = teamColor;
         floorInkEffectMain.startColor = teamColor;
+    }
+
+    private void UpdateStartSpeed() ///
+    {
+        if (lastParticleSpeed != particleSpeed)
+        {
+            lastParticleSpeed = particleSpeed;
+            startSpeedCurve.constantMin = particleSpeed;
+            startSpeedCurve.constantMax = particleSpeed + 5f;
+            mainParticleMain.startSpeed = startSpeedCurve;
+        }
+        
     }
 }
