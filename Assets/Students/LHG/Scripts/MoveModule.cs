@@ -24,7 +24,5 @@ public class MoveModule
         Vector3 direction = (targetPos - _controller.transform.position).normalized;
         _controller.transform.position += direction * _controller.moveSpeed * Time.deltaTime;
         _controller.transform.LookAt(targetPos);
-
-        
     }
 }
