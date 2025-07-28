@@ -6,67 +6,76 @@ using UnityEngine.Android;
 
 public class InkParticleGun : MonoBehaviourPun
 {
+    [SerializeField] private float particleSpeed =20f;
     private TeamColorInfo teamColorInfo; //팀 컬러 정보
     [SerializeField] private ParticleSystem mainParticle; //잉크 줄기
     [SerializeField] private ParticleSystem fireEffect; // 무기 주변에 잉크가 튀는 연출
+    [SerializeField] private ParticleSystem floorInkEffect; // 충돌부분에 잉크 퍼지는 연출
     [SerializeField] private InkParticleCollision particleCollision; //잉크 충돌 스크립트
-    private Team myTeam;
+
+    // 게임시작시 파티클을 off 시켜놓기위해 EmissionModule을 담을 변수들
+    private ParticleSystem.EmissionModule mainEmission;
+    private ParticleSystem.EmissionModule fireEmission;
+
+    //파티클 색 변경을 위해 MainModule 을 담을 변수들
+    private ParticleSystem.MainModule mainParticleMain;
+    private ParticleSystem.MainModule fireEffectMain;
+    private ParticleSystem.MainModule floorInkEffectMain;
+
+    private Team currentTeam = Team.None;
 
     private void Awake()
     {
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
         //팀 컬러정보 받아옴
+
+        //emission 들
+        mainEmission = mainParticle.emission;
+        fireEmission = fireEffect.emission;
+
+        //main 들
+        mainParticleMain = mainParticle.main;
+        fireEffectMain = fireEffect.main;
+        floorInkEffectMain = floorInkEffect.main;
     }
 
     private void Start()
     {
-        ParticleSystem.EmissionModule emission = mainParticle.emission;
-        // 게임시작시 파티클을 off 시켜놓기위해 EmissionModule을 받아옴
-        ParticleSystem.EmissionModule fireEffectEmission = fireEffect.emission;
-        //게임시작시 파티클을 off 시켜놓기위해 EmissionModule을 받아옴
-        emission.enabled = false;
+        mainEmission.enabled = false;
         //비활성화
-        fireEffectEmission.enabled = false;
+        fireEmission.enabled = false;
         //비활성화
-
+        SetTeamColor(currentTeam);
     }
 
     [PunRPC]
-    public void FireParticle(Team team, bool mouseButtonDown) //활성화 & 색 지정
+    public void FireParticle(Team team, bool mouseButtonDown) //활성화 
     {
-        //파티클 on off 설정
-        ParticleSystem.EmissionModule emission = mainParticle.emission;
-        //파티클 on off 를 위해 EmissionModule 받아옴
-        ParticleSystem.EmissionModule fireEffectEmission = fireEffect.emission;
-        //파티클 on off 를 위해 EmissionModule 받아옴
-        emission.enabled = mouseButtonDown;
-        //비활성화
-        fireEffectEmission.enabled = mouseButtonDown;
-        //비활성화
+        mainParticleMain.startSpeed = particleSpeed;
+        //파티클 on off 설정. 마우스가 클릭상태일땐 활성화
+        mainEmission.enabled = mouseButtonDown;
+        fireEmission.enabled = mouseButtonDown;
 
-
-        //컬러 설정
-        myTeam = team;
-        //팀정보 
-
-        Color teamColor = teamColorInfo.GetTeamColor(myTeam);
-        //팀정보를 토대로 팀색을 가져옴
-        teamColor.a = 1f;
-        //블랜딩할때 완전히 덮기위해 알파를 1로 고정
-
-
-        //mainParticle의 자식 파티클들에게 모두 팀색상을 지정
-        ParticleSystem[] particles = mainParticle.GetComponentsInChildren<ParticleSystem>();
-        for (int i = 0; i < particles.Length; i++)
+        if (team != currentTeam)
+            //플레이어컨트롤러에서 넘겨받은 팀이 현재팀이 아닐경우 (처음과 팀이 변경됐을 경우)
         {
-            ParticleSystem partSys = particles[i];
-            ParticleSystem.MainModule main = partSys.main;
-            main.startColor = teamColor;
+            SetTeamColor(team);
         }
-
-        particleCollision.SetTeam(myTeam);
+        
+        particleCollision.SetTeam(currentTeam);
         //파티클 충돌 스크립트로 넘겨줌
     }
 
-    
+    private void SetTeamColor(Team team) //색 지정
+    {
+        currentTeam = team;
+        //나의 팀 정보 
+        Color teamColor = teamColorInfo.GetTeamColor(currentTeam);
+        //팀정보를 토대로 팀색을 가져옴
+
+        ///파티클에 팀컬러 지정
+        mainParticleMain.startColor = teamColor;
+        fireEffectMain.startColor = teamColor;
+        floorInkEffectMain.startColor = teamColor;
+    }
 }
