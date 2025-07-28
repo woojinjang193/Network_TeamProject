@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private const float RECENTER_COOLDOWN = 1.0f;
 
     [Header("카메라 설정")]
+    public GameObject playerCameraObject;
     public ThirdPersonCamera tpsCamera;
     public Camera mainCamera;
     public Transform cameraPivot;
@@ -57,6 +58,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [Tooltip("적 팀 잉크 위에서의 이동 속도 감소 배율")]
     [Range(0.1f, 1f)]
     public float enemyInkSpeedModifier = 0.5f;
+    [SerializeField, Range(0.1f, 2.0f)]
+    private float inkColorThreshold = 1.0f;
 
     // 네트워크
     private Vector3 networkPosition;
@@ -66,6 +69,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private float networkMoveZ = 0f;
 
     // 잉크 감지 시스템
+    private float groundCheckTimer = 0f;
+    private const float GROUND_CHECK_INTERVAL = 0.1f; // 1초에 10번 검사
+
     public bool IsGrounded { get; private set; } = false;
     public InkStatus CurrentGroundInkStatus { get; private set; } = InkStatus.NONE;
     public InkStatus CurrentWallInkStatus { get; private set; } = InkStatus.NONE;
@@ -88,13 +94,49 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (photonView.IsMine)
         {
-            mainCamera = Camera.main;
-            tpsCamera = Camera.main.GetComponentInParent<ThirdPersonCamera>();
-            tpsCamera.followTransform = this.cameraPivot;
+            // 카메라 동기화
+            if (playerCameraObject == null)
+            {
+                Debug.LogError("Player Camera Object가 Inspector에 할당되지 않았습니다.", this);
+                return;
+            }
+            playerCameraObject.SetActive(true);
+
+            // 메인 카메라 컴포넌트를 찾습니다.
+            mainCamera = playerCameraObject.GetComponentInChildren<Camera>();
+            if (mainCamera == null)
+            {
+                Debug.LogError("Player Camera Object 또는 그 자식에서 Camera 컴포넌트를 찾을 수 없습니다", this);
+            }
+
+            if (tpsCamera == null)
+            {
+                tpsCamera = playerCameraObject.GetComponent<ThirdPersonCamera>();
+            }
+            if (tpsCamera == null)
+            {
+                tpsCamera = playerCameraObject.GetComponentInParent<ThirdPersonCamera>();
+            }
+
+            if (tpsCamera != null)
+            {
+                tpsCamera.followTransform = this.cameraPivot;
+            }
+            else
+            {
+                Debug.LogError("ThirdPersonCamera 스크립트를 찾을 수 없습니다.", this);
+            }
             Init();
         }
         else
         {
+            // 이 캐릭터가 다른 플레이어(원격)의 것이므로, 이 캐릭터에 포함된 카메라를 비활성화합니다.
+            // 이렇게 해야 다른 플레이어의 카메라가 내 화면에 그려지거나 컨트롤을 방해하는 문제를 막을 수 있습니다.
+            if (playerCameraObject != null)
+            {
+                playerCameraObject.SetActive(false);
+            }
+
             rig.isKinematic = true;
         }
 
@@ -136,7 +178,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (photonView.IsMine)
         {
-            GroundAndInkCheck();
+            groundCheckTimer -= Time.deltaTime;
+            if (groundCheckTimer <= 0f)
+            {
+                groundCheckTimer = GROUND_CHECK_INTERVAL;
+                GroundAndInkCheck();
+            }
+
 
             if (stateMachine != null)
             {
@@ -241,7 +289,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     private InkStatus GetInkStatusFromColor(Color color)
     {
-        if (color.a < 0.1f) return InkStatus.NONE;
+        if (color.a < 0.2f) return InkStatus.NONE;
 
         Color myTeamInputColor = teamColorInfo.GetTeamInputColor(myTeam);
 
@@ -252,12 +300,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         float diffToMyTeam = Mathf.Abs(color.r - myTeamInputColor.r) + Mathf.Abs(color.g - myTeamInputColor.g) + Mathf.Abs(color.b - myTeamInputColor.b);
         float diffToEnemyTeam = Mathf.Abs(color.r - enemyTeamInputColor.r) + Mathf.Abs(color.g - enemyTeamInputColor.g) + Mathf.Abs(color.b - enemyTeamInputColor.b);
 
-        // 더 가까운 색상의 팀으로 판정하되, 색상 차이가 일정 임계값(0.1f)보다 작아야 함
-        if (diffToMyTeam < 0.1f && diffToMyTeam < diffToEnemyTeam)
+        if (diffToMyTeam < inkColorThreshold && diffToMyTeam < diffToEnemyTeam)
         {
             return InkStatus.OUR_TEAM;
         }
-        else if (diffToEnemyTeam < 0.1f && diffToEnemyTeam < diffToMyTeam)
+        else if (diffToEnemyTeam < inkColorThreshold && diffToEnemyTeam < diffToMyTeam)
         {
             return InkStatus.ENEMY_TEAM;
         }

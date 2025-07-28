@@ -5011,7 +5011,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1565905520952451939
 Transform:
   m_ObjectHideFlags: 0
@@ -5047,8 +5047,9 @@ MonoBehaviour:
   rig: {fileID: 0}
   input: {fileID: 0}
   col: {fileID: 0}
+  playerCameraObject: {fileID: 5879017347163355587}
   tpsCamera: {fileID: 0}
-  mainCamera: {fileID: 0}
+  mainCamera: {fileID: 3256701126537642152}
   cameraPivot: {fileID: 254563859974924112}
   humanModel: {fileID: 3997674216597739597}
   squidModel: {fileID: 4322107737467862600}
@@ -5069,6 +5070,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   enemyInkSpeedModifier: 0.5
+  inkColorThreshold: 1
 --- !u!114 &2401178482321953882
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -8,7 +8,7 @@ public class Player_Squid : PlayerState
     public Dictionary<LowState, BaseState> lowStateDic { get; private set; }
 
     private float revertTimer = 0f;
-    private const float REVERT_DELAY = 0.2f;
+    private const float REVERT_DELAY = 0.1f;
 
     public Player_Squid(PlayerController player, StateMachine stateMachine) : base(player, stateMachine)
     {
