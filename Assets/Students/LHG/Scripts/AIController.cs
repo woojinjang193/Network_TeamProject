@@ -10,6 +10,7 @@ public class AIController : MonoBehaviour
     public AIStateMachine StateMachine {  get; private set; }
 
     [SerializeField] public float moveSpeed = 5;
+    [SerializeField] public float fireInterval = 1; //발사간격
 
     private void Awake()
     {
