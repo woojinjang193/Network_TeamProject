@@ -18,6 +18,7 @@ public class Player_Squid : PlayerState
 
         lowStateDic.Add(LowState.Idle, new Squid_Idle(player, subStateMachine, this));
         lowStateDic.Add(LowState.Move, new Squid_Swim(player, subStateMachine, this));
+        lowStateDic.Add(LowState.Jump, new Squid_Jump(player, subStateMachine, this));
     }
 
     public override void Enter()
@@ -28,6 +29,7 @@ public class Player_Squid : PlayerState
         player.squidModel.SetActive(true);
         player.col.height = 1.0f;
         player.col.radius = 0.5f;
+
         player.rig.useGravity = false;
         player.rig.velocity = Vector3.zero;
 
@@ -45,19 +47,18 @@ public class Player_Squid : PlayerState
             return;
         }
 
-        bool onOurInk = player.CurrentGroundInkStatus == InkStatus.OUR_TEAM || player.IsOnWalkableWall;
 
-        if (onOurInk)
-        {
-            revertTimer = 0f;
-        }
-        else
+        if (player.IsGrounded && player.CurrentGroundInkStatus != InkStatus.OUR_TEAM)
         {
             revertTimer += Time.deltaTime;
             if (revertTimer >= REVERT_DELAY)
             {
                 this.stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
             }
+        }
+        else
+        {
+            revertTimer = 0f;
         }
     }
     

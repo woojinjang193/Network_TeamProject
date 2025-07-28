@@ -1,6 +1,5 @@
 using Photon.Pun;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using UnityEngine;
 
 public enum InkStatus { NONE, OUR_TEAM, ENEMY_TEAM }
@@ -217,7 +216,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
 
-        
+
         UpdatePlayerColor();
     }
 
@@ -276,9 +275,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     private void OnGroundColorRead(Color color)
     {
-        Debug.Log($"<color=yellow>읽어온 바닥 색상 (RGBA): ({color.r}, {color.g}, {color.b}, {color.a})</color>");
+        // Debug.Log($"<color=yellow>읽어온 바닥 색상 (RGBA): ({color.r}, {color.g}, {color.b}, {color.a})</color>");
         CurrentGroundInkStatus = GetInkStatusFromColor(color);
-        Debug.Log($"<color=green>최종 바닥 잉크 상태: {CurrentGroundInkStatus}</color>");
+        // Debug.Log($"<color=green>최종 바닥 잉크 상태: {CurrentGroundInkStatus}</color>");
     }
 
     private void OnWallColorRead(Color color)
@@ -312,7 +311,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         return InkStatus.NONE;
     }
 
-
     void LateUpdate()
     {
         if (photonView.IsMine && tpsCamera != null)
@@ -327,6 +325,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (photonView.IsMine && stateMachine != null)
         {
             stateMachine.FixedUpdate();
+            if (!IsGrounded && rig.useGravity)
+            {
+                if (rig.velocity.y >= 0)
+                {
+                    rig.velocity += Vector3.up * Physics.gravity.y * (gravityScale - 1) * Time.fixedDeltaTime;
+                }
+                else
+                {
+                    rig.velocity += Vector3.up * Physics.gravity.y * (fallingGravityScale - 1) * Time.fixedDeltaTime;
+                }
+            }
         }
     }
 
@@ -392,7 +401,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             }
             else
             {
-                stream.SendNext(false); 
+                stream.SendNext(false);
             }
 
             if (humanAnimator != null)

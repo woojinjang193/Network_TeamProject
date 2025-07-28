@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,13 +14,18 @@ public class Human_Idle : PlayerState
 
     public override void Enter()
     {
-        Debug.Log("Human Idle Enter");
         HasPhysics = false; 
         // player.humanAnimator.SetBool("isMoving", false);
     }
 
     public override void Update()
     {
+        if (!IsGrounded())
+        {
+            stateMachine.ChangeState(humanState.lowStateDic[LowState.Jump]);
+            return;
+        }
+
         if (IsGrounded() && player.input.IsJumpPressed)
         {
             stateMachine.ChangeState(humanState.lowStateDic[LowState.Jump]);
