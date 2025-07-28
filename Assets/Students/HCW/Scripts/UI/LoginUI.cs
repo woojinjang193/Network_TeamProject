@@ -1,10 +1,12 @@
 ﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Firebase.Auth;
+using Firebase.Extensions;
 
 public class LoginUI : BaseUI
 {
-    [SerializeField] private TMP_InputField nameInputField;
+    [SerializeField] private TMP_InputField emailInputField;
     [SerializeField] private TMP_InputField passwordInputField;
     [SerializeField] private Button loginButton;
     [SerializeField] private Button showSignUpUIButton;
@@ -18,18 +20,38 @@ public class LoginUI : BaseUI
 
     private void OnLoginButtonClicked()
     {
-        string id = nameInputField.text;
+        string email = emailInputField.text;
         string password = passwordInputField.text;
 
         SetMessage("로그인 중..."); // 로딩 메시지 표시
 
-        // TODO: 여기에 Firebase 로그인 로직을 추가할 예정
-        Debug.Log($"로그인 시도: {id} / {password}");
+        FirebaseManager.Auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled)
+            {
+                SetMessage("로그인이 취소되었습니다.");
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                SetMessage("아이디 또는 비밀번호가 틀렸습니다.");
+                Debug.LogError("SignInWithEmailAndPasswordAsync error: " + task.Exception);
+                return;
+            }
+
+            // 로그인 성공
+            Firebase.Auth.FirebaseUser newUser = task.Result.User;
+            SetMessage($"로그인 성공: {newUser.Email}");
+            Debug.LogFormat("로그인 성공: {0} ({1})", newUser.DisplayName, newUser.UserId);
+
+            // 로그인 성공 후 로비 UI 표시
+            UIManager.Instance.ReplaceUI(typeof(LobbyUI));
+        });
     }
 
     private void ShowSignUpUI()
     {
-        FindObjectOfType<UIManager>().ShowUI(typeof(SignUpUI));
+        UIManager.Instance.ReplaceUI(typeof(SignUpUI));
     }
 
     // 호출할 메시지 업데이트 함수
