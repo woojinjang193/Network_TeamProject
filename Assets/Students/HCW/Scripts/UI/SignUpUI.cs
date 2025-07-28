@@ -1,6 +1,8 @@
-﻿using TMPro;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Firebase.Auth;
+using Firebase.Extensions;
 
 public class SignUpUI : BaseUI
 {
@@ -33,13 +35,36 @@ public class SignUpUI : BaseUI
 
         SetMessage("회원가입 중..."); // 로딩 메시지 표시
 
-        // TODO: 여기에 Firebase 회원가입 로직을 추가할 예정
-        Debug.Log($"회원가입 시도: {email} / {name} / {password}");
+        FirebaseManager.Auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled)
+            {
+                SetMessage("회원가입이 취소되었습니다.");
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                SetMessage("회원가입에 실패했습니다. 입력 정보를 확인해주세요.");
+                Debug.LogError("회원가입 실패: " + task.Exception);
+                return;
+            }
+
+            // 회원가입 성공
+            Firebase.Auth.FirebaseUser newUser = task.Result.User;
+            SetMessage($"회원가입 성공: {newUser.Email}\n인증 메일을 확인해주세요.");
+            Debug.LogFormat("회원가입 성공: {0} ({1})", newUser.DisplayName, newUser.UserId);
+
+            // 이메일 인증 보내기
+            newUser.SendEmailVerificationAsync();
+
+            // 성공 후 로그인 UI로 돌아가기
+            ShowLoginUI();
+        });
     }
 
     private void ShowLoginUI()
     {
-        FindObjectOfType<UIManager>().ShowUI(typeof(LoginUI));
+        UIManager.Instance.ReplaceUI(typeof(LoginUI));
     }
 
     // 호출할 메시지 업데이트 함수
