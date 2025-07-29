@@ -56,4 +56,27 @@ public class AIController : MonoBehaviour
     }
 
     public void Respawn()
+    {
+        transform.position = _initialPosition;
+        transform.rotation = _initialRotation;
+        gameObject.SetActive(true);
+        gameObject.GetComponent<Collider>().enabled = true;
+        
+        
+        //AI 리셋
+        health = 100;
+        StateMachine.SetState(new IdleState(this));
+    }
+
+    public void Die()
+    {
+        if (health <= 0)
+        {
+            //TODO hit애니메이션 + 딜레이
+            StateMachine.SetState(new DeathState(this));
+            
+            Debug.Log("AI 사망");
+        }
+    }
+
 }
