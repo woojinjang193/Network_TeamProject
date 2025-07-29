@@ -39,10 +39,12 @@ public class PaintableObj : MonoBehaviour
         tempMap = new RenderTexture(splatMap.width, splatMap.height, 0, RenderTextureFormat.ARGBFloat);
         //임시 텍스쳐 생성 splatMap과 같은 크기로 생성
 
-        splatMaterial = new Material(Shader.Find("Unlit/SplatMask"));
+        //splatMaterial = new Material(Shader.Find("Unlit/SplatMask"));
+        splatMaterial = new Material(Resources.Load<Shader>("Shaders/SplatMask"));
         // 쉐이더를 넣어서 splatMaterial 생성
 
-        blendMaterial = new Material(Shader.Find("Unlit/Blend"));
+        //blendMaterial = new Material(Shader.Find("Unlit/Blend"));
+        blendMaterial = new Material(Resources.Load<Shader>("Shaders/Blend"));
         // 쉐이더를 넣어서 blendMaterial 생성
 
         visualMeterial = GetComponent<Renderer>().material;

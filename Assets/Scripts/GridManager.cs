@@ -7,7 +7,6 @@ using UnityEngine;
 public class GridManager : Singleton<GridManager>
 {
     [SerializeField] private TMP_Text teamRateText;
-    public static GridManager GetInstance() => Instance;
 
     private int countTeam1 = 0;
     private int countTeam2 = 0;
@@ -19,7 +18,22 @@ public class GridManager : Singleton<GridManager>
     protected override void Awake()
     {
         base.Awake();
-        DontDestroyOnLoad(gameObject);
+
+        if(teamRateText == null)
+        {
+            GameObject teamRateTextPrefab = Resources.Load<GameObject>("UI/CoverageRateCanvas");
+            if (teamRateTextPrefab != null)
+            {
+                GameObject canvas = Instantiate(teamRateTextPrefab);
+                canvas.transform.SetParent(transform, false);
+                teamRateText = canvas.GetComponentInChildren<TMP_Text>();
+            }
+            else
+            {
+                Debug.LogError("UI/CoverageRateCanvas 프리팹을 찾을 수 없습니다.");
+            }
+        }
+     
     }
     private void Start()
     {
@@ -87,5 +101,12 @@ public class GridManager : Singleton<GridManager>
         float Team1Rate = countTeam1 / (float)total * 100f;
         float Team2Rate = countTeam2 / (float)total * 100f;
         teamRateText.text = $"Team1 : {Team1Rate.ToString("F2")}%    Team2 : {Team2Rate.ToString("F2")}%";
+    }
+
+    public string GetWinningTeam()
+    {
+        if (countTeam1 > countTeam2) return "Team1";
+        else if (countTeam2 > countTeam1) return "Team2";
+        else return "Draw";
     }
 }

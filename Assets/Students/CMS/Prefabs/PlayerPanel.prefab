@@ -93,6 +93,8 @@ MonoBehaviour:
   nameText: {fileID: 5132647429768207230}
   readyText: {fileID: 2603284736428460041}
   hostImage: {fileID: 7435030237702785178, guid: 78d0e3541e8a95945a3dbc6ea128fc7e, type: 3}
+  readyImage: {fileID: 935016672983889421}
+  backgroundImage: {fileID: 985349646414112164}
   readyButton: {fileID: 4730139271090586991}
 --- !u!1 &5549710473648187958
 GameObject:

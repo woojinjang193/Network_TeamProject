@@ -10,11 +10,10 @@ using Photon.Pun;
 public class PlayerPanelItem : MonoBehaviour
 {
     [SerializeField] private TMP_Text nameText;
-
     [SerializeField] private TMP_Text readyText;
     [SerializeField] private Image hostImage;
     [SerializeField] private Image readyImage;
-
+    [SerializeField] private Image backgroundImage; // 패널 배경
     [SerializeField] private Button readyButton;
 
     private bool isReady;
@@ -26,6 +25,8 @@ public class PlayerPanelItem : MonoBehaviour
         nameText.text = player.NickName;
         hostImage.enabled = player.IsMasterClient; // 호스트 여부 표시
         readyButton.interactable = player.IsLocal; // 로컬 플레이어만 준비 버튼 활성화
+
+        ApplyTeamColor(player);
 
         if (!player.IsLocal)
             return;
@@ -39,28 +40,43 @@ public class PlayerPanelItem : MonoBehaviour
     public void ReadyButtonClick()
     {
         isReady = !isReady;
-
         readyText.text = isReady ? "Ready" : "Click Ready";
         readyImage.color = isReady ? Color.green : Color.white;
-
         ReadyPropertiesUpdate();
     }
     public void ReadyPropertiesUpdate()
     {
-        ExitGames.Client.Photon.Hashtable playerProperty = new ExitGames.Client.Photon.Hashtable();
-        playerProperty["Ready"] = isReady;
-        PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperty);
+        PhotonNetwork.LocalPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable
+        {
+            { "Ready", isReady }
+        });
     }
 
     public void ReadyCheck(Player player)
     {
         bool isReady = false;
         if (player.CustomProperties.TryGetValue("Ready", out object value))
-        {
-            isReady = (bool)value;  
-        }
+            isReady = (bool)value;
 
         readyText.text = isReady ? "Ready" : "Click Ready";
         readyImage.color = isReady ? Color.green : Color.white;
+    }
+
+    public void ApplyTeamColor(Player player)
+    {
+        if (player.CustomProperties.TryGetValue("team", out object team))
+        {
+            string teamName = team.ToString();
+            if (teamName == "Team1")
+                backgroundImage.color = new Color(1f, 0.5f, 0.5f); //빨강
+            else if (teamName == "Team2")
+                backgroundImage.color = new Color(0.5f, 0.5f, 1f); //파랑
+            else
+                backgroundImage.color = Color.white;
+        }
+        else
+        {
+            backgroundImage.color = Color.white;
+        }
     }
 }

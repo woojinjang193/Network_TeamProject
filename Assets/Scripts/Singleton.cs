@@ -4,21 +4,52 @@ using UnityEngine;
 
 public class Singleton<T> : MonoBehaviour where T : MonoBehaviour  
 {
-    protected static T Instance;
+    private static T instance;
+    public static T Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindObjectOfType<T>();
+
+                if (instance != null) return instance;
+
+                GameObject go = new GameObject($"{typeof(T)}");
+                instance = go.AddComponent<T>();
+                DontDestroyOnLoad(go);
+
+            }
+            return instance;
+        }
+    }
     protected virtual void Awake()
     {
-        if (Instance == null)
+        Init();
+    }
+    protected virtual void Init()
+    {
+        if (instance == null)
         {
-            Instance = this as T; // this as T는 객체를 T 타입으로 바꾸려 시도해보고 안되면 null을 반환
+            instance = this as T;
+            DontDestroyOnLoad(gameObject);
         }
-        else
+        else if (instance != this)
         {
             Destroy(gameObject);
         }
     }
-
-    public virtual void Init() 
+    protected void OnApplicationQuit()
     {
+        instance = null;
     }
 
+
+    public virtual void DestroyManager()
+    {
+        if (instance != null)
+        {
+            Destroy(gameObject);
+        }
+    }
 }
