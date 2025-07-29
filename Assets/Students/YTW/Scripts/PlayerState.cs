@@ -17,13 +17,19 @@ public class PlayerState : BaseState
 
     protected void SetMove(float moveSpeed)
     {
+        if (player.input.MoveInput == Vector2.zero)
+        {
+            player.rig.velocity = new Vector3(0, player.rig.velocity.y, 0);
+            return;
+        }
+        
         Vector3 camForward = player.mainCamera.transform.forward;
         Vector3 camRight = player.mainCamera.transform.right;
         camForward.y = 0;
         camRight.y = 0;
 
-        Vector3 moveDirection = (camForward.normalized * player.input.MoveInput.y +
-                                 camRight.normalized * player.input.MoveInput.x);
+        Vector3 moveDirection = (camForward * player.input.MoveInput.y +
+                                 camRight * player.input.MoveInput.x).normalized;
 
         player.rig.velocity = new Vector3(moveDirection.x * moveSpeed, player.rig.velocity.y, moveDirection.z * moveSpeed);
     }

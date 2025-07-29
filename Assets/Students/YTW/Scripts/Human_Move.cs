@@ -34,6 +34,7 @@ public class Human_Move : PlayerState
 
         if (player.input.MoveInput == Vector2.zero)
         {
+            player.rig.velocity = new Vector3(0, player.rig.velocity.y, 0);
             stateMachine.ChangeState(humanState.lowStateDic[LowState.Idle]);
         }
     }
@@ -83,5 +84,6 @@ public class Human_Move : PlayerState
             player.humanAnimator.SetFloat("moveX", 0f);
             player.humanAnimator.SetFloat("moveZ", 0f);
         }
+        
     }
 }
