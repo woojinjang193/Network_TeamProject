@@ -9,6 +9,7 @@ public class MapGrid : MonoBehaviour
 
     private void Start()
     {
+        //Debug.Log($"Manager.Grid 상태: {Manager.Grid}");
         Manager.Grid.RegisterGrid(this);
         //그리드를 매니저에 등록
         //Debug.Log($"그리드등록 {this.name}");

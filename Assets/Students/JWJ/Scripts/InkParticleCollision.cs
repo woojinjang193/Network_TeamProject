@@ -77,10 +77,10 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
 
     private void OnParticleCollision(GameObject other)
     {
-        if (!photonView.IsMine)
-        {
-            return;
-        }
+       //if (!photonView.IsMine)
+       //{
+       //    return;
+       //}
         events.Clear(); //이벤트 실행전 초기화
         int count = particleSys.GetCollisionEvents(other, events);
         //충돌한 파티클 수
@@ -108,8 +108,12 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
                 PlayerTestController player = Manager.Game.GetPlayer(collider);
                 if (player != null)
                 {
-                    HitPlayer(player);
-                    //팀판정 및 후처리
+                    if(photonView.IsMine)
+                    {
+                        HitPlayer(player);
+                        //팀판정 및 후처리
+                    }
+
                 }
             }   
         }

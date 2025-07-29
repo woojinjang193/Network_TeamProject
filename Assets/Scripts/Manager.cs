@@ -2,10 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Manager
+public class Manager : Singleton<Manager>
 {
-    public static GameManager Game => GameManager.GetInstance();
-    public static AudioManager Audio => AudioManager.GetInstance();
-    public static GridManager Grid => GridManager.GetInstance();
+    public static GameManager Game;
+    public static AudioManager Audio;
+    public static GridManager Grid;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        Game = GameManager.Instance;
+        Audio = AudioManager.Instance;
+        Grid = GridManager.Instance;
+    }
 
 }
