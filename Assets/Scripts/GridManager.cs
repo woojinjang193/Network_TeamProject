@@ -7,7 +7,6 @@ using UnityEngine;
 public class GridManager : Singleton<GridManager>
 {
     [SerializeField] private TMP_Text teamRateText;
-    public static GridManager GetInstance() => Instance;
 
     private int countTeam1 = 0;
     private int countTeam2 = 0;
@@ -19,7 +18,6 @@ public class GridManager : Singleton<GridManager>
     protected override void Awake()
     {
         base.Awake();
-        DontDestroyOnLoad(gameObject);
     }
     private void Start()
     {
