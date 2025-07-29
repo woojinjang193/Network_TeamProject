@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 public class AIController : MonoBehaviour
 {
@@ -16,6 +16,9 @@ public class AIController : MonoBehaviour
     [SerializeField] public float detectInterval = 3; //탐지간격(초)
     [SerializeField] public float health = 100;
 
+    public Transform spawnPoint;
+    private Vector3 _initialPosition;
+    private Quaternion _initialRotation;
     
     [SerializeField] Button testDamageBtn;
 
@@ -36,14 +39,9 @@ public class AIController : MonoBehaviour
 
     private void Update()
     {
-        StateMachine.Update();
 
-        if (health <= 0)
-        {
-            //TODO hit애니메이션 + 딜레이
-            StateMachine.SetState(new DeathState(this));
-            gameObject.SetActive(false);
-        }
+        StateMachine.Update();
+        Die();
     }
 
     void OnDrawGizmos()
@@ -56,4 +54,6 @@ public class AIController : MonoBehaviour
     {
         health -= 50;
     }
+
+    public void Respawn()
 }
