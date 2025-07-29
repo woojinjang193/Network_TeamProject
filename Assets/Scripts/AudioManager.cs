@@ -4,15 +4,14 @@ using UnityEngine;
 
 public class AudioManager : Singleton<AudioManager>
 {
-    public static AudioManager GetInstance() => Instance;
     protected override void Awake()
     {
         base.Awake();
-        DontDestroyOnLoad(gameObject);
     }
+
     private void Start()
     {
-        Debug.Log("¿Àµð¿À¸Å´ÏÀú ½ºÅ¸Æ®");
+        Debug.Log("ì˜¤ë””ì˜¤ë§¤ë‹ˆì € ìŠ¤íƒ€íŠ¸");
     }
 
     public void PlayBGM()

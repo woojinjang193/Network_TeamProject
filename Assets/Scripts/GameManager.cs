@@ -5,7 +5,6 @@ using UnityEngine;
 public class GameManager : Singleton<GameManager>
 {
     public bool IsGameEnd {  get; private set; }
-    public static GameManager GetInstance() => Instance;
 
     private Dictionary<Collider, PlayerTestController> playerDic = new();
     //플레이어의 콜라이더와 컨트롤러를 넣을 딕셔너리 
