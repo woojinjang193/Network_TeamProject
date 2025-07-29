@@ -18,6 +18,22 @@ public class GridManager : Singleton<GridManager>
     protected override void Awake()
     {
         base.Awake();
+
+        if(teamRateText == null)
+        {
+            GameObject teamRateTextPrefab = Resources.Load<GameObject>("UI/CoverageRateCanvas");
+            if (teamRateTextPrefab != null)
+            {
+                GameObject canvas = Instantiate(teamRateTextPrefab);
+                canvas.transform.SetParent(transform, false);
+                teamRateText = canvas.GetComponentInChildren<TMP_Text>();
+            }
+            else
+            {
+                Debug.LogError("UI/CoverageRateCanvas 프리팹을 찾을 수 없습니다.");
+            }
+        }
+     
     }
     private void Start()
     {
