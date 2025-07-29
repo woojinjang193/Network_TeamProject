@@ -2396,6 +2396,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1038548921244454968}
   - component: {fileID: 9071353398356857311}
+  - component: {fileID: 5533257509022700154}
   m_Layer: 0
   m_Name: Black Character
   m_TagString: Untagged
@@ -2431,7 +2432,7 @@ Animator:
   m_GameObject: {fileID: 4418458815952609560}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: dd4802cc7972ecb4699ed0b29916793f, type: 3}
-  m_Controller: {fileID: 9100000, guid: 63baaba3b44ffd547a13dde7e115ab8e, type: 2}
+  m_Controller: {fileID: 9100000, guid: bb6a2011ab8475b49893425f084cab81, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -2442,6 +2443,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5533257509022700154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4418458815952609560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21ae530ceb304df4da667bc92404659e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  humanAnimator: {fileID: 0}
 --- !u!1 &4478753655602133027
 GameObject:
   m_ObjectHideFlags: 0
@@ -6292,6 +6306,14 @@ PrefabInstance:
     - target: {fileID: 979059415274921061, guid: 4142de7b55369254c8a147607873df80, type: 3}
       propertyPath: m_Name
       value: Face_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 3037025253949873097, guid: 4142de7b55369254c8a147607873df80, type: 3}
+      propertyPath: m_Name
+      value: Eye_R
+      objectReference: {fileID: 0}
+    - target: {fileID: 4282575347093181128, guid: 4142de7b55369254c8a147607873df80, type: 3}
+      propertyPath: m_Name
+      value: Eye_L
       objectReference: {fileID: 0}
     - target: {fileID: 9167614337021841975, guid: 4142de7b55369254c8a147607873df80, type: 3}
       propertyPath: m_LocalPosition.x
