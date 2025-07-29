@@ -102,4 +102,11 @@ public class GridManager : Singleton<GridManager>
         float Team2Rate = countTeam2 / (float)total * 100f;
         teamRateText.text = $"Team1 : {Team1Rate.ToString("F2")}%    Team2 : {Team2Rate.ToString("F2")}%";
     }
+
+    public string GetWinningTeam()
+    {
+        if (countTeam1 > countTeam2) return "Team1";
+        else if (countTeam2 > countTeam1) return "Team2";
+        else return "Draw";
+    }
 }
