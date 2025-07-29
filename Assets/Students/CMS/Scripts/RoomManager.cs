@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Realtime;
+using ExitGames.Client.Photon; 
 
 
 public class RoomManager : MonoBehaviour
 {
-    [SerializeField] private Button startButton; // 방 시작 버튼 (현재 미사용)
+    [SerializeField] private Button startButton; // 방 시작 버튼
     [SerializeField] private Button leaveButton; // 방 나가기 버튼
+    [SerializeField] private Button team1Button;
+    [SerializeField] private Button team2Button;
 
     [SerializeField] private GameObject playerPanelItemPrefabs;  // 플레이어 패널 프리팹
     [SerializeField] private Transform playerPanelContent;       // 플레이어 패널들이 추가될 부모 오브젝트
@@ -20,6 +23,9 @@ public class RoomManager : MonoBehaviour
     {
         leaveButton.onClick.AddListener(()=> NetworkManager.Instance.LeaveRoom()); // 방 나가기 버튼 클릭 시 호출
         startButton.onClick.AddListener(OnClickGameStart);
+
+        team1Button.onClick.AddListener(() => OnClickChooseTeam("Team1"));
+        team2Button.onClick.AddListener(() => OnClickChooseTeam("Team2"));
     }
 
     private void OnClickGameStart()
@@ -60,30 +66,47 @@ public class RoomManager : MonoBehaviour
     }
     public void CheckAllReady()
     {
-        // 모든 플레이어의 Ready 상태 확인
+        int team1Count = 0, team2Count = 0;
+
         foreach (Player player in PhotonNetwork.PlayerList)
         {
-            if (player.CustomProperties.TryGetValue("Ready", out object value))
+            // Ready 체크
+            if (!player.CustomProperties.TryGetValue("Ready", out object readyObj) || !(bool)readyObj)
             {
-                if (!(bool)value)
-                {
-                    SetStartButtonActive(false);
-                    return; // 한 명이라도 false면 리턴
-                }
+                SetStartButtonActive(false);
+                return;
+            }
+
+            // 팀 체크
+            if (player.CustomProperties.TryGetValue("team", out object teamObj))
+            {
+                string team = teamObj.ToString();
+                if (team == "Team1") team1Count++;
+                else if (team == "Team2") team2Count++;
             }
             else
             {
+                // 팀이 안 정해진 경우도 실패 처리
                 SetStartButtonActive(false);
-                return; // Ready 값이 없는 경우도 false 취급
+                return;
             }
         }
 
-        // 모든 플레이어가 Ready 상태면 Start 버튼 활성화 (호스트만)
-        SetStartButtonActive(PhotonNetwork.IsMasterClient);
+        // 준비완료 && 팀 수 같음 && 최소 1명 이상일 때만 시작 버튼 활성화
+        bool canStart = team1Count == team2Count && team1Count > 0;
+        SetStartButtonActive(canStart && PhotonNetwork.IsMasterClient);
     }
 
     private void SetStartButtonActive(bool isActive)
     {
         startButton.gameObject.SetActive(isActive);
+    }
+    public void OnClickChooseTeam(string team)
+    {
+        PhotonNetwork.LocalPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable
+        {
+            { "team", team },
+            { "Ready", false }
+        });
     }
 }

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
-using TMPro;
+using TMPro; 
+using UnityEngine.SceneManagement;
+
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
@@ -26,6 +28,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         Instance = this;
         Debug.Log("NetworkManager 초기화 완료");
+    }
+
+    private void Start()
+    {
+        if(SceneManager.GetActiveScene().name == "LoginScene")
+        {
+            ShowLoading(); // 로딩 화면 활성화
+            PhotonNetwork.ConnectUsingSettings(); // Photon 서버에 연결 시도
+            Debug.Log("Photon 서버 연결 시도 중...");
+        }
+        else
+        {
+            ShowLobby(); // 로비 화면 활성화
+        }
     }
 
     public override void OnConnectedToMaster()
@@ -107,7 +123,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         lobbyPanel.SetActive(false);
         roomPanel.SetActive(true);
-        roomManager.PlayerPanelSpawn(PhotonNetwork.LocalPlayer);
+
+        roomManager.PlayerPanelspawn(); 
         Debug.Log("방 입장 성공!");
     }
 
@@ -155,9 +172,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        roomManager.PlayerPanelSpawn(otherPlayer);
+        roomManager.PlayerPanelRemove(otherPlayer); 
     }
-    
+
 
     public void LeaveRoom()   // 방 나가기 요청
     {
@@ -173,13 +190,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         lobbyPanelScript.OnReturnFromRoom();  // 로비 버튼 등 상태 복원
     }
 
-    public override void OnPlayerPropertiesUpdate(Player target, ExitGames.Client.Photon.Hashtable changedProps)
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
-        if (changedProps.ContainsKey("Ready") && roomManager.playerPanels.TryGetValue(target.ActorNumber, out PlayerPanelItem item))
+        if (roomManager.playerPanels.TryGetValue(targetPlayer.ActorNumber, out var panel))
         {
-            item.ReadyCheck(target);
+            panel.ReadyCheck(targetPlayer); // 기존 Ready UI 반영
+            panel.ApplyTeamColor(targetPlayer); // 팀 색상 반영
         }
 
-        roomManager.CheckAllReady(); // 모든 Ready 상태 재검사
+        roomManager.CheckAllReady(); // 준비 여부 재확인
     }
 }
