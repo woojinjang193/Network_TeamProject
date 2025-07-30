@@ -32,20 +32,18 @@ public class PlayerState : BaseState
         Vector3 lookDirection = player.rig.velocity;
         lookDirection.y = 0;
 
-        if (lookDirection != Vector3.zero)
+        if (lookDirection.sqrMagnitude > 0.01f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
-            player.rig.rotation = Quaternion.Slerp(player.rig.rotation, targetRotation, Time.fixedDeltaTime * 10f);
+            player.transform.rotation = Quaternion.Slerp(player.transform.rotation, targetRotation, Time.fixedDeltaTime * 15f);
         }
     }
 
-  
     protected void Jump(float jumpForce)
     {
-        player.rig.velocity = new Vector3(player.rig.velocity.x, 0, player.rig.velocity.z);
-        player.rig.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        player.rig.useGravity = true;
+        player.rig.velocity = new Vector3(player.rig.velocity.x, jumpForce, player.rig.velocity.z);
     }
-
     protected bool IsGrounded()
     {
         return player.IsGrounded;

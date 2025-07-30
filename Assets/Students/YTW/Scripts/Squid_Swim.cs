@@ -16,12 +16,11 @@ public class Squid_Swim : PlayerState
     {
         if (player.input.IsJumpPressed && IsGrounded())
         {
-            player.rig.useGravity = true; 
             stateMachine.ChangeState(squidState.lowStateDic[LowState.Jump]);
             return;
         }
 
-        if (!IsGrounded())
+        if (!IsGrounded() && !player.IsOnWalkableWall)
         {
             stateMachine.ChangeState(squidState.lowStateDic[LowState.Jump]);
             return;
@@ -34,9 +33,13 @@ public class Squid_Swim : PlayerState
     }
     public override void FixedUpdate()
     {
-        if (player.IsOnWalkableWall && player.input.MoveInput.y > 0.1f)
+        if (player.IsAtWallEdge && player.input.MoveInput.y > 0.1f)
         {
-            ClimbWall();
+            VaultOverWall();
+        }
+        else if (player.IsOnWalkableWall)
+        {
+            MoveOnWall();
         }
         else
         {
@@ -44,28 +47,37 @@ public class Squid_Swim : PlayerState
         }
     }
 
-    private void ClimbWall()
+    private void MoveOnWall()
     {
-        Vector3 wallClimbVelocity = Vector3.up * player.squidSpeed;
-        player.rig.velocity = wallClimbVelocity;
+        player.IsVaulting = false;
+        Quaternion cameraYaw = Quaternion.Euler(0, player.mainCamera.transform.eulerAngles.y, 0);
+        Vector3 moveDirection = new Vector3(player.input.MoveInput.x, player.input.MoveInput.y, 0);
+        Vector3 targetDirection = cameraYaw * moveDirection;
+        player.rig.velocity = targetDirection.normalized * player.squidSpeed;
+        Quaternion targetRotation = Quaternion.LookRotation(-player.WallNormal);
+        player.transform.rotation = Quaternion.Slerp(player.transform.rotation, targetRotation, Time.fixedDeltaTime * 10f);
     }
 
+    private void VaultOverWall()
+    {
+        player.IsVaulting = true;
+
+        // 기존 속도를 0으로 만들어 예측 가능성을 높입니다.
+        player.rig.velocity = Vector3.zero;
+
+        // 위로 솟구치는 힘과 앞으로 살짝 나아가는 힘을 '충격량'으로 한 번만 가합니다.
+        // 이 힘은 지속되지 않으므로 멀리 날아가지 않습니다.
+        Vector3 upwardForce = Vector3.up * player.squidJumpForce * 1.2f;
+        Vector3 forwardForce = player.transform.forward * player.squidSpeed * 0.5f;
+
+        player.rig.AddForce(upwardForce + forwardForce, ForceMode.Impulse);
+    }
+
+    // 지상 수영 메서드
     private void SwimOnGround()
     {
-        // 잉크 속에 숨어서 움직임 표현
-        if (player.rig.velocity.y > 0.1f) return;
-
-        Vector3 moveDirection = new Vector3(player.input.MoveInput.x, 0f, player.input.MoveInput.y);
-        Vector3 cameraForward = player.mainCamera.transform.forward;
-        cameraForward.y = 0;
-        cameraForward.Normalize();
-        Vector3 cameraRight = player.mainCamera.transform.right;
-        cameraRight.y = 0;
-        cameraRight.Normalize();
-
-        Vector3 moveVec = (cameraForward * moveDirection.z + cameraRight * moveDirection.x).normalized;
-
-        player.rig.velocity = new Vector3(moveVec.x * player.squidSpeed, -1.0f, moveVec.z * player.squidSpeed);
+        player.IsVaulting = false;
+        SetMove(player.squidSpeed);
         SetPlayerRotation();
     }
 }

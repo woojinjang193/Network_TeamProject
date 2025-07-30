@@ -15,9 +15,15 @@ public class Squid_Jump : PlayerState
 
     public override void Enter()
     {
+        player.IsVaulting = false;
+
         if (player.input.IsJumpPressed)
         {
             Jump(player.squidJumpForce);
+        }
+        else
+        {
+            player.rig.useGravity = true;
         }
     }
 
@@ -25,6 +31,7 @@ public class Squid_Jump : PlayerState
     {
         if (player.rig.velocity.y < 0.1f && IsGrounded())
         {
+            player.IsVaulting = false;
             if (player.input.MoveInput != Vector2.zero)
             {
                 stateMachine.ChangeState(squidState.lowStateDic[LowState.Move]);
@@ -33,6 +40,13 @@ public class Squid_Jump : PlayerState
             {
                 stateMachine.ChangeState(squidState.lowStateDic[LowState.Idle]);
             }
+            return;
+        }
+
+        if (!player.IsVaulting)
+        {
+            SetMove(player.moveSpeed * 0.9f); 
+            SetPlayerRotation(); 
         }
     }
 }
