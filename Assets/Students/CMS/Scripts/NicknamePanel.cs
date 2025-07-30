@@ -42,6 +42,7 @@ public class NicknamePanel : MonoBehaviour
                     return;
                 }
                 Debug.Log("닉네임 업데이트 성공!");
+                FirebaseManager.UploadNickname(nicknameInput.text);
                 lobbyPanel.SetActive(true);
                 gameObject.SetActive(false);
             });
