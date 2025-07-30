@@ -3908,7 +3908,7 @@ ParticleSystem:
     radiusScale: 0.15
     collidesWith:
       serializedVersion: 2
-      m_Bits: 71
+      m_Bits: 327
     maxCollisionShapes: 256
     quality: 0
     voxelSize: 0.5
@@ -4999,6 +4999,7 @@ GameObject:
   - component: {fileID: 9200769922787301180}
   - component: {fileID: 3723181291678754530}
   - component: {fileID: 1644389226452304539}
+  - component: {fileID: 611179299146713548}
   m_Layer: 8
   m_Name: Player1
   m_TagString: Untagged
@@ -5151,6 +5152,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 1
+--- !u!114 &611179299146713548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 620561224654458845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffa1b22d83c881b4f9045bf6d0be5fa8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHP: 100
 --- !u!1 &1244760371198544076
 GameObject:
   m_ObjectHideFlags: 0
