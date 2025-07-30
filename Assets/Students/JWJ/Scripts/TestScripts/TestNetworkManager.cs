@@ -30,7 +30,7 @@ public class TestNetworkManager : MonoBehaviourPunCallbacks
     private void PlayerSpawn()
     {
         Vector3 spawnPos = new Vector3(Random.Range(0, 5), 1, Random.Range(0, 5));
-        PhotonNetwork.Instantiate("JWJ_Test_Player", spawnPos, Quaternion.identity);
+        PhotonNetwork.Instantiate("Player1", spawnPos, Quaternion.identity);
     }
     public override void OnPlayerEnteredRoom(Player player)
     {

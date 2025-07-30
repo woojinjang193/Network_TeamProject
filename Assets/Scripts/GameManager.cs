@@ -10,7 +10,7 @@ public class GameManager : Singleton<GameManager>
 {
     public bool IsGameEnd {  get; private set; }
 
-    private Dictionary<Collider, PlayerTestController> playerDic = new();
+    private Dictionary<Collider, PlayerController> playerDic = new();
     //플레이어의 콜라이더와 컨트롤러를 넣을 딕셔너리 
 
     [Header("팀별 스폰 위치")]
@@ -90,17 +90,17 @@ public class GameManager : Singleton<GameManager>
         PhotonNetwork.Instantiate(playerPrefabName, spawnPoint.position, spawnPoint.rotation);
     }
 
-    public void RegisterPlayer(Collider col, PlayerTestController playerController)
+    public void RegisterPlayer(Collider col, PlayerController playerController)
     {
         playerDic[col] = playerController;
         //호출되면 그 플레이어의 콜라이더를 딕셔너리에 추가
     }
 
-    public PlayerTestController GetPlayer(Collider col)
+    public PlayerController GetPlayer(Collider col)
     {
-        playerDic.TryGetValue(col, out PlayerTestController playerTestController);
-        //키를 넣으면 playerTestController를 반환
-        return playerTestController;
+        playerDic.TryGetValue(col, out PlayerController playerController);
+        //키를 넣으면 playerController를 반환
+        return playerController;
 
     }
 

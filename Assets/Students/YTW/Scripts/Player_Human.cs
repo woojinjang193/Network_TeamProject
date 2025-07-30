@@ -57,11 +57,11 @@ public class Player_Human : PlayerState
         {
             if (player.input.IsFirePressed)
             {
-                player.weaponView.RPC("FireParticle", RpcTarget.All, player.myTeam, true);
+                player.weaponView.RPC("FireParticle", RpcTarget.All, player.MyTeam, true);
             }
             if (player.input.IsFireReleased)
             {
-                player.weaponView.RPC("FireParticle", RpcTarget.All, player.myTeam, false);
+                player.weaponView.RPC("FireParticle", RpcTarget.All, player.MyTeam, false);
             }
         }
         else
@@ -82,7 +82,7 @@ public class Player_Human : PlayerState
     {
         if (player.weaponView != null)
         {
-            player.weaponView.RPC("FireParticle", RpcTarget.All, player.myTeam, false);
+            player.weaponView.RPC("FireParticle", RpcTarget.All, player.MyTeam, false);
         }
     }
 

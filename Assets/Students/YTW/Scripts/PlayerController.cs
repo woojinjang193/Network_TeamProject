@@ -49,7 +49,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     [Header("팀 설정")]
     private TeamColorInfo teamColorInfo;
-    public Team myTeam { get; private set; } = Team.None;
+ 
+    private Team myTeam = Team.None;
+    public Team MyTeam => myTeam;
 
     [Header("잉크 상호작용 설정")]
     [Tooltip("잉크가 칠해질 수 있는 오브젝트의 레이어")]
@@ -70,6 +72,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     // 잉크 감지 시스템
     private float groundCheckTimer = 0f;
     private const float GROUND_CHECK_INTERVAL = 0.1f; // 1초에 10번 검사
+
+    //플레이어 체력
+    private PlayerHealth playerHealth;///
+    public PlayerHealth PlayerHealth => playerHealth;///
+
 
     public bool IsGrounded { get; private set; } = false;
     public InkStatus CurrentGroundInkStatus { get; private set; } = InkStatus.NONE;
@@ -92,6 +99,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         playerRenderer = humanModel.GetComponent<SkinnedMeshRenderer>();
         squidRenderer = squidModel.GetComponent<SkinnedMeshRenderer>();
+
+        playerHealth = GetComponent<PlayerHealth>();///
 
         if (photonView.IsMine)
         {
@@ -140,6 +149,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             rig.isKinematic = true;
         }
+
+        Manager.Game.RegisterPlayer(col, this);
 
     }
 
