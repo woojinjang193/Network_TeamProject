@@ -16,6 +16,7 @@ public class Squid_Swim : PlayerState
     {
         if (player.input.IsJumpPressed && IsGrounded())
         {
+            Jump(player.squidJumpForce);
             stateMachine.ChangeState(squidState.lowStateDic[LowState.Jump]);
             return;
         }
@@ -61,19 +62,14 @@ public class Squid_Swim : PlayerState
     private void VaultOverWall()
     {
         player.IsVaulting = true;
-
-        // 기존 속도를 0으로 만들어 예측 가능성을 높입니다.
         player.rig.velocity = Vector3.zero;
 
-        // 위로 솟구치는 힘과 앞으로 살짝 나아가는 힘을 '충격량'으로 한 번만 가합니다.
-        // 이 힘은 지속되지 않으므로 멀리 날아가지 않습니다.
         Vector3 upwardForce = Vector3.up * player.squidJumpForce * 1.2f;
         Vector3 forwardForce = player.transform.forward * player.squidSpeed * 0.5f;
 
         player.rig.AddForce(upwardForce + forwardForce, ForceMode.Impulse);
     }
 
-    // 지상 수영 메서드
     private void SwimOnGround()
     {
         player.IsVaulting = false;

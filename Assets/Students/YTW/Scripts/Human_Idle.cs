@@ -14,7 +14,9 @@ public class Human_Idle : PlayerState
 
     public override void Enter()
     {
-        HasPhysics = false; 
+        Debug.Log("Human_Idle 상태");
+        HasPhysics = true; 
+
         // player.humanAnimator.SetBool("isMoving", false);
     }
 
@@ -38,6 +40,17 @@ public class Human_Idle : PlayerState
         }
     }
 
+    
+    public override void FixedUpdate() 
+    {
+        float verticalVelocity = player.rig.velocity.y;
+
+        Vector3 horizontalVelocity = new Vector3(player.rig.velocity.x, 0f, player.rig.velocity.z);
+
+        horizontalVelocity = Vector3.Lerp(horizontalVelocity, Vector3.zero, Time.fixedDeltaTime * 30f);
+
+        player.rig.velocity = new Vector3(horizontalVelocity.x, verticalVelocity, horizontalVelocity.z);
+    }
+
     public override void Exit() { }
-    public override void FixedUpdate() { }
 }
