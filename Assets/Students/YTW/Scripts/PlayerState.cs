@@ -56,6 +56,25 @@ public class PlayerState : BaseState
         }
     }
 
+    protected void UpdateAnimationParameters()
+    {
+        if (player.humanAnimator == null) return;
+
+        Vector3 worldMoveDirection = player.rig.velocity;
+        if (player.rig.velocity is { x: <= 0.01f, z: <= 0.01f })
+        {
+            player.humanAnimator.SetFloat("MoveX", 0f);
+            player.humanAnimator.SetFloat("MoveY", 0f);
+            return;
+        }
+        worldMoveDirection.y = 0;
+
+        Vector3 localMoveDirection = player.transform.InverseTransformDirection(worldMoveDirection.normalized);
+
+        player.humanAnimator.SetFloat("MoveX", localMoveDirection.x, 0.1f, Time.fixedDeltaTime);
+        player.humanAnimator.SetFloat("MoveY", localMoveDirection.z, 0.1f, Time.fixedDeltaTime);
+    }
+    
     protected void Jump(float jumpForce)
     {
         player.rig.useGravity = true;

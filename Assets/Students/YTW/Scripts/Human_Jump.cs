@@ -19,6 +19,7 @@ public class Human_Jump : PlayerState
             Jump(player.humanJumpForce);
         }
         player.humanAnimator.SetTrigger("JumpTrigger");
+        player.humanAnimator.SetBool("IsAir", true);
     }
 
     public override void Update()
@@ -44,5 +45,8 @@ public class Human_Jump : PlayerState
         }
     }
 
-    public override void Exit() { }
+    public override void Exit()
+    {
+        player.humanAnimator.SetBool("IsAir", false);
+    }
 }

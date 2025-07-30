@@ -1,3 +1,4 @@
+using System;
 using Photon.Pun;
 using System.Collections.Generic;
 using UnityEngine;
@@ -68,8 +69,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private Quaternion networkRotation;
     private bool isSquidNetworked = false;
     private float networkMoveX = 0f;
-    private float networkMoveZ = 0f;
-
+    private float networkMoveY = 0f;
+    private float interpolatePos { get; set; } = 0f;
+    private float interpolateRot { get; set; } = 0f;
+    private float deltaPos = 0;
+    private float deltaRot = 0;
+    
+    
     // 잉크 감지 시스템
     private float groundCheckTimer = 0f;
     private const float GROUND_CHECK_INTERVAL = 0.1f; // 1초에 10번 검사
@@ -217,23 +223,29 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
-            transform.position = Vector3.Lerp(transform.position, networkPosition, Time.deltaTime * 10.0f);
-            transform.rotation = Quaternion.Lerp(transform.rotation, networkRotation, Time.deltaTime * 10.0f);
+            // 지연보상
+            deltaPos = Vector3.Distance(transform.position, networkPosition);
+            deltaRot = Quaternion.Angle(transform.rotation, networkRotation);
+            
+            interpolatePos = deltaPos * Time.deltaTime * PhotonNetwork.SerializationRate;
+            interpolateRot = deltaRot * Time.deltaTime * PhotonNetwork.SerializationRate;
+            
+            transform.position = Vector3.Slerp(transform.position, networkPosition, interpolatePos);
+            transform.rotation = Quaternion.Slerp(transform.rotation, networkRotation, interpolateRot);
 
             humanModel.SetActive(!isSquidNetworked);
             squidModel.SetActive(isSquidNetworked);
 
             if (humanAnimator != null)
             {
-                humanAnimator.SetFloat("moveX", networkMoveX);
-                humanAnimator.SetFloat("moveZ", networkMoveZ);
+                humanAnimator.SetFloat("MoveX", networkMoveY);
+                humanAnimator.SetFloat("MoveY", networkMoveX);
             }
         }
-
-
+        
         UpdatePlayerColor();
     }
-
+    
     private void GroundAndInkCheck()
     {
         LayerMask combinedLayer = groundLayer | inkableLayer;
@@ -281,9 +293,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
                 // 머리 높이 레이캐스트를 발사하여 벽 상단을 확인
                 if (IsOnWalkableWall && !Physics.Raycast(edgeRayStart, transform.forward, wallRayDistance, inkableLayer))
-            {
-                IsAtWallEdge = true;
-            }
+                {
+                    IsAtWallEdge = true;
+                }
                 else
                 {
                     IsAtWallEdge = false;
@@ -457,10 +469,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         // 내가 직접 조종하는 캐릭터에서만 작동
         if (stream.IsWriting)
         {
+            if (stateMachine == null || highStateDic == null)
+            {
+                Debug.LogError("스테이트 머신 또는 스테이트 딕셔너리 없음");
+                return;
+            }
             // 현재 내 위치를 stream에 실림
             stream.SendNext(transform.position);
             // 현재 내 회전값을 stream에 실림
             stream.SendNext(transform.rotation);
+            // 현재 속도 전송
             stream.SendNext((int)myTeam);
             // 현재 내 상태가 오징어 폼인지 아닌지(bool)를 stream에 실림
             // (stateMachine.CurrentState가 SquidForm 상태와 같으면 true, 아니면 false가 실림)
@@ -473,30 +491,41 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 stream.SendNext(false);
             }
 
-            if (humanAnimator != null)
+            // 인간폼일때 Send
+            if (stateMachine.CurrentState == highStateDic[HighState.HumanForm])
             {
                 stream.SendNext(humanAnimator.GetFloat("MoveX"));
                 stream.SendNext(humanAnimator.GetFloat("MoveY"));
             }
-            else
+            else if(stateMachine.CurrentState == highStateDic[HighState.SquidForm])
             {
-                stream.SendNext(0f);
-                stream.SendNext(0f);
+                // stream.SendNext(squidAnimator.GetFloat("MoveSpeed"));
             }
         }
-        else
+        else if (stream.IsReading)
         // stream.IsWriting이 false, 즉 stream.IsReading일 때
         // 다른 사람의 컴퓨터에 보이는 내 캐릭터, 또는 내 컴퓨터에 보이는 다른 사람의 캐릭터에서 작동
         {
             // 데이터 통로(stream)에서 첫 번째 데이터를 꺼내 networkPosition 변수에 저장
-            this.networkPosition = (Vector3)stream.ReceiveNext();
+            networkPosition = (Vector3)stream.ReceiveNext();
             // 두 번째 데이터를 꺼내 networkRotation 변수에 저장
-            this.networkRotation = (Quaternion)stream.ReceiveNext();
+            networkRotation = (Quaternion)stream.ReceiveNext();
             // 세 번째 데이터를 꺼내 isSquidNetworked 변수에 저장
-            this.myTeam = (Team)(int)stream.ReceiveNext();
-            this.isSquidNetworked = (bool)stream.ReceiveNext();
-            this.networkMoveX = (float)stream.ReceiveNext();
-            this.networkMoveZ = (float)stream.ReceiveNext();
+            myTeam = (Team)(int)stream.ReceiveNext(); // TODO: 팀변경 테스트 끝나면 지우기
+            isSquidNetworked = (bool)stream.ReceiveNext();
+            
+            // 인간 폼일때 수신
+            if (!isSquidNetworked)
+            {
+                networkMoveX = (float)stream.ReceiveNext();
+                networkMoveY = (float)stream.ReceiveNext();
+            }
+            // 오징어 폼일때 수신
+            else if (isSquidNetworked)
+            {
+                // networkMoveSpeed = (float)stream.ReceiveNext();   
+            }
+            
         }
     }
 
