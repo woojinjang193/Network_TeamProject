@@ -39,7 +39,6 @@ public class Player_Human : PlayerState
 
         if (player.input.IsSquidHeld)
         {
-            // 땅에 있고 우리팀 잉크 위일 때만 변신
             if (player.IsGrounded && player.CurrentGroundInkStatus == InkStatus.OUR_TEAM)
             {
                 this.stateMachine.ChangeState(player.highStateDic[HighState.SquidForm]);

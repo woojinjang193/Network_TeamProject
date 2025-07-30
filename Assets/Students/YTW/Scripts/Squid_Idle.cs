@@ -16,7 +16,7 @@ public class Squid_Idle : PlayerState
     {
         if (player.input.IsJumpPressed && IsGrounded())
         {
-            player.rig.useGravity = true; // 점프할 때는 중력 활성화
+            player.rig.useGravity = true; 
             stateMachine.ChangeState(squidState.lowStateDic[LowState.Jump]);
             return;
         }

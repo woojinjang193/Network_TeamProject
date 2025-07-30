@@ -17,7 +17,6 @@ public class Human_Jump : PlayerState
         {
             Jump(player.humanJumpForce);
         }
-        // player.animator.SetTrigger("HumanJump");
     }
 
     public override void Update()
@@ -27,6 +26,9 @@ public class Human_Jump : PlayerState
 
     public override void FixedUpdate()
     {
+        SetMove(player.moveSpeed);
+        SetPlayerRotation();
+
         if (player.rig.velocity.y < 0.1f && IsGrounded())
         {
             if (player.input.MoveInput != Vector2.zero)
