@@ -49,7 +49,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     [Header("팀 설정")]
     private TeamColorInfo teamColorInfo;
-    public Team myTeam { get; private set; } = Team.None;
+ 
+    private Team myTeam = Team.None;
+    public Team MyTeam => myTeam;
 
     [Header("잉크 상호작용 설정")]
     [Tooltip("잉크가 칠해질 수 있는 오브젝트의 레이어")]
@@ -71,10 +73,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private float groundCheckTimer = 0f;
     private const float GROUND_CHECK_INTERVAL = 0.1f; // 1초에 10번 검사
 
+    //플레이어 체력
+    private PlayerHealth playerHealth;///
+    public PlayerHealth PlayerHealth => playerHealth;///
+
+
     public bool IsGrounded { get; private set; } = false;
     public InkStatus CurrentGroundInkStatus { get; private set; } = InkStatus.NONE;
     public InkStatus CurrentWallInkStatus { get; private set; } = InkStatus.NONE;
     public bool IsOnWalkableWall { get; private set; } = false;
+    public bool IsAtWallEdge { get; private set; } = false;
+    public bool IsVaulting = false;
     public Vector3 WallNormal { get; private set; } = Vector3.zero;
 
     void Awake()
@@ -90,6 +99,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         playerRenderer = humanModel.GetComponent<SkinnedMeshRenderer>();
         squidRenderer = squidModel.GetComponent<SkinnedMeshRenderer>();
+
+        playerHealth = GetComponent<PlayerHealth>();///
 
         if (photonView.IsMine)
         {
@@ -139,6 +150,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             rig.isKinematic = true;
         }
 
+        Manager.Game.RegisterPlayer(col, this);
+
     }
 
     void Start()
@@ -178,13 +191,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (photonView.IsMine)
         {
-            groundCheckTimer -= Time.deltaTime;
-            if (groundCheckTimer <= 0f)
-            {
-                groundCheckTimer = GROUND_CHECK_INTERVAL;
-                GroundAndInkCheck();
-            }
-
+            GroundAndInkCheck();
 
             if (stateMachine != null)
             {
@@ -250,26 +257,43 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         // 벽 체크
-        Vector3 wallRayStart = transform.position + Vector3.up * 0.5f;
+        Vector3 wallRayStart = transform.position - transform.up * (col.height / 2 - 0.1f);
+        // 현재 콜라이더의 절대적인 꼭대기 위치 바로 아래에서 레이를 쏨
+        Vector3 edgeRayStart = transform.position + transform.up * (col.height / 2 - 0.1f);
+
         float wallRayDistance = 1f;
         Debug.DrawRay(wallRayStart, transform.forward * wallRayDistance, Color.blue);
 
         if (Physics.Raycast(wallRayStart, transform.forward, out RaycastHit wallHit, wallRayDistance, inkableLayer))
         {
+            WallNormal = wallHit.normal;
             if (wallHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
             {
                 SplatmapReader.ReadPixel(paintableObj.splatMap, wallHit.textureCoord, OnWallColorRead);
+
+                // 머리 높이 레이캐스트를 발사하여 벽 상단을 확인
+                if (IsOnWalkableWall && !Physics.Raycast(edgeRayStart, transform.forward, wallRayDistance, inkableLayer))
+            {
+                IsAtWallEdge = true;
+            }
+                else
+                {
+                    IsAtWallEdge = false;
+                }
             }
             else
             {
                 CurrentWallInkStatus = InkStatus.NONE;
                 IsOnWalkableWall = false;
+                IsAtWallEdge = false;
             }
         }
         else
         {
+            WallNormal = Vector3.zero;
             CurrentWallInkStatus = InkStatus.NONE;
             IsOnWalkableWall = false;
+            IsAtWallEdge = false;
         }
     }
 
@@ -284,6 +308,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private void OnWallColorRead(Color color)
     {
         CurrentWallInkStatus = GetInkStatusFromColor(color);
+        if (stateMachine.CurrentState != highStateDic[HighState.SquidForm])
+        {
+            IsOnWalkableWall = false;
+            return;
+        }
+
         IsOnWalkableWall = (CurrentWallInkStatus == InkStatus.OUR_TEAM);
     }
 
@@ -326,7 +356,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (photonView.IsMine && stateMachine != null)
         {
             stateMachine.FixedUpdate();
-            if (!IsGrounded && rig.useGravity)
+            if (!IsGrounded && rig.useGravity && !IsVaulting)
             {
                 if (rig.velocity.y >= 0)
                 {

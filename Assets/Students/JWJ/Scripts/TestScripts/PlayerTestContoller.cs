@@ -32,10 +32,10 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
     {
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
         Collider col = GetComponent<Collider>();
-        Manager.Game.RegisterPlayer(col, this);
+        //Manager.Game.RegisterPlayer(col, this);///// 테스트를 위해 잠시 주석처리
         //생성시 플레이어의 콜라이더와 컨트롤러를 딕셔너리에 등록
     }
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) //이거 뭐임?
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) ////?
     {
         if (stream.IsWriting)
         {
@@ -49,8 +49,8 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
 
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+       Cursor.lockState = CursorLockMode.Locked;
+       Cursor.visible = false;
 
         rigid = GetComponent<Rigidbody>();
         cam = GetComponentInChildren<Camera>();
@@ -87,10 +87,10 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
             }
         }
 
-        TeamSelect();
+        TeamSelect(); // 테스트 코드
     }
 
-    private void TeamSelect( )
+    private void TeamSelect( ) //테스트 코드
     {
         if (photonView.IsMine)
         {
@@ -134,4 +134,5 @@ public class PlayerTestController : MonoBehaviourPun, IPunObservable
         playerY.y = cameraPivot.eulerAngles.y;
         transform.eulerAngles = playerY;
     }
+
 }

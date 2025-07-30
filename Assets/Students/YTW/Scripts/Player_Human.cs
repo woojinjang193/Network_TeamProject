@@ -42,7 +42,6 @@ public class Player_Human : PlayerState
 
         if (player.input.IsSquidHeld)
         {
-            // 땅에 있고 우리팀 잉크 위일 때만 변신
             if (player.IsGrounded && player.CurrentGroundInkStatus == InkStatus.OUR_TEAM)
             {
                 this.stateMachine.ChangeState(player.highStateDic[HighState.SquidForm]);
@@ -61,11 +60,11 @@ public class Player_Human : PlayerState
         {
             if (player.input.IsFirePressed)
             {
-                player.weaponView.RPC("FireParticle", RpcTarget.All, player.myTeam, true);
+                player.weaponView.RPC("FireParticle", RpcTarget.All, player.MyTeam, true);
             }
             if (player.input.IsFireReleased)
             {
-                player.weaponView.RPC("FireParticle", RpcTarget.All, player.myTeam, false);
+                player.weaponView.RPC("FireParticle", RpcTarget.All, player.MyTeam, false);
             }
         }
         else
@@ -86,7 +85,7 @@ public class Player_Human : PlayerState
     {
         if (player.weaponView != null)
         {
-            player.weaponView.RPC("FireParticle", RpcTarget.All, player.myTeam, false);
+            player.weaponView.RPC("FireParticle", RpcTarget.All, player.MyTeam, false);
         }
     }
 

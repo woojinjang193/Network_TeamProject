@@ -27,6 +27,9 @@ public class Human_Jump : PlayerState
 
     public override void FixedUpdate()
     {
+        SetMove(player.moveSpeed);
+        SetPlayerRotation();
+
         if (player.rig.velocity.y < 0.1f && IsGrounded())
         {
             if (player.input.MoveInput != Vector2.zero)
