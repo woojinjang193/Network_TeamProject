@@ -7,6 +7,8 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
+    public BaseUI CurrentUI => uiStack.Count > 0 ? uiStack.Peek() : null;
+
     private Dictionary<Type, BaseUI> uiDictionary = new Dictionary<Type, BaseUI>();
     private Stack<BaseUI> uiStack = new Stack<BaseUI>();
 

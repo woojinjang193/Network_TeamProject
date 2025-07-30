@@ -13,14 +13,12 @@ public class LobbyUI : BaseUI
     [SerializeField] private Button logoutButton;
     [SerializeField] private GameObject characterDisplayPanel; // 캐릭터를 보여줄 패널
 
-    [Header("방 내부 패널")]
-    [SerializeField] private GameObject roomPanel;
-    [SerializeField] private TMP_Text roomNameText;
-    [SerializeField] private Transform playerList;
-    [SerializeField] private GameObject playerListPrefab; // 각 플레이어 정보를 표시할 UI 프리팹
-    [SerializeField] private Button readyButton;
-    [SerializeField] private Button startGameButton; // 방장만 활성화
-    [SerializeField] private Button leaveRoomButton;
+    [Header("방 생성")]
+    [SerializeField] private TMP_InputField createRoomNameInput;
+
+    
+
+    
 
     private void Awake()
     {
@@ -28,11 +26,6 @@ public class LobbyUI : BaseUI
         createRoomButton.onClick.AddListener(OnCreateRoomButtonClicked);
         findRoomButton.onClick.AddListener(OnFindRoomButtonClicked);
         logoutButton.onClick.AddListener(OnLogoutButtonClicked);
-
-        // 방 내부 버튼 이벤트 연결
-        readyButton.onClick.AddListener(OnReadyButtonClicked);
-        startGameButton.onClick.AddListener(OnStartGameButtonClicked);
-        leaveRoomButton.onClick.AddListener(OnLeaveRoomButtonClicked);
     }
 
     public override void Open()
@@ -50,23 +43,19 @@ public class LobbyUI : BaseUI
     public void ShowMainLobby()
     {
         mainLobbyPanel.SetActive(true);
-        roomPanel.SetActive(false);
     }
 
-    // 방 내부 화면
-    public void ShowRoomUI(string roomName = "")
-    {
-        mainLobbyPanel.SetActive(false);
-        roomPanel.SetActive(true);
-        roomNameText.text = roomName;
-        // TODO: 플레이어 목록 업데이트 로직 추가
-    }
+    
 
     private void OnCreateRoomButtonClicked()
     {
-        Debug.Log("방 생성 버튼 클릭됨");
-        // TODO: 방 생성 로직 (Photon 연동)
-        ShowRoomUI("새로운 방"); // 임시로 방 화면 보여주기
+        string roomName = createRoomNameInput.text;
+        if (string.IsNullOrEmpty(roomName))
+        {
+            Debug.Log("방 이름이 비어있어, 랜덤 방으로 생성합니다.");
+            roomName = $"Room_{Random.Range(1000, 9999)}";
+        }
+        NetworkManager.Instance.CreateRoom(roomName);
     }
 
     private void OnFindRoomButtonClicked()
@@ -81,22 +70,14 @@ public class LobbyUI : BaseUI
         UIManager.Instance.ReplaceUI(typeof(LoginUI)); // 로그인 화면으로 돌아가기
     }
 
-    private void OnReadyButtonClicked()
-    {
-        Debug.Log("준비 버튼 클릭됨");
-        // TODO: 준비 상태 토글 로직 (Photon 연동)
-    }
+    
 
-    private void OnStartGameButtonClicked()
-    {
-        Debug.Log("게임 시작 버튼 클릭됨");
-        // TODO: 게임 시작 로직 (방장만, Photon 연동)
-    }
+    
 
-    private void OnLeaveRoomButtonClicked()
+    
+
+    public void OnReturnFromRoom()
     {
-        Debug.Log("방 나가기 버튼 클릭됨");
-        // TODO: 방 나가기 로직 (Photon 연동)
-        ShowMainLobby(); // 메인 로비 화면으로 돌아가기
+        if (createRoomButton != null) createRoomButton.interactable = true;
     }
 }
