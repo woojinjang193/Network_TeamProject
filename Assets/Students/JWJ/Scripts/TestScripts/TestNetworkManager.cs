@@ -22,7 +22,7 @@ public class TestNetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        Debug.Log("ÀÔÀå ¿Ï·á");
+        Debug.Log("ìž…ìž¥ ì™„ë£Œ");
         PhotonNetwork.LocalPlayer.NickName = $"Player_{PhotonNetwork.LocalPlayer.ActorNumber}";
         PlayerSpawn();
     }
@@ -34,6 +34,6 @@ public class TestNetworkManager : MonoBehaviourPunCallbacks
     }
     public override void OnPlayerEnteredRoom(Player player)
     {
-        Debug.Log($"{player.NickName} ÀÔÀå ¿Ï·á");
+        Debug.Log($"{player.NickName} ìž…ìž¥ ì™„ë£Œ");
     }
 }
