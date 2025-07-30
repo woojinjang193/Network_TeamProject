@@ -14,7 +14,7 @@ public class PaintableObj : MonoBehaviour
 
     private CommandBuffer buffer;  // 그래픽 명령 (명령을 모아서 한번에 작업함)
 
-    private int textureSize = 1024;
+    [SerializeField] private int textureSize = 1024;
 
     private TeamColorInfo teamColorInfo;
 
