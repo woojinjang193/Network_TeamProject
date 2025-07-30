@@ -32,6 +32,7 @@ public class PlayerState : BaseState
 
         Vector3 moveDirection = (camForward * player.input.MoveInput.y +
                                  camRight * player.input.MoveInput.x).normalized;
+<<<<<<< Updated upstream
 
         // 경사면 이동일 경우
         if (player.IsGrounded)
@@ -41,6 +42,9 @@ public class PlayerState : BaseState
         }
         else 
         {
+=======
+        
+>>>>>>> Stashed changes
         player.rig.velocity = new Vector3(moveDirection.x * moveSpeed, player.rig.velocity.y, moveDirection.z * moveSpeed);
         }
     }
