@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using UnityEngine;
 public class GridManager : Singleton<GridManager>
 {
     [SerializeField] private TMP_Text teamRateText;
+    private PhotonView photonView;///
 
     private int countTeam1 = 0;
     private int countTeam2 = 0;
@@ -33,7 +35,13 @@ public class GridManager : Singleton<GridManager>
                 Debug.LogError("UI/CoverageRateCanvas 프리팹을 찾을 수 없습니다.");
             }
         }
-     
+
+        photonView = GetComponent<PhotonView>();//
+        //if (photonView == null)//
+        //{
+        //    photonView = gameObject.AddComponent<PhotonView>();
+        //}
+
     }
     private void Start()
     {
@@ -101,7 +109,16 @@ public class GridManager : Singleton<GridManager>
         float Team1Rate = countTeam1 / (float)total * 100f;
         float Team2Rate = countTeam2 / (float)total * 100f;
         teamRateText.text = $"Team1 : {Team1Rate.ToString("F2")}%    Team2 : {Team2Rate.ToString("F2")}%";
+
+        photonView.RPC("SyncCoverageUI", RpcTarget.Others, Team1Rate, Team2Rate);
     }
+
+    [PunRPC]
+    public void SyncCoverageUI(float team1Rate, float team2Rate) // 추가됨!!!
+    {
+        teamRateText.text = $"Team1 : {team1Rate:F2}%    Team2 : {team2Rate:F2}%";
+    }
+
 
     public string GetWinningTeam()
     {
