@@ -22,26 +22,35 @@ public class AIController : MonoBehaviour
     
     [SerializeField] Button testDamageBtn;
 
+    [Header("모델 설정")]
+    public SkinnedMeshRenderer AIRenderer;
+
+    [Header("팀 설정")]
+    private TeamColorInfo teamColorInfo;
+    public Team myTeam { get; private set; } = Team.None;
+
+
     private void Awake()
     {
-        testDamageBtn.onClick.AddListener(TakeDamage);
-
+        testDamageBtn.onClick.AddListener(TakeDamage); //테스트코드 삭제할 것.
         //statedic대신 모듈화한 개별 스크립트로 관리
         MoveModule = new MoveModule(this);
         FireModule = new FireModule(this);
         DetectModule = new DetectModule(this);
 
-
         StateMachine = new AIStateMachine();
         //시작시 idle상태로
         StateMachine.SetState(new IdleState(this));
+
+        teamColorInfo = FindObjectOfType<TeamColorInfo>();
     }
 
     private void Update()
     {
-
         StateMachine.Update();
         Die();
+        UpdateAIColor();
+        TestTeamSelection(); //테스트코드 삭제할 것.
     }
 
     void OnDrawGizmos()
@@ -79,4 +88,36 @@ public class AIController : MonoBehaviour
         }
     }
 
+
+    private void UpdateAIColor()
+    {
+        if (teamColorInfo != null)
+        {
+            Color teamColor = teamColorInfo.GetTeamColor(myTeam);
+
+            if (AIRenderer != null)
+            {
+                AIRenderer.material.color = teamColor;
+            }
+
+            if (AIRenderer != null)
+            {
+                AIRenderer.material.color = teamColor;
+            }
+        }
+    }
+
+    private void TestTeamSelection()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            myTeam = Team.Team1;
+            Debug.Log($"팀 변경: {myTeam}");
+        }
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            myTeam = Team.Team2;
+            Debug.Log($"팀 변경: {myTeam}");
+        }
+    }
 }
