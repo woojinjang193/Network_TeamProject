@@ -105,7 +105,7 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
                     //페인트 칠함
                 }
 
-                PlayerTestController player = Manager.Game.GetPlayer(collider);
+                PlayerController player = Manager.Game.GetPlayer(collider);
                 if (player != null)
                 {
                     if(photonView.IsMine)
@@ -148,7 +148,7 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
         }
     }
 
-    private void HitPlayer(PlayerTestController player)
+    private void HitPlayer(PlayerController player)
     {
         if (player.MyTeam == myTeam) 
         {

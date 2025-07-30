@@ -49,7 +49,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     [Header("팀 설정")]
     private TeamColorInfo teamColorInfo;
-    public Team myTeam { get; private set; } = Team.None;
+ 
+    private Team myTeam = Team.None;
+    public Team MyTeam => myTeam;
 
     [Header("잉크 상호작용 설정")]
     [Tooltip("잉크가 칠해질 수 있는 오브젝트의 레이어")]
