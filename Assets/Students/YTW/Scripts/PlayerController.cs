@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public ThirdPersonCamera tpsCamera;
     public Camera mainCamera;
     public Transform cameraPivot;
+    public GameObject spectatorCamera;
 
     [Header("모델 설정")]
     public GameObject humanModel;
@@ -77,8 +78,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private PlayerHealth playerHealth;///
     public PlayerHealth PlayerHealth => playerHealth;///
 
-
     public bool IsGrounded { get; private set; } = false;
+    public Vector3 GroundNormal { get; private set; } = Vector3.up;
     public InkStatus CurrentGroundInkStatus { get; private set; } = InkStatus.NONE;
     public InkStatus CurrentWallInkStatus { get; private set; } = InkStatus.NONE;
     public bool IsOnWalkableWall { get; private set; } = false;
@@ -176,9 +177,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         highStateDic.Add(HighState.HumanForm, new Player_Human(this, stateMachine));
         highStateDic.Add(HighState.SquidForm, new Player_Squid(this, stateMachine));
-        // highStateDic.Add(HighState.Die, new Player_Die(this, stateMachine));       
+        highStateDic.Add(HighState.Die, new Player_Die(this, stateMachine));       
         stateMachine.Initialize(highStateDic[HighState.HumanForm]);
-        
+
+        if (spectatorCamera == null)
+        {
+            spectatorCamera = GameObject.FindWithTag("SpectatorCamera");
+            if (spectatorCamera != null) spectatorCamera.SetActive(false); // 처음엔 비활성화
+        }
     }
 
     void Update()
@@ -240,6 +246,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (Physics.Raycast(groundRayStart, Vector3.down, out RaycastHit groundHit, groundRayDistance, combinedLayer))
         {
             IsGrounded = true;
+            GroundNormal = groundHit.normal;
             if (groundHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
             {
                 // 잉크 색상은 비동기로 읽어오므로, 이 값은 약간의 딜레이가 있을 수 있음
@@ -253,6 +260,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         else
         {
             IsGrounded = false;
+            GroundNormal = Vector3.up;
             CurrentGroundInkStatus = InkStatus.NONE;
         }
 
@@ -410,7 +418,37 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    public void Die()
+    {
+        // 상태 머신을 Die 상태로 변경
+        if (photonView.IsMine)
+        {
+            stateMachine.ChangeState(highStateDic[HighState.Die]);
+        }
+    }
 
+    public void Respawn()
+    {
+        if (!photonView.IsMine) return;
+
+        // 스폰 위치 결정 예정
+        //string team = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
+        //Transform[] spawnPoints = (team == "Team1")
+        //    ? Manager.Game.team1SpawnPoints 
+        //    : Manager.Game.team2SpawnPoints;
+
+        //Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+
+        // 위치 및 상태 초기화
+        //transform.position = spawnPoint.position;
+        //transform.rotation = spawnPoint.rotation;
+
+        // 체력 초기화
+        playerHealth.Respawn();
+
+        stateMachine.ChangeState(highStateDic[HighState.HumanForm]);
+        Debug.Log("플레이어 리스폰");
+    }
 
     // PUN2가 주기적으로 호출하여 데이터를 동기화하는 콜백 함수
     // OnPhotonSerializeView : 정기적으로 데이터를 주고받는 통신 채널

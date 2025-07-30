@@ -1,6 +1,3 @@
-using Photon.Realtime;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Squid_Jump : PlayerState
@@ -15,16 +12,10 @@ public class Squid_Jump : PlayerState
 
     public override void Enter()
     {
+        Debug.Log("Squid_Jump 상태");
         player.IsVaulting = false;
+        player.rig.useGravity = true;
 
-        if (player.input.IsJumpPressed)
-        {
-            Jump(player.squidJumpForce);
-        }
-        else
-        {
-            player.rig.useGravity = true;
-        }
     }
 
     public override void FixedUpdate()
@@ -45,8 +36,8 @@ public class Squid_Jump : PlayerState
 
         if (!player.IsVaulting)
         {
-            SetMove(player.moveSpeed * 0.9f); 
-            SetPlayerRotation(); 
+            SetMove(player.moveSpeed);
+            SetPlayerRotation();
         }
     }
 }

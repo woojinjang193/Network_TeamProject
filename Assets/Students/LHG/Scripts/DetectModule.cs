@@ -7,9 +7,11 @@ public class DetectModule
 {
     private AIController _controller;
     public Transform Target { get; private set; }
+    public Transform TargetGrid { get; private set; }
     public bool HasEnemy => Target != null;
-    private float detectRadius = 10f;
+    public bool HasTargetGrid => TargetGrid != null;
 
+    private float detectRadius = 10f;
 
     public DetectModule(AIController controller)
     {
@@ -38,6 +40,9 @@ public class DetectModule
 
     private void DetectGrid()
     {
-        //TODO 중립 또는 적 타일을 탐지 
+        Collider[] hits = Physics.OverlapSphere(_controller.transform.position, detectRadius);
+
+        //TargetGrid = hits.FirstOrDefault(myteam == Team.Team1).transform;
+        //TRYGETVALUE, GETCOMPONENT, COMPARETAG
     }
 }

@@ -118,6 +118,12 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
 
     private void OnParticleTrigger()
     {
+        if(!PhotonNetwork.IsMasterClient) //마스터 클라이언트만 실행
+        {
+            //Debug.Log("마스터 클라이언트가 아닙니다.");
+            return;
+        }
+ 
         int numEnter = particleSys.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter);
         //트리거Enter 한 파티클 수
 

@@ -33,7 +33,7 @@ public class Player_Squid : PlayerState
         player.col.radius = 0.2f;
         player.col.center = colCenter;
         player.IsVaulting = false;
-        player.rig.useGravity = false;
+
         player.rig.velocity = Vector3.zero;
 
         revertTimer = 0f;

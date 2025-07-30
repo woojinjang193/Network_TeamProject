@@ -15,6 +15,7 @@ public class Human_Move : PlayerState
 
     public override void Enter()
     {
+        Debug.Log("Human_Move 상태");
         player.humanAnimator.SetBool("IsMove", true);
     }
 

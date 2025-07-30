@@ -13,6 +13,7 @@ public class Human_Jump : PlayerState
 
     public override void Enter()
     {
+        Debug.Log("Human_Jump 상태");
         if (player.input.IsJumpPressed)
         {
             Jump(player.humanJumpForce);
