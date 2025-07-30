@@ -33,6 +33,7 @@ public class PlayerState : BaseState
         Vector3 moveDirection = (camForward * player.input.MoveInput.y +
                                  camRight * player.input.MoveInput.x).normalized;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
         // 경사면 이동일 경우
         if (player.IsGrounded)
@@ -42,6 +43,9 @@ public class PlayerState : BaseState
         }
         else 
         {
+=======
+        
+>>>>>>> Stashed changes
 =======
         
 >>>>>>> Stashed changes
