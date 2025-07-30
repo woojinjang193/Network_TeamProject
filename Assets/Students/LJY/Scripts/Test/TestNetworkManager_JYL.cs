@@ -13,7 +13,7 @@ public class TestNetworkManager_JYL : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        PhotonNetwork.CreateRoom("Test_Room");
+        PhotonNetwork.JoinOrCreateRoom("Test_Room_JYL",new RoomOptions(){MaxPlayers = 8},TypedLobby.Default);
     }
 
     public override void OnJoinedRoom()

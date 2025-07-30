@@ -63,7 +63,7 @@ public class PlayerState : BaseState
         if (player.humanAnimator == null) return;
 
         Vector3 worldMoveDirection = player.rig.velocity;
-        if (player.rig.velocity is { x: <= 0.01f, z: <= 0.01f })
+        if (player.rig.velocity == Vector3.zero)
         {
             player.humanAnimator.SetFloat(MoveX, 0f);
             player.humanAnimator.SetFloat(MoveY, 0f);

@@ -7,6 +7,11 @@ public enum InkStatus { NONE, OUR_TEAM, ENEMY_TEAM }
 
 public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 {
+    private static readonly int IsMove = Animator.StringToHash("IsMove");
+    private static readonly int IsAir = Animator.StringToHash("IsAir");
+    private static readonly int MoveX = Animator.StringToHash("MoveX");
+    private static readonly int MoveY = Animator.StringToHash("MoveY");
+    private static readonly int JumpTrigger = Animator.StringToHash("JumpTrigger");
 
     public StateMachine stateMachine { get; private set; }
     public Dictionary<HighState, PlayerState> highStateDic { get; private set; }
@@ -40,6 +45,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public float humanJumpForce = 15f;
     public float squidJumpForce = 15f;
     public float squidSpeed = 8f;
+    public const float RESPAWN_TIME = 3.0f; // 리스폰까지 걸리는 시간
 
     [Header("점프 설정")]
     public float gravityScale = 4f;
@@ -64,41 +70,69 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField, Range(0.1f, 2.0f)]
     private float inkColorThreshold = 1.0f;
 
-    // 네트워크
-    private Vector3 networkPosition;
-    private Quaternion networkRotation;
-    private bool isSquidNetworked = false;
-    private float networkMoveX = 0f;
-    private float networkMoveY = 0f;
-    private float interpolatePos { get; set; } = 0f;
-    private float interpolateRot { get; set; } = 0f;
-    private float deltaPos = 0;
-    private float deltaRot = 0;
+    // 네트워크 파라매터
+    private float networkMoveX;
+    private float networkMoveY;
+    private Vector3 networkPos;
+    private Quaternion networkRot;
+    private float deltaPos;
+    private float deltaRot;
+    private float interpolatePos;
+    private float interpolateRot;
+    private bool isSquidNetworked;
+    private bool isAir;
+    private bool isMove;
+    private bool isJump;
     
     
-    // 잉크 감지 시스템
+    
+    // 잉크 감지 시스템 파라매터
     private float groundCheckTimer = 0f;
     private const float GROUND_CHECK_INTERVAL = 0.1f; // 1초에 10번 검사
 
-    //플레이어 체력
-    private PlayerHealth playerHealth;///
-    public PlayerHealth PlayerHealth => playerHealth;///
+    //플레이어 체력 및 사망 파라매터
+    private float curHp;
+    public float CurHp
+    {
+        get { return curHp;}
+        private set { curHp = value; }
+    }
+    private float maxHp = 100f;
+    public float MaxHp
+    {
+        get { return maxHp; }
+        private set { maxHp = value; }
+    }
 
-    public bool IsGrounded { get; private set; } = false;
+    private bool isDead;
+    public bool IsDead
+    {
+        get { return isDead;}
+        set { isDead = value; }
+    }
+
+    public bool deadState;
+
+    // 플레이어 이동 판정
+    public bool IsGrounded { get; private set; }
     public Vector3 GroundNormal { get; private set; } = Vector3.up;
     public InkStatus CurrentGroundInkStatus { get; private set; } = InkStatus.NONE;
     public InkStatus CurrentWallInkStatus { get; private set; } = InkStatus.NONE;
-    public bool IsOnWalkableWall { get; private set; } = false;
-    public bool IsAtWallEdge { get; private set; } = false;
+    public bool IsOnWalkableWall { get; private set; }
+    public bool IsAtWallEdge { get; private set; }
     public bool IsVaulting = false;
     public Vector3 WallNormal { get; private set; } = Vector3.zero;
 
     void Awake()
     {
         rig = GetComponent<Rigidbody>();
-        input = GetComponent<PlayerInput>();
         col = GetComponent<CapsuleCollider>();
 
+        if (inkParticleGun != null)
+        {
+            weaponView = inkParticleGun.GetComponent<PhotonView>();
+        }
+        
         humanAnimator = humanModel.GetComponentInChildren<Animator>();
         squidAnimator = squidModel.GetComponentInChildren<Animator>();
 
@@ -106,46 +140,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         playerRenderer = humanModel.GetComponent<SkinnedMeshRenderer>();
         squidRenderer = squidModel.GetComponent<SkinnedMeshRenderer>();
-
-        playerHealth = GetComponent<PlayerHealth>();///
-
+        
+        CurHp = MaxHp;
+        
         if (photonView.IsMine)
         {
-            // 카메라 동기화
-            if (playerCameraObject == null)
-            {
-                Debug.LogError("Player Camera Object가 Inspector에 할당되지 않았습니다.", this);
-                return;
-            }
-            playerCameraObject.SetActive(true);
-
-            // 메인 카메라 컴포넌트를 찾습니다.
-            mainCamera = playerCameraObject.GetComponentInChildren<Camera>();
-            if (mainCamera == null)
-            {
-                Debug.LogError("Player Camera Object 또는 그 자식에서 Camera 컴포넌트를 찾을 수 없습니다", this);
-            }
-
-            if (tpsCamera == null)
-            {
-                tpsCamera = playerCameraObject.GetComponent<ThirdPersonCamera>();
-            }
-            if (tpsCamera == null)
-            {
-                tpsCamera = playerCameraObject.GetComponentInParent<ThirdPersonCamera>();
-            }
-
-            if (tpsCamera != null)
-            {
-                tpsCamera.followTransform = this.cameraPivot;
-            }
-            else
-            {
-                Debug.LogError("ThirdPersonCamera 스크립트를 찾을 수 없습니다.", this);
-            }
-            Init();
+            MineInit();
         }
-        else
+        
+        else if(!photonView.IsMine)
         {
             // 이 캐릭터가 다른 플레이어(원격)의 것이므로, 이 캐릭터에 포함된 카메라를 비활성화합니다.
             // 이렇게 해야 다른 플레이어의 카메라가 내 화면에 그려지거나 컨트롤을 방해하는 문제를 막을 수 있습니다.
@@ -156,53 +159,47 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             rig.isKinematic = true;
         }
-
+        
         Manager.Game.RegisterPlayer(col, this);
 
     }
 
-    void Start()
-    {
-        if (inkParticleGun != null)
-        {
-            weaponView = inkParticleGun.GetComponent<PhotonView>();
-        }
+    void Start() { }
 
-        if (photonView.IsMine)
+    void FixedUpdate()
+    {
+        if (photonView.IsMine && stateMachine != null)
         {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            stateMachine.FixedUpdate();
+            if (!IsGrounded && rig.useGravity && !IsVaulting)
+            {
+                if (rig.velocity.y >= 0)
+                {
+                    rig.velocity += Vector3.up * Physics.gravity.y * (gravityScale - 1) * Time.fixedDeltaTime;
+                }
+                else
+                {
+                    rig.velocity += Vector3.up * Physics.gravity.y * (fallingGravityScale - 1) * Time.fixedDeltaTime;
+                }
+            }
+        }
+        
+        else if(!photonView.IsMine && !IsDead)
+        {
+            OthersAnimation();
         }
     }
-
-    public void Init()
-    {
-        stateMachine = new StateMachine();
-        highStateDic = new Dictionary<HighState, PlayerState>();
-
-
-        highStateDic.Add(HighState.HumanForm, new Player_Human(this, stateMachine));
-        highStateDic.Add(HighState.SquidForm, new Player_Squid(this, stateMachine));
-        highStateDic.Add(HighState.Die, new Player_Die(this, stateMachine));       
-        stateMachine.Initialize(highStateDic[HighState.HumanForm]);
-
-        if (spectatorCamera == null)
-        {
-            spectatorCamera = GameObject.FindWithTag("SpectatorCamera");
-            if (spectatorCamera != null) spectatorCamera.SetActive(false); // 처음엔 비활성화
-        }
-    }
-
+    
     void Update()
     {
-        if (recenterCooldownTimer > 0)
-        {
-            recenterCooldownTimer -= Time.deltaTime;
-        }
-
-
+        // 본인의 photonView일 경우
         if (photonView.IsMine)
         {
+            if (recenterCooldownTimer > 0)
+            {
+                recenterCooldownTimer -= Time.deltaTime;
+            }
+            
             GroundAndInkCheck();
 
             if (stateMachine != null)
@@ -219,33 +216,150 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                     tpsCamera.Recenter(transform.forward);
                 }
             }
-
         }
+        // 본인의 photonView가 아닐 경우
         else
         {
-            // 지연보상
-            deltaPos = Vector3.Distance(transform.position, networkPosition);
-            deltaRot = Quaternion.Angle(transform.rotation, networkRotation);
-            
-            interpolatePos = deltaPos * Time.deltaTime * PhotonNetwork.SerializationRate;
-            interpolateRot = deltaRot * Time.deltaTime * PhotonNetwork.SerializationRate;
-            
-            transform.position = Vector3.Slerp(transform.position, networkPosition, interpolatePos);
-            transform.rotation = Quaternion.Slerp(transform.rotation, networkRotation, interpolateRot);
-
-            humanModel.SetActive(!isSquidNetworked);
-            squidModel.SetActive(isSquidNetworked);
-
-            if (humanAnimator != null)
+            // 리스폰 조건 체크
+            if ( IsDead && !deadState)
             {
-                humanAnimator.SetFloat("MoveX", networkMoveY);
-                humanAnimator.SetFloat("MoveY", networkMoveX);
+                Respawn();
             }
         }
         
+        // TODO : 테스트 이후 삭제 예정
         UpdatePlayerColor();
     }
     
+    void LateUpdate()
+    {
+        if (photonView.IsMine && tpsCamera != null)
+        {
+            tpsCamera.CameraUpdate(input.MouseInput.x, input.MouseInput.y);
+
+        }
+    }
+
+    public void MineInit()
+    {
+        input = GetComponent<PlayerInput>();
+        
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        
+        stateMachine = new StateMachine();
+        highStateDic = new Dictionary<HighState, PlayerState>();
+        
+        highStateDic.Add(HighState.HumanForm, new Player_Human(this, stateMachine));
+        highStateDic.Add(HighState.SquidForm, new Player_Squid(this, stateMachine));
+        highStateDic.Add(HighState.Die, new Player_Die(this, stateMachine));       
+        
+        stateMachine.Initialize(highStateDic[HighState.HumanForm]);
+        
+        // 카메라 동기화
+        if (playerCameraObject == null)
+        {
+            Debug.LogError("Player Camera Object가 Inspector에 할당되지 않았습니다.", this);
+            return;
+        }
+        playerCameraObject.SetActive(true);
+
+        // 메인 카메라 컴포넌트를 찾습니다.
+        mainCamera = playerCameraObject.GetComponentInChildren<Camera>();
+        if (mainCamera == null)
+        {
+            Debug.LogError("Player Camera Object 또는 그 자식에서 Camera 컴포넌트를 찾을 수 없습니다", this);
+        }
+
+        if (tpsCamera == null)
+        {
+            tpsCamera = playerCameraObject.GetComponent<ThirdPersonCamera>();
+        }
+        if (tpsCamera == null)
+        {
+            tpsCamera = playerCameraObject.GetComponentInParent<ThirdPersonCamera>();
+        }
+
+        if (tpsCamera != null)
+        {
+            tpsCamera.followTransform = this.cameraPivot;
+        }
+        else
+        {
+            Debug.LogError("ThirdPersonCamera 스크립트를 찾을 수 없습니다.", this);
+        }
+
+        if (spectatorCamera == null)
+        {
+            spectatorCamera = GameObject.FindWithTag("SpectatorCamera");
+            if (spectatorCamera != null) spectatorCamera.SetActive(false); // 처음엔 비활성화
+        }
+        
+    }
+    
+    private void OthersAnimation()
+    {
+        // 오징어 폼
+        if (isSquidNetworked)
+        {
+            humanModel.SetActive(false);
+            squidModel.SetActive(true);
+            
+            col.direction = 2;
+            col.height = 1.0f;
+            col.radius = 0.2f;
+            col.center = Vector3.zero;
+
+            if (squidAnimator != null)
+            {
+                // squidAnimator.SetBool(IsMove,isMove);
+                // squidAnimator.SetBool(IsAir,isAir);
+            }
+        }
+        // 인간 폼
+        else
+        {
+            humanModel.SetActive(true);
+            squidModel.SetActive(isSquidNetworked);
+            
+            col.direction = 1;
+            col.center = new Vector3(0, 0.5f, 0);
+            col.height = 1.0f;
+            col.radius = 0.25f;
+            
+            if (humanAnimator != null)
+            {
+                // 애니메이션 상태 파라매터 처리
+                humanAnimator.SetBool(IsMove,isMove);
+                humanAnimator.SetBool(IsAir,isAir);
+                
+                // 점프 애니메이션 트리거 파라매터 처리
+                if (isAir&&!isJump)
+                {
+                    humanAnimator.SetTrigger(JumpTrigger);
+                    isJump = true;
+                }
+                else if (!isAir && isJump)
+                {
+                    isJump = false;
+                }
+                
+                // Move 관련 입력 처리
+                humanAnimator.SetFloat(MoveX, networkMoveX);
+                humanAnimator.SetFloat(MoveY, networkMoveY);
+            }
+            
+            // 지연 보상
+            deltaPos = Vector3.Distance(transform.position, networkPos);
+            deltaRot = Quaternion.Angle(transform.rotation, networkRot);
+
+            interpolatePos = deltaPos * Time.deltaTime * PhotonNetwork.SerializationRate;
+            interpolateRot = deltaRot * Time.deltaTime * PhotonNetwork.SerializationRate;
+            
+            transform.position = Vector3.MoveTowards(transform.position, networkPos, interpolatePos);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, networkRot, interpolateRot);
+        }
+    }
     private void GroundAndInkCheck()
     {
         LayerMask combinedLayer = groundLayer | inkableLayer;
@@ -362,34 +476,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         return InkStatus.NONE;
     }
 
-    void LateUpdate()
-    {
-        if (photonView.IsMine && tpsCamera != null)
-        {
-            tpsCamera.CameraUpdate(input.MouseInput.x, input.MouseInput.y);
-
-        }
-    }
-
-    void FixedUpdate()
-    {
-        if (photonView.IsMine && stateMachine != null)
-        {
-            stateMachine.FixedUpdate();
-            if (!IsGrounded && rig.useGravity && !IsVaulting)
-            {
-                if (rig.velocity.y >= 0)
-                {
-                    rig.velocity += Vector3.up * Physics.gravity.y * (gravityScale - 1) * Time.fixedDeltaTime;
-                }
-                else
-                {
-                    rig.velocity += Vector3.up * Physics.gravity.y * (fallingGravityScale - 1) * Time.fixedDeltaTime;
-                }
-            }
-        }
-    }
-
     public void LookAround()
     {
         Vector3 playerRotation = transform.eulerAngles;
@@ -429,21 +515,60 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
     }
+    
+    [PunRPC]
+    public void TakeDamage(float amount)
+    {
+        if (IsDead) return;
 
+        CurHp -= amount;
+        Debug.Log($"현재 체력{CurHp}");
+
+        if (CurHp <= 0)
+        {
+            CurHp = 0;
+            IsDead = true;
+            Debug.Log("플레이어 죽음");
+
+            Die();
+        }
+    }
+    
+    // TODO : 죽을 때 처리 필요
     public void Die()
     {
+        // 원격으로도 죽은 처리 해줘야 함
+        IsDead = true;
+        deadState = true;
         // 상태 머신을 Die 상태로 변경
         if (photonView.IsMine)
         {
             stateMachine.ChangeState(highStateDic[HighState.Die]);
         }
+        else
+        {
+            // 본인의 PhotonView가 아닐 경우
+            col.enabled = false;
+            humanModel.SetActive(false);
+            squidModel.SetActive(false);
+        }
     }
 
     public void Respawn()
     {
-        if (!photonView.IsMine) return;
+        // 체력 초기화
+        CurHp = MaxHp;
+        
+        if (!photonView.IsMine)
+        {
+            IsDead = false;
+            col.enabled = true;
+            humanModel.SetActive(true);
+            return;
+        }
 
-        // 스폰 위치 결정 예정
+        // TODO : 스폰 위치 결정 예정 : 스폰 위치를 팀마다 배열로 넣어놓고 랜덤뽑기.
+        // 스폰포인트 오브젝트 및 스크립트 작성해서 활용. 맵마다 달라야 함
         //string team = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
         //Transform[] spawnPoints = (team == "Team1")
         //    ? Manager.Game.team1SpawnPoints 
@@ -454,9 +579,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         // 위치 및 상태 초기화
         //transform.position = spawnPoint.position;
         //transform.rotation = spawnPoint.rotation;
-
-        // 체력 초기화
-        playerHealth.Respawn();
 
         stateMachine.ChangeState(highStateDic[HighState.HumanForm]);
         Debug.Log("플레이어 리스폰");
@@ -469,60 +591,87 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         // 내가 직접 조종하는 캐릭터에서만 작동
         if (stream.IsWriting)
         {
+                        
+            // 0 플레이어 사망 정보 전송
+            stream.SendNext(deadState);
+
             if (stateMachine == null || highStateDic == null)
             {
                 Debug.LogError("스테이트 머신 또는 스테이트 딕셔너리 없음");
                 return;
             }
-            // 현재 내 위치를 stream에 실림
+
+            // 1현재 내 위치를 stream에 실림
             stream.SendNext(transform.position);
-            // 현재 내 회전값을 stream에 실림
+            // 2현재 내 회전값을 stream에 실림
             stream.SendNext(transform.rotation);
-            // 현재 속도 전송
+            
+            // 3팀정보 전송
             stream.SendNext((int)myTeam);
+            
             // 현재 내 상태가 오징어 폼인지 아닌지(bool)를 stream에 실림
             // (stateMachine.CurrentState가 SquidForm 상태와 같으면 true, 아니면 false가 실림)
             if (stateMachine != null && highStateDic != null && highStateDic.ContainsKey(HighState.SquidForm))
             {
+                // 4 오징어 상태 여부
                 stream.SendNext(stateMachine.CurrentState == highStateDic[HighState.SquidForm]);
             }
             else
             {
+                // 4 아닐경우 false
                 stream.SendNext(false);
             }
 
             // 인간폼일때 Send
             if (stateMachine.CurrentState == highStateDic[HighState.HumanForm])
             {
-                stream.SendNext(humanAnimator.GetFloat("MoveX"));
-                stream.SendNext(humanAnimator.GetFloat("MoveY"));
+                // 5현재 움직이는 여부 전송
+                stream.SendNext(humanAnimator.GetBool(IsMove));
+                // 6현재 공중인지 전송
+                stream.SendNext(humanAnimator.GetBool(IsAir));
+                // 7,8 이동 파라매터
+                stream.SendNext(humanAnimator.GetFloat(MoveX));
+                stream.SendNext(humanAnimator.GetFloat(MoveY));
             }
-            else if(stateMachine.CurrentState == highStateDic[HighState.SquidForm])
+            // 오징어 폼일때 Send
+            else if (stateMachine.CurrentState == highStateDic[HighState.SquidForm])
             {
                 // stream.SendNext(squidAnimator.GetFloat("MoveSpeed"));
             }
+
         }
         else if (stream.IsReading)
-        // stream.IsWriting이 false, 즉 stream.IsReading일 때
-        // 다른 사람의 컴퓨터에 보이는 내 캐릭터, 또는 내 컴퓨터에 보이는 다른 사람의 캐릭터에서 작동
+            // stream.IsWriting이 false, 즉 stream.IsReading일 때
+            // 다른 사람의 컴퓨터에 보이는 내 캐릭터, 또는 내 컴퓨터에 보이는 다른 사람의 캐릭터에서 작동
         {
-            // 데이터 통로(stream)에서 첫 번째 데이터를 꺼내 networkPosition 변수에 저장
-            networkPosition = (Vector3)stream.ReceiveNext();
-            // 두 번째 데이터를 꺼내 networkRotation 변수에 저장
-            networkRotation = (Quaternion)stream.ReceiveNmyTeam = (Team)(int)stream.ReceiveNext(); // TODO: 팀변경 테스트 끝나면 지우기
-            isSquidNetworked = (bool)stream.ReceiveNext(
+            // 0 플레이어 사망정보 수신
+            deadState = (bool)stream.ReceiveNext();
+            // 1 위치
+            networkPos = (Vector3)stream.ReceiveNext();
+            // 2 회전
+            networkRot = (Quaternion)stream.ReceiveNext();
+            // 3 팀 정보
+            myTeam= (Team)(int)stream.ReceiveNext(); // TODO: 팀변경 테스트 끝나면 지우기
+            // 4 오징어 여부
+            isSquidNetworked = (bool)stream.ReceiveNext();
+            
             // 인간 폼일때 수신
-            if (!isSquidNetworked)
+            if (!isSquidNetworked && !deadState)
             {
+                // 5 움직이는지
+                isMove =  (bool)stream.ReceiveNext();
+                // 6 공중인지
+                isAir = (bool)stream.ReceiveNext();
+                // 7,8 이동 파라매터 
                 networkMoveX = (float)stream.ReceiveNext();
                 networkMoveY = (float)stream.ReceiveNext();
             }
             // 오징어 폼일때 수신
-            else if (isSquidNetworked)
+            else if (isSquidNetworked && !deadState)
             {
                 // networkMoveSpeed = (float)stream.ReceiveNext();   
             }
-            
+
         }
     }
 

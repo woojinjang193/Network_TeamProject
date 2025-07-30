@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class Player_Die : PlayerState
 {
-    private const float RESPAWN_TIME = 3.0f; // 리스폰까지 걸리는 시간
 
     public Player_Die(PlayerController player, StateMachine stateMachine) : base(player, stateMachine) { }
 
@@ -33,14 +32,16 @@ public class Player_Die : PlayerState
 
     private IEnumerator RespawnCoroutine()
     {
-        Debug.Log($"{RESPAWN_TIME}초 후 리스폰합니다.");
-        yield return new WaitForSeconds(RESPAWN_TIME);
+        Debug.Log($"{PlayerController.RESPAWN_TIME}초 후 리스폰합니다.");
+        yield return new WaitForSeconds(PlayerController.RESPAWN_TIME);
 
+        player.deadState = false;
         player.Respawn();
     }
 
     public override void Exit()
     {
+        player.IsDead = false;
         Debug.Log("사망 상태 종료, 리스폰 준비");
 
         // 비활성화했던 컴포넌트들 다시 활성화

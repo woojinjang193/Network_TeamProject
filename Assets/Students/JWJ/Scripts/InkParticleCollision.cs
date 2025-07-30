@@ -91,28 +91,35 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
 
             if (collider == null)
             {
+                Debug.Log("콜라이더가 널임");
                 continue;
+            }
+            
+            if (paintableObject.TryGetValue(collider, out PaintableObj paintableObj))
+            //타입 변환에 성공 && 딕셔너리에 키를 넣어 값을 받음
+            {
+                paintableObj.DrawInk(hitPos, radius, hardness, strength, myTeam);
+                continue;
+                //페인트 칠함
+            }
+            
+            Debug.Log(" 페인트 칠할 수 있는 콜라이더가 아님");
+
+            PlayerController player = Manager.Game.GetPlayer(collider);
+            if (player != null)
+            {
+                if(photonView.IsMine)
+                {
+                    Debug.Log("히트플레이어 들어옴");
+                    HitPlayer(player);
+                    //팀판정 및 후처리
+                }
+
             }
             else
             {
-                if (paintableObject.TryGetValue(collider, out PaintableObj paintableObj))
-                //타입 변환에 성공 && 딕셔너리에 키를 넣어 값을 받음
-                {
-                    paintableObj.DrawInk(hitPos, radius, hardness, strength, myTeam);
-                    //페인트 칠함
-                }
-
-                PlayerController player = Manager.Game.GetPlayer(collider);
-                if (player != null)
-                {
-                    if(photonView.IsMine)
-                    {
-                        HitPlayer(player);
-                        //팀판정 및 후처리
-                    }
-
-                }
-            }   
+                Debug.Log("플레이어를 찾지 못함.");
+            }
         }
     }
 
