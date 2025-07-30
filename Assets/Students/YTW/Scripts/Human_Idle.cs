@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Human_Idle : PlayerState
 {
+    private static readonly int IsMove = Animator.StringToHash("IsMove");
     private Player_Human humanState; 
 
     public Human_Idle(PlayerController player, StateMachine stateMachine, Player_Human humanState) : base(player, stateMachine)
@@ -15,7 +16,7 @@ public class Human_Idle : PlayerState
     public override void Enter()
     {
         HasPhysics = false; 
-        // player.humanAnimator.SetBool("isMoving", false);
+        player.humanAnimator.SetBool(IsMove, false);
     }
 
     public override void Update()

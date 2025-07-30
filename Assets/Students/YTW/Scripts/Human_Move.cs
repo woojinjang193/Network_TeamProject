@@ -15,7 +15,7 @@ public class Human_Move : PlayerState
 
     public override void Enter()
     {
-        // player.humanAnimator.SetBool("isMoving", true);
+        player.humanAnimator.SetBool("IsMove", true);
     }
 
     public override void Update()

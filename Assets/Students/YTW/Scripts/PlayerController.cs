@@ -165,6 +165,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         highStateDic.Add(HighState.SquidForm, new Player_Squid(this, stateMachine));
         // highStateDic.Add(HighState.Die, new Player_Die(this, stateMachine));       
         stateMachine.Initialize(highStateDic[HighState.HumanForm]);
+        
     }
 
     void Update()
@@ -406,8 +407,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             if (humanAnimator != null)
             {
-                stream.SendNext(humanAnimator.GetFloat("moveX"));
-                stream.SendNext(humanAnimator.GetFloat("moveZ"));
+                stream.SendNext(humanAnimator.GetFloat("MoveX"));
+                stream.SendNext(humanAnimator.GetFloat("MoveY"));
             }
             else
             {

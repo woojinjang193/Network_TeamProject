@@ -17,7 +17,7 @@ public class Human_Jump : PlayerState
         {
             Jump(player.humanJumpForce);
         }
-        // player.animator.SetTrigger("HumanJump");
+        player.humanAnimator.SetTrigger("JumpTrigger");
     }
 
     public override void Update()

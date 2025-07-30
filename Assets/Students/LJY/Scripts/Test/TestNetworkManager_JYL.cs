@@ -16,23 +16,18 @@ public class TestNetworkManager_JYL : MonoBehaviourPunCallbacks
         PhotonNetwork.CreateRoom("Test_Room");
     }
 
-    public override void OnCreatedRoom()
-    {
-    }
-
     public override void OnJoinedRoom()
     {
-        Debug.Log("���� �Ϸ�");
         PhotonNetwork.LocalPlayer.NickName = $"Player_{PhotonNetwork.LocalPlayer.ActorNumber}";
         PlayerSpawn();
     }
 
     private void PlayerSpawn()
     {
-        PhotonNetwork.Instantiate("Player", new Vector3(0, 5, 0), Quaternion.identity);
+        PhotonNetwork.Instantiate("Player_CharacterTest", new Vector3(0, 5, 0), Quaternion.identity);
     }
     public override void OnPlayerEnteredRoom(Player player)
     {
-        Debug.Log($"{player.NickName} ���� �Ϸ�");
+        base.OnPlayerEnteredRoom(player);
     }
 }

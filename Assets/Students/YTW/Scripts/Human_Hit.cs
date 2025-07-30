@@ -14,7 +14,7 @@ public class Human_Hit : PlayerState
 
     public override void Enter()
     {
-
+        player.humanAnimator.SetTrigger("HitTrigger");
     }
 
     public override void Update()

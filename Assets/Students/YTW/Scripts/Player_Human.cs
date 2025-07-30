@@ -7,6 +7,7 @@ public class Player_Human : PlayerState
 {
     private StateMachine subStateMachine;
     public Dictionary<LowState, BaseState> lowStateDic { get; private set; }
+    private Vector3 colCenter = new Vector3(0, 0.5f, 0);
 
     public Player_Human(PlayerController player, StateMachine stateMachine) : base(player, stateMachine)
     {
@@ -26,8 +27,10 @@ public class Player_Human : PlayerState
         player.gameObject.layer = LayerMask.NameToLayer("Player");
         player.humanModel.SetActive(true);
         player.squidModel.SetActive(false);
-        player.col.height = 2.0f;
-        player.col.radius = 0.5f;
+        player.col.direction = 1;
+        player.col.center = colCenter;
+        player.col.height = 1.0f;
+        player.col.radius = 0.25f;
         subStateMachine.Initialize(lowStateDic[LowState.Idle]);
     }
 

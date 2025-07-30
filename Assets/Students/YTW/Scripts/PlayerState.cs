@@ -20,6 +20,8 @@ public class PlayerState : BaseState
         if (player.input.MoveInput == Vector2.zero)
         {
             player.rig.velocity = new Vector3(0, player.rig.velocity.y, 0);
+            player.humanAnimator.SetFloat("MoveX",0f);
+            player.humanAnimator.SetFloat("MoveY",0f);
             return;
         }
         
@@ -31,6 +33,8 @@ public class PlayerState : BaseState
         Vector3 moveDirection = (camForward * player.input.MoveInput.y +
                                  camRight * player.input.MoveInput.x).normalized;
 
+        player.humanAnimator.SetFloat("MoveX",player.input.MoveInput.x);
+        player.humanAnimator.SetFloat("MoveY",player.input.MoveInput.y);
         player.rig.velocity = new Vector3(moveDirection.x * moveSpeed, player.rig.velocity.y, moveDirection.z * moveSpeed);
     }
     protected void SetPlayerRotation()

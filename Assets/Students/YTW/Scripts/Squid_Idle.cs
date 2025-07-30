@@ -12,6 +12,10 @@ public class Squid_Idle : PlayerState
         HasPhysics = true; 
     }
 
+    public override void Enter()
+    {
+        
+    }
     public override void Update()
     {
         if (player.input.IsJumpPressed && IsGrounded())
