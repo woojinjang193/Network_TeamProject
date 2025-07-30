@@ -1,4 +1,4 @@
-﻿using TMPro;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Firebase.Auth;
@@ -23,29 +23,45 @@ public class LoginUI : BaseUI
         string email = emailInputField.text;
         string password = passwordInputField.text;
 
-        SetMessage("로그인 중..."); // 로딩 메시지 표시
+        SetMessage("로그인 중...");
 
         FirebaseManager.Auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
         {
-            if (task.IsCanceled)
+            if (task.IsCanceled || task.IsFaulted)
             {
-                SetMessage("로그인이 취소되었습니다.");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                SetMessage("아이디 또는 비밀번호가 틀렸습니다.");
-                Debug.LogError("SignInWithEmailAndPasswordAsync error: " + task.Exception);
+                SetMessage("로그인에 실패했습니다: " + task.Exception.GetBaseException().Message);
+                Debug.LogError($"로그인 실패: {task.Exception}");
                 return;
             }
 
-            // 로그인 성공
-            Firebase.Auth.FirebaseUser newUser = task.Result.User;
-            SetMessage($"로그인 성공: {newUser.Email}");
-            Debug.LogFormat("로그인 성공: {0} ({1})", newUser.DisplayName, newUser.UserId);
+            FirebaseUser user = task.Result.User;
+            Debug.Log("로그인 성공");
 
-            // 로그인 성공 후 로비 UI 표시
-            UIManager.Instance.ReplaceUI(typeof(LobbyUI));
+            if (!user.IsEmailVerified)
+            {
+                SetMessage("이메일 인증이 필요합니다.");
+                Debug.Log("이메일 인증 안 됨 -> 이메일 인증 UI로 전환해야 함");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(user.DisplayName))
+            {
+                SetMessage("닉네임 설정이 필요합니다.");
+                Debug.Log("닉네임 설정 안 됨 -> 닉네임 설정 UI로 전환해야 함");
+                return;
+            }
+
+            // Photon 닉네임 설정
+            Photon.Pun.PhotonNetwork.NickName = user.DisplayName;
+            Debug.Log($"Photon 닉네임 설정 완료: {user.DisplayName}");
+
+            // Photon 서버 연결 및 로비 이동
+            if (!Photon.Pun.PhotonNetwork.IsConnected)
+            {
+                Debug.Log("Photon 서버에 연결되지 않음. 연결 시도 중...");
+                Photon.Pun.PhotonNetwork.ConnectUsingSettings();
+            }
+            NetworkManager.Instance.ShowLobby(); // 로그인 성공 후 로비로 이동
         });
     }
 

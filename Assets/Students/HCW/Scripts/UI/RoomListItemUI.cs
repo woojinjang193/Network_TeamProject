@@ -20,10 +20,7 @@ public class RoomListItemUI : MonoBehaviour
 
     private void OnJoinButtonClick()
     {
-        // 포톤 방 입장 로직 구현
-        if (Photon.Pun.PhotonNetwork.InLobby)
-        {
-            Photon.Pun.PhotonNetwork.JoinRoom(roomName);
-        }
+        Debug.Log($"방 참가 시도: {roomName}");
+        NetworkManager.Instance.JoinRoom(roomName);
     }
 }
