@@ -509,11 +509,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             // 데이터 통로(stream)에서 첫 번째 데이터를 꺼내 networkPosition 변수에 저장
             networkPosition = (Vector3)stream.ReceiveNext();
             // 두 번째 데이터를 꺼내 networkRotation 변수에 저장
-            networkRotation = (Quaternion)stream.ReceiveNext();
-            // 세 번째 데이터를 꺼내 isSquidNetworked 변수에 저장
-            myTeam = (Team)(int)stream.ReceiveNext(); // TODO: 팀변경 테스트 끝나면 지우기
-            isSquidNetworked = (bool)stream.ReceiveNext();
-            
+            networkRotation = (Quaternion)stream.ReceiveNmyTeam = (Team)(int)stream.ReceiveNext(); // TODO: 팀변경 테스트 끝나면 지우기
+            isSquidNetworked = (bool)stream.ReceiveNext(
             // 인간 폼일때 수신
             if (!isSquidNetworked)
             {
