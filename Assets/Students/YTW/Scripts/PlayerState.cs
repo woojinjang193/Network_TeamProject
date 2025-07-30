@@ -25,7 +25,16 @@ public class PlayerState : BaseState
         Vector3 moveDirection = (camForward.normalized * player.input.MoveInput.y +
                                  camRight.normalized * player.input.MoveInput.x);
 
-        player.rig.velocity = new Vector3(moveDirection.x * moveSpeed, player.rig.velocity.y, moveDirection.z * moveSpeed);
+        // 경사면 이동일 경우
+        if (player.IsGrounded)
+        {
+            Vector3 projectedMove = Vector3.ProjectOnPlane(moveDirection, player.GroundNormal).normalized * moveDirection.magnitude;
+            player.rig.velocity = new Vector3(projectedMove.x * moveSpeed, player.rig.velocity.y, projectedMove.z * moveSpeed);
+        }
+        else 
+        {
+           player.rig.velocity = new Vector3(moveDirection.x * moveSpeed, player.rig.velocity.y, moveDirection.z * moveSpeed);
+        }
     }
     protected void SetPlayerRotation()
     {

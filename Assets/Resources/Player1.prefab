@@ -5046,6 +5046,7 @@ MonoBehaviour:
   tpsCamera: {fileID: 0}
   mainCamera: {fileID: 8051169038002597667}
   cameraPivot: {fileID: 6579688343699347416}
+  spectatorCamera: {fileID: 0}
   humanModel: {fileID: 2512374777122993336}
   squidModel: {fileID: 7729832221034502543}
   playerRenderer: {fileID: 0}
@@ -5109,7 +5110,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 620561224654458845}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 114f767a83c86c441a86ce32dc16ba4a, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -20077,7 +20078,6 @@ GameObject:
   - component: {fileID: 6696035168054863781}
   - component: {fileID: 9094626360172697884}
   - component: {fileID: 1036531369311597167}
-  - component: {fileID: 2950553933216866960}
   m_Layer: 8
   m_Name: Nose
   m_TagString: Untagged
@@ -20150,27 +20150,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2950553933216866960
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6207776091164533110}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6555690559534966212
 GameObject:
   m_ObjectHideFlags: 0
@@ -20496,7 +20475,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8431939645755301419}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 114f767a83c86c441a86ce32dc16ba4a, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
