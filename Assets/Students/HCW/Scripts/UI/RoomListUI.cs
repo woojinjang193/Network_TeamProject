@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -51,7 +53,7 @@ public class RoomListUI : BaseUI
 
         foreach (var info in roomList)
         {
-            if (info.RemovedFromList || !info.IsVisible || !info.IsOpen) continue;
+            if (info.RemovedFromList) continue;
 
             GameObject itemGO = Instantiate(roomListItemPrefab, roomListContent);
             RoomListItemUI itemUI = itemGO.GetComponent<RoomListItemUI>();
@@ -60,6 +62,7 @@ public class RoomListUI : BaseUI
                 itemUI.Setup(info);
                 roomListItems[info.Name] = itemUI;
             }
+            
         }
     }
 

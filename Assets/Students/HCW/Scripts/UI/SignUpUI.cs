@@ -70,6 +70,7 @@ public class SignUpUI : BaseUI
                 }
 
                 Debug.Log($"닉네임 설정 성공: {name}");
+                FirebaseManager.UploadNickname(name);
                 SetMessage("회원가입 및 닉네임 설정 완료!");
 
                 // 모든 과정 성공 후 로그인 UI로 돌아가기

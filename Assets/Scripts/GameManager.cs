@@ -31,7 +31,35 @@ public class GameManager : Singleton<GameManager>
     }
     private void Start()
     {
-        Debug.Log("게임매니저 스타트");
+        Debug.Log("=== [GameManager] Start ===");
+
+        Debug.Log("[GameManager] LocalPlayer CustomProperties 상태:");
+        foreach (var kv in PhotonNetwork.LocalPlayer.CustomProperties)
+        {
+            Debug.Log($"  Key: {kv.Key}, Value: {kv.Value}");
+        }
+
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("team", out object teamVal))
+        {
+            Debug.Log($"[GameManager] LocalPlayer 팀 정보: {teamVal}");
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] LocalPlayer 팀 정보가 없음 (team 키가 없음)");
+        }
+
+        Debug.Log("=== 전체 플레이어 팀 정보 확인 ===");
+        foreach (var player in PhotonNetwork.PlayerList)
+        {
+            string nick = player.NickName;
+            string team = player.CustomProperties.TryGetValue("team", out object t) ? t.ToString() : "없음";
+            bool ready = player.CustomProperties.TryGetValue("Ready", out object r) && (bool)r;
+
+            Debug.Log($"닉네임: {nick}, 팀: {team}, Ready: {ready}, ActorNumber: {player.ActorNumber}");
+        }
+
+        Debug.Log("=== [GameManager] Start 끝 ===");
+        StartCoroutine(SpawnPlayerWithDelay());
     }
 
     [PunRPC]

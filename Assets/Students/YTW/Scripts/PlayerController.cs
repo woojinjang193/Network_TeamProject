@@ -1,4 +1,5 @@
 using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -166,6 +167,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+
+            Debug.Log("[PlayerController] Start 실행됨 - 내 오브젝트");
+
+            //팀 할당 코루틴 시작
+            StartCoroutine(WaitForTeamAssignment());
         }
     }
 
@@ -185,6 +191,25 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             spectatorCamera = GameObject.FindWithTag("SpectatorCamera");
             if (spectatorCamera != null) spectatorCamera.SetActive(false); // 처음엔 비활성화
         }
+    }
+    private IEnumerator WaitForTeamAssignment()
+    {
+        Debug.Log("[PlayerController] 팀 할당 대기 시작");
+
+        while (!PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("team"))
+        {
+            Debug.Log("[PlayerController] team 속성 대기 중...");
+            yield return null;
+        }
+
+        string teamString = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
+        Debug.Log($"[PlayerController] 받은 team 값: {teamString}");
+
+        if (teamString == "Team1") myTeam = Team.Team1;
+        else if (teamString == "Team2") myTeam = Team.Team2;
+        else myTeam = Team.None;
+
+        Debug.Log($"[PlayerController] 팀 할당 완료: {myTeam}");
     }
 
     void Update()

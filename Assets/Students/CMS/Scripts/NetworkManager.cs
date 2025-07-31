@@ -134,6 +134,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if (UIManager.Instance != null && UIManager.Instance.CurrentUI is RoomListUI roomListUI)
         {
             roomListUI.UpdateRoomList(roomList);
+            Debug.Log("룸리스트 UI 만드는 함수 수행들어감OnRoomListUpdate");
         }
     }
 
