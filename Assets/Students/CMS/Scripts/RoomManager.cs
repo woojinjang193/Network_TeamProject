@@ -32,6 +32,7 @@ public class RoomManager : MonoBehaviour
 
     public void PlayerPanelSpawnAll()  // 현재 방의 모든 플레이어 패널 일괄 생성
     {
+        PhotonNetwork.AutomaticallySyncScene = true;
         playerPanels.Clear();
         foreach(Player player in PhotonNetwork.PlayerList)
         {
