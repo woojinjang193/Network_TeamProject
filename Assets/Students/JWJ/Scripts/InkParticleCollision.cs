@@ -26,6 +26,7 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
     {
         photonView = GetComponent<PhotonView>();
         //포톤뷰
+
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
         //팀컬러 정보를 가져옴
         particleSys = GetComponent<ParticleSystem>();
@@ -77,10 +78,6 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
 
     private void OnParticleCollision(GameObject other)
     {
-       //if (!photonView.IsMine)
-       //{
-       //    return;
-       //}
         events.Clear(); //이벤트 실행전 초기화
         int count = particleSys.GetCollisionEvents(other, events);
         //충돌한 파티클 수
@@ -105,7 +102,7 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
                     //페인트 칠함
                 }
 
-                PlayerTestController player = Manager.Game.GetPlayer(collider);
+                PlayerController player = Manager.Game.GetPlayer(collider);
                 if (player != null)
                 {
                     if(photonView.IsMine)
@@ -121,6 +118,13 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
 
     private void OnParticleTrigger()
     {
+        if(!PhotonNetwork.IsMasterClient) //마스터 클라이언트만 실행
+        {
+            //Debug.Log("마스터 클라이언트가 아닙니다.");
+            return;
+        }
+        //Debug.Log("트리거 충돌.");
+
         int numEnter = particleSys.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter);
         //트리거Enter 한 파티클 수
 
@@ -148,17 +152,17 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
         }
     }
 
-    private void HitPlayer(PlayerTestController player)
+    private void HitPlayer(PlayerController player)
     {
         if (player.MyTeam == myTeam) 
         {
             Debug.Log("아군입니다.");
             return;
         }
-        if (player.MyTeam != myTeam)
+        else if (player.MyTeam != myTeam)
         {
             Debug.Log("적 입니다.");
-            //데미지전송 구현해야함
+            player.photonView.RPC("TakeDamage", player.photonView.Owner, 0.2f);
         }
         else
         {

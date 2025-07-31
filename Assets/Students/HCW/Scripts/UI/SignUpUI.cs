@@ -51,14 +51,31 @@ public class SignUpUI : BaseUI
 
             // 회원가입 성공
             Firebase.Auth.FirebaseUser newUser = task.Result.User;
-            SetMessage($"회원가입 성공: {newUser.Email}\n인증 메일을 확인해주세요.");
-            Debug.LogFormat("회원가입 성공: {0} ({1})", newUser.DisplayName, newUser.UserId);
+            Debug.LogFormat("회원가입 성공: {0} ({1})", newUser.Email, newUser.UserId);
 
             // 이메일 인증 보내기
-            newUser.SendEmailVerificationAsync();
+            newUser.SendEmailVerificationAsync().ContinueWithOnMainThread(verifyTask => {
+                if(verifyTask.IsCompleted) {
+                    SetMessage($"인증 메일을 {newUser.Email}로 발송했습니다.");
+                }
+            });
 
-            // 성공 후 로그인 UI로 돌아가기
-            ShowLoginUI();
+            // 사용자 프로필(닉네임) 업데이트
+            UserProfile profile = new UserProfile { DisplayName = name };
+            newUser.UpdateUserProfileAsync(profile).ContinueWithOnMainThread(profileTask => {
+                if (profileTask.IsCanceled || profileTask.IsFaulted)
+                {
+                    SetMessage("닉네임 설정에 실패했습니다: " + profileTask.Exception.GetBaseException().Message);
+                    return;
+                }
+
+                Debug.Log($"닉네임 설정 성공: {name}");
+                FirebaseManager.UploadNickname(name);
+                SetMessage("회원가입 및 닉네임 설정 완료!");
+
+                // 모든 과정 성공 후 로그인 UI로 돌아가기
+                ShowLoginUI();
+            });
         });
     }
 

@@ -80,7 +80,7 @@ public class LoginPanel : MonoBehaviour
                 {
                     Debug.Log("Photon 서버에 연결되지 않음 연결 시도 중");
                     PhotonNetwork.ConnectUsingSettings();
-                    NetworkManager.Instance.ShowLoading();
+                    //NetworkManager.Instance.ShowLoading();
                 }
                 else
                 {

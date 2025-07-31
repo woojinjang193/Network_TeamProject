@@ -12,13 +12,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public static NetworkManager Instance { get; private set; }
 
     [SerializeField] TMP_Text stateText;       // 네트워크 상태 표시용 텍스트
-    [SerializeField] GameObject loadingPanel;  // 로딩 중일 때 보여줄 패널
-    [SerializeField] GameObject lobbyPanel;    // 로비 화면 패널
-    [SerializeField] GameObject loginPanel;    // 로그인 화면 패널
-    [SerializeField] GameObject roomListItems;
-    [SerializeField] LobbyPanel lobbyPanelScript;
-    [SerializeField] GameObject roomPanel;     // 방 UI 패널
-
     [SerializeField] RoomManager roomManager; // 방 관리 스크립트
 
 
@@ -32,23 +25,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        if(SceneManager.GetActiveScene().name == "LoginScene")
-        {
-            ShowLoading(); // 로딩 화면 활성화
-            PhotonNetwork.ConnectUsingSettings(); // Photon 서버에 연결 시도
-            Debug.Log("Photon 서버 연결 시도 중...");
-        }
-        else
-        {
-            ShowLobby(); // 로비 화면 활성화
-        }
+        PhotonNetwork.ConnectUsingSettings();
+        Debug.Log("Photon 서버 연결 시도 중...");
     }
 
     public override void OnConnectedToMaster()
     {
         Debug.Log("Photon 연결 완료");
-
-        ShowLobby(); // 로비 화면 활성화
     }
 
     public override void OnDisconnected(DisconnectCause cause)
@@ -61,16 +44,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Debug.Log("재연결 시도 중...");
     }
 
-    private void Update()
-    {
-        stateText.text = $"State: {PhotonNetwork.NetworkClientState}";
-    }
-    public void ShowLoading()
-    {
-        Debug.Log("로딩 화면 활성화");
-        loadingPanel.SetActive(true);
-        lobbyPanel.SetActive(false);
-    }
+    
+    
 
     public void CreateRoom(string roomName)
     {
@@ -90,8 +65,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         RoomOptions options = new RoomOptions
         {
             MaxPlayers = 6,
-            IsVisible = true,     //필수
-            IsOpen = true         //입장 가능
+            IsVisible = true,
+            IsOpen = true
         };
 
         PhotonNetwork.CreateRoom(roomName, options);
@@ -121,11 +96,19 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        lobbyPanel.SetActive(false);
-        roomPanel.SetActive(true);
-
-        roomManager.PlayerPanelspawn(); 
         Debug.Log("방 입장 성공!");
+
+        // UIManager를 통해 RoomUI를 표시
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ReplaceUI(typeof(RoomUI));
+        }
+
+        // RoomManager를 통해 플레이어 목록 생성
+        if (roomManager != null) 
+        {
+            roomManager.PlayerPanelSpawnAll();
+        } 
     }
 
     // 랜덤 입장에 실패했을 때 호출되는 콜백 (입장 가능한 방이 없을 때)
@@ -139,16 +122,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public void ShowLobby()
     {
-        loadingPanel.SetActive(false); // 로딩 꺼주고
-        loginPanel.SetActive(false);   // 로그인 패널 끄고
-        lobbyPanel.SetActive(true);    //로비 패널 켜기
-
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ReplaceUI(typeof(LobbyUI));
+        }
         PhotonNetwork.JoinLobby();
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        lobbyPanelScript.UpdateRoomList(roomList); 
+        if (UIManager.Instance != null && UIManager.Instance.CurrentUI is RoomListUI roomListUI)
+        {
+            roomListUI.UpdateRoomList(roomList);
+            Debug.Log("룸리스트 UI 만드는 함수 수행들어감OnRoomListUpdate");
+        }
     }
 
     public void JoinRoom(string roomName)
@@ -172,7 +159,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        roomManager.PlayerPanelRemove(otherPlayer); 
+        roomManager.PlayerPanelRemove(otherPlayer);
     }
 
 
@@ -183,21 +170,28 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnLeftRoom()  // 방 나간 후 처리
     {
-        Debug.Log("방 나감,로비로 이동");
-        roomManager.PlayerPanelRemove(PhotonNetwork.LocalPlayer); // 현재 플레이어 패널 제거
-        roomPanel.SetActive(false);
-        lobbyPanel.SetActive(true);
-        lobbyPanelScript.OnReturnFromRoom();  // 로비 버튼 등 상태 복원
+        Debug.Log("방 나감, 로비로 이동");
+
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ReplaceUI(typeof(LobbyUI));
+            if (UIManager.Instance.CurrentUI is LobbyUI lobbyUI)
+            {
+                lobbyUI.ShowMainLobby();
+                lobbyUI.OnReturnFromRoom(); // 버튼 상태 등 복원
+            }
+        }
+
+        if (roomManager != null)
+        {
+            roomManager.PlayerPanelRemove(PhotonNetwork.LocalPlayer); // 현재 플레이어 패널 제거
+        }
     }
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
-        if (roomManager.playerPanels.TryGetValue(targetPlayer.ActorNumber, out var panel))
-        {
-            panel.ReadyCheck(targetPlayer); // 기존 Ready UI 반영
-            panel.ApplyTeamColor(targetPlayer); // 팀 색상 반영
-        }
+        roomManager?.OnPlayerPropertiesUpdated(targetPlayer, changedProps);
 
-        roomManager.CheckAllReady(); // 준비 여부 재확인
+        roomManager?.CheckAllReady();
     }
 }

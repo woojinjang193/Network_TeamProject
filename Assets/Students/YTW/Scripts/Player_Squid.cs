@@ -29,8 +29,8 @@ public class Player_Squid : PlayerState
         player.squidModel.SetActive(true);
         player.col.height = 1.0f;
         player.col.radius = 0.5f;
+        player.IsVaulting = false;
 
-        player.rig.useGravity = false;
         player.rig.velocity = Vector3.zero;
 
         revertTimer = 0f;
@@ -41,13 +41,21 @@ public class Player_Squid : PlayerState
     {
         subStateMachine.Update();
 
-        if (!player.input.IsSquidHeld)
+        if (!player.input.IsSquidHeld && !player.IsOnWalkableWall)
         {
             this.stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
             return;
         }
 
+        if (player.WallNormal != Vector3.zero && !player.IsGrounded && player.CurrentWallInkStatus != InkStatus.OUR_TEAM)
+        {
+            player.rig.AddForce(player.WallNormal * 5f, ForceMode.Impulse);
 
+            this.stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
+            return;
+        }
+
+        // 3. 땅에 있지만, 우리 팀 잉크가 아닐 경우 (기존 로직)
         if (player.IsGrounded && player.CurrentGroundInkStatus != InkStatus.OUR_TEAM)
         {
             revertTimer += Time.deltaTime;
@@ -68,7 +76,7 @@ public class Player_Squid : PlayerState
         subStateMachine.FixedUpdate();
     }
 
-    public override void Exit() 
+    public override void Exit()
     {
         player.rig.useGravity = true;
     }

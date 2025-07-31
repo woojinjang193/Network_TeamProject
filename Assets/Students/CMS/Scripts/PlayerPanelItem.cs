@@ -14,42 +14,15 @@ public class PlayerPanelItem : MonoBehaviour
     [SerializeField] private Image hostImage;
     [SerializeField] private Image readyImage;
     [SerializeField] private Image backgroundImage; // 패널 배경
-    [SerializeField] private Button readyButton;
-
-    private bool isReady;
-
-
 
     public void Init(Player player)
     {
         nameText.text = player.NickName;
         hostImage.enabled = player.IsMasterClient; // 호스트 여부 표시
-        readyButton.interactable = player.IsLocal; // 로컬 플레이어만 준비 버튼 활성화
 
         ApplyTeamColor(player);
 
-        if (!player.IsLocal)
-            return;
-
-        isReady = false;
-
-        ReadyPropertiesUpdate();
-        readyButton.onClick.AddListener(ReadyButtonClick);
-    }
-
-    public void ReadyButtonClick()
-    {
-        isReady = !isReady;
-        readyText.text = isReady ? "Ready" : "Click Ready";
-        readyImage.color = isReady ? Color.green : Color.white;
-        ReadyPropertiesUpdate();
-    }
-    public void ReadyPropertiesUpdate()
-    {
-        PhotonNetwork.LocalPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable
-        {
-            { "Ready", isReady }
-        });
+        ReadyCheck(player);
     }
 
     public void ReadyCheck(Player player)

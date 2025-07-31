@@ -7,6 +7,7 @@ TagManager:
   - Bullet
   - Ink
   - Grid
+  - SpectatorCamera
   layers:
   - Default
   - TransparentFX

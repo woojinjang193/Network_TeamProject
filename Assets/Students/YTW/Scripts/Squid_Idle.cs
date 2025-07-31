@@ -12,11 +12,16 @@ public class Squid_Idle : PlayerState
         HasPhysics = true; 
     }
 
+    public override void Enter()
+    {
+
+    }
+
     public override void Update()
     {
         if (player.input.IsJumpPressed && IsGrounded())
         {
-            player.rig.useGravity = true; // 점프할 때는 중력 활성화
+            Jump(player.squidJumpForce);
             stateMachine.ChangeState(squidState.lowStateDic[LowState.Jump]);
             return;
         }
@@ -34,10 +39,11 @@ public class Squid_Idle : PlayerState
     }
     public override void FixedUpdate()
     {
-        if (player.rig.velocity.y > 0.1f)
-        {
-            return;
-        }
-        player.rig.velocity = new Vector3(0f, -1.0f, 0f);
+        float verticalVelocity = player.rig.velocity.y;
+        Vector3 horizontalVelocity = new Vector3(player.rig.velocity.x, 0f, player.rig.velocity.z);
+
+        horizontalVelocity = Vector3.Lerp(horizontalVelocity, Vector3.zero, Time.fixedDeltaTime * 20f); 
+
+        player.rig.velocity = new Vector3(horizontalVelocity.x, verticalVelocity, horizontalVelocity.z);
     }
 }

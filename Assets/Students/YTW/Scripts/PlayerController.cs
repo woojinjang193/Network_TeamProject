@@ -1,4 +1,5 @@
 using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -25,6 +26,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public ThirdPersonCamera tpsCamera;
     public Camera mainCamera;
     public Transform cameraPivot;
+    public GameObject spectatorCamera;
 
     [Header("모델 설정")]
     public GameObject humanModel;
@@ -49,7 +51,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     [Header("팀 설정")]
     private TeamColorInfo teamColorInfo;
-    public Team myTeam { get; private set; } = Team.None;
+ 
+    private Team myTeam = Team.None;
+    public Team MyTeam => myTeam;
 
     [Header("잉크 상호작용 설정")]
     [Tooltip("잉크가 칠해질 수 있는 오브젝트의 레이어")]
@@ -71,10 +75,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private float groundCheckTimer = 0f;
     private const float GROUND_CHECK_INTERVAL = 0.1f; // 1초에 10번 검사
 
+    //플레이어 체력
+    private PlayerHealth playerHealth;///
+    public PlayerHealth PlayerHealth => playerHealth;///
+
     public bool IsGrounded { get; private set; } = false;
+    public Vector3 GroundNormal { get; private set; } = Vector3.up;
     public InkStatus CurrentGroundInkStatus { get; private set; } = InkStatus.NONE;
     public InkStatus CurrentWallInkStatus { get; private set; } = InkStatus.NONE;
     public bool IsOnWalkableWall { get; private set; } = false;
+    public bool IsAtWallEdge { get; private set; } = false;
+    public bool IsVaulting = false;
     public Vector3 WallNormal { get; private set; } = Vector3.zero;
 
     void Awake()
@@ -90,6 +101,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         playerRenderer = humanModel.GetComponent<SkinnedMeshRenderer>();
         squidRenderer = squidModel.GetComponent<SkinnedMeshRenderer>();
+
+        playerHealth = GetComponent<PlayerHealth>();///
 
         if (photonView.IsMine)
         {
@@ -139,6 +152,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             rig.isKinematic = true;
         }
 
+        Manager.Game.RegisterPlayer(col, this);
+
     }
 
     void Start()
@@ -152,6 +167,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+
+            Debug.Log("[PlayerController] Start 실행됨 - 내 오브젝트");
+
+            //팀 할당 코루틴 시작
+            StartCoroutine(WaitForTeamAssignment());
         }
     }
 
@@ -163,8 +183,33 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         highStateDic.Add(HighState.HumanForm, new Player_Human(this, stateMachine));
         highStateDic.Add(HighState.SquidForm, new Player_Squid(this, stateMachine));
-        // highStateDic.Add(HighState.Die, new Player_Die(this, stateMachine));       
+        highStateDic.Add(HighState.Die, new Player_Die(this, stateMachine));       
         stateMachine.Initialize(highStateDic[HighState.HumanForm]);
+
+        if (spectatorCamera == null)
+        {
+            spectatorCamera = GameObject.FindWithTag("SpectatorCamera");
+            if (spectatorCamera != null) spectatorCamera.SetActive(false); // 처음엔 비활성화
+        }
+    }
+    private IEnumerator WaitForTeamAssignment()
+    {
+        Debug.Log("[PlayerController] 팀 할당 대기 시작");
+
+        while (!PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("team"))
+        {
+            Debug.Log("[PlayerController] team 속성 대기 중...");
+            yield return null;
+        }
+
+        string teamString = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
+        Debug.Log($"[PlayerController] 받은 team 값: {teamString}");
+
+        if (teamString == "Team1") myTeam = Team.Team1;
+        else if (teamString == "Team2") myTeam = Team.Team2;
+        else myTeam = Team.None;
+
+        Debug.Log($"[PlayerController] 팀 할당 완료: {myTeam}");
     }
 
     void Update()
@@ -177,13 +222,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (photonView.IsMine)
         {
-            groundCheckTimer -= Time.deltaTime;
-            if (groundCheckTimer <= 0f)
-            {
-                groundCheckTimer = GROUND_CHECK_INTERVAL;
-                GroundAndInkCheck();
-            }
-
+            GroundAndInkCheck();
 
             if (stateMachine != null)
             {
@@ -232,6 +271,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (Physics.Raycast(groundRayStart, Vector3.down, out RaycastHit groundHit, groundRayDistance, combinedLayer))
         {
             IsGrounded = true;
+            GroundNormal = groundHit.normal;
             if (groundHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
             {
                 // 잉크 색상은 비동기로 읽어오므로, 이 값은 약간의 딜레이가 있을 수 있음
@@ -245,30 +285,48 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         else
         {
             IsGrounded = false;
+            GroundNormal = Vector3.up;
             CurrentGroundInkStatus = InkStatus.NONE;
         }
 
         // 벽 체크
-        Vector3 wallRayStart = transform.position + Vector3.up * 0.5f;
+        Vector3 wallRayStart = transform.position - transform.up * (col.height / 2 - 0.1f);
+        // 현재 콜라이더의 절대적인 꼭대기 위치 바로 아래에서 레이를 쏨
+        Vector3 edgeRayStart = transform.position + transform.up * (col.height / 2 - 0.1f);
+
         float wallRayDistance = 1f;
         Debug.DrawRay(wallRayStart, transform.forward * wallRayDistance, Color.blue);
 
         if (Physics.Raycast(wallRayStart, transform.forward, out RaycastHit wallHit, wallRayDistance, inkableLayer))
         {
+            WallNormal = wallHit.normal;
             if (wallHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
             {
                 SplatmapReader.ReadPixel(paintableObj.splatMap, wallHit.textureCoord, OnWallColorRead);
+
+                // 머리 높이 레이캐스트를 발사하여 벽 상단을 확인
+                if (IsOnWalkableWall && !Physics.Raycast(edgeRayStart, transform.forward, wallRayDistance, inkableLayer))
+            {
+                IsAtWallEdge = true;
+            }
+                else
+                {
+                    IsAtWallEdge = false;
+                }
             }
             else
             {
                 CurrentWallInkStatus = InkStatus.NONE;
                 IsOnWalkableWall = false;
+                IsAtWallEdge = false;
             }
         }
         else
         {
+            WallNormal = Vector3.zero;
             CurrentWallInkStatus = InkStatus.NONE;
             IsOnWalkableWall = false;
+            IsAtWallEdge = false;
         }
     }
 
@@ -283,6 +341,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private void OnWallColorRead(Color color)
     {
         CurrentWallInkStatus = GetInkStatusFromColor(color);
+        if (stateMachine.CurrentState != highStateDic[HighState.SquidForm])
+        {
+            IsOnWalkableWall = false;
+            return;
+        }
+
         IsOnWalkableWall = (CurrentWallInkStatus == InkStatus.OUR_TEAM);
     }
 
@@ -325,7 +389,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (photonView.IsMine && stateMachine != null)
         {
             stateMachine.FixedUpdate();
-            if (!IsGrounded && rig.useGravity)
+            if (!IsGrounded && rig.useGravity && !IsVaulting)
             {
                 if (rig.velocity.y >= 0)
                 {
@@ -379,7 +443,37 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    public void Die()
+    {
+        // 상태 머신을 Die 상태로 변경
+        if (photonView.IsMine)
+        {
+            stateMachine.ChangeState(highStateDic[HighState.Die]);
+        }
+    }
 
+    public void Respawn()
+    {
+        if (!photonView.IsMine) return;
+
+        // 스폰 위치 결정 예정
+        //string team = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
+        //Transform[] spawnPoints = (team == "Team1")
+        //    ? Manager.Game.team1SpawnPoints 
+        //    : Manager.Game.team2SpawnPoints;
+
+        //Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+
+        // 위치 및 상태 초기화
+        //transform.position = spawnPoint.position;
+        //transform.rotation = spawnPoint.rotation;
+
+        // 체력 초기화
+        playerHealth.Respawn();
+
+        stateMachine.ChangeState(highStateDic[HighState.HumanForm]);
+        Debug.Log("플레이어 리스폰");
+    }
 
     // PUN2가 주기적으로 호출하여 데이터를 동기화하는 콜백 함수
     // OnPhotonSerializeView : 정기적으로 데이터를 주고받는 통신 채널

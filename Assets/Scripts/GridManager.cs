@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,13 @@ using UnityEngine;
 public class GridManager : Singleton<GridManager>
 {
     [SerializeField] private TMP_Text teamRateText;
+    private PhotonView photonView;///
 
     private int countTeam1 = 0;
     private int countTeam2 = 0;
     private int countNone = 0;
 
-    private Dictionary<string, MapGrid> gridDic = new(5000);
+    private Dictionary<int, MapGrid> gridDic = new(5000);
     //그리드들을 넣어놓을 딕셔너리
 
     protected override void Awake()
@@ -33,7 +35,9 @@ public class GridManager : Singleton<GridManager>
                 Debug.LogError("UI/CoverageRateCanvas 프리팹을 찾을 수 없습니다.");
             }
         }
-     
+
+        photonView = GetComponent<PhotonView>();//
+
     }
     private void Start()
     {
@@ -42,10 +46,11 @@ public class GridManager : Singleton<GridManager>
 
     public void RegisterGrid(MapGrid grid)
     {
-        if(!gridDic.ContainsKey(grid.gameObject.name))
+        int id = grid.gameObject.GetInstanceID();
+        if(!gridDic.ContainsKey(id))
             // 딕셔너리에 없다면
         {
-            gridDic.Add(grid.gameObject.name, grid);
+            gridDic.Add(id, grid);
             //딕셔너리에 등록
             countNone++;
             //그리드를 등록할때는 팀을none 으로 넣음
@@ -53,11 +58,15 @@ public class GridManager : Singleton<GridManager>
     }
     public MapGrid GetGrid(GameObject obj)
     {
-        return gridDic[obj.name];
+        int id = obj.GetInstanceID();
+        return gridDic[id];
+        
     }    
 
     public List<MapGrid> GetAllGrids() //InkParticleCollision 에서 한번 호출
     {
+        //Debug.Log($"등록된 그리드 총개수: {gridDic.Count}");
+        //Debug.Log($"None :{countNone}");
         return gridDic.Values.ToList();
         //딕셔너리를 리스트로 바꿔서 반환
     }
@@ -101,7 +110,16 @@ public class GridManager : Singleton<GridManager>
         float Team1Rate = countTeam1 / (float)total * 100f;
         float Team2Rate = countTeam2 / (float)total * 100f;
         teamRateText.text = $"Team1 : {Team1Rate.ToString("F2")}%    Team2 : {Team2Rate.ToString("F2")}%";
+
+        photonView.RPC("SyncCoverageUI", RpcTarget.Others, Team1Rate, Team2Rate);
     }
+
+    [PunRPC]
+    public void SyncCoverageUI(float team1Rate, float team2Rate) // 추가됨!!!
+    {
+        teamRateText.text = $"Team1 : {team1Rate:F2}%    Team2 : {team2Rate:F2}%";
+    }
+
 
     public string GetWinningTeam()
     {

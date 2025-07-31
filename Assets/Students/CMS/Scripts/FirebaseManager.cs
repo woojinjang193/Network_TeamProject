@@ -107,4 +107,32 @@ public class FirebaseManager : MonoBehaviour
             }
         });
     }
+    public static void UploadNickname(string nickname)
+    {
+        FirebaseUser user = Auth.CurrentUser;
+        if (user == null)
+        {
+            Debug.LogWarning("Firebase 로그인 안 되어 있음");
+            return;
+        }
+
+        string uid = user.UserId;
+        DatabaseReference userRef = dbRef.Child("users").Child(uid);
+
+        Dictionary<string, object> updates = new Dictionary<string, object>
+    {
+        { "nickname", nickname }
+    };
+
+        userRef.UpdateChildrenAsync(updates).ContinueWithOnMainThread(task => {
+            if (task.IsCompleted)
+            {
+                Debug.Log("닉네임 업로드 성공");
+            }
+            else
+            {
+                Debug.LogError("닉네임 업로드 실패: " + task.Exception);
+            }
+        });
+    }
 }
