@@ -1,6 +1,7 @@
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
 public class Player_Die : PlayerState
@@ -30,10 +31,16 @@ public class Player_Die : PlayerState
         }
     }
 
+    public override void Update()
+    {
+        
+    }
+
     private IEnumerator RespawnCoroutine()
     {
         Debug.Log($"{PlayerController.RESPAWN_TIME}초 후 리스폰합니다.");
         yield return new WaitForSeconds(PlayerController.RESPAWN_TIME);
+        Debug.Log($"리스폰 시간{PlayerController.RESPAWN_TIME}");
 
         player.deadState = false;
         player.Respawn();

@@ -7,6 +7,7 @@ using UnityEngine.Events;
 public class Squid_Swim : PlayerState
 {
     private static readonly int IsMove = Animator.StringToHash("IsMove");
+    private static readonly int MoveSpeed = Animator.StringToHash("MoveSpeed");
     private Player_Squid squidState;
     private event UnityAction OnSwimStart ;
     private event UnityAction OnSwimStop ;
@@ -126,7 +127,7 @@ public class Squid_Swim : PlayerState
 
     private void SetAnimatorParameter()
     {
-        player.squidAnimator.SetFloat("MoveSpeed", player.rig.velocity.magnitude/player.squidSpeed);
+        player.squidAnimator.SetFloat(MoveSpeed, player.rig.velocity.magnitude/player.squidSpeed);
     }
 
     private void SwimStarted()
