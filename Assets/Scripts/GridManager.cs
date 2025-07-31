@@ -14,7 +14,7 @@ public class GridManager : Singleton<GridManager>
     private int countTeam2 = 0;
     private int countNone = 0;
 
-    private Dictionary<string, MapGrid> gridDic = new(5000);
+    private Dictionary<int, MapGrid> gridDic = new(5000);
     //그리드들을 넣어놓을 딕셔너리
 
     protected override void Awake()
@@ -37,10 +37,6 @@ public class GridManager : Singleton<GridManager>
         }
 
         photonView = GetComponent<PhotonView>();//
-        //if (photonView == null)//
-        //{
-        //    photonView = gameObject.AddComponent<PhotonView>();
-        //}
 
     }
     private void Start()
@@ -50,10 +46,11 @@ public class GridManager : Singleton<GridManager>
 
     public void RegisterGrid(MapGrid grid)
     {
-        if(!gridDic.ContainsKey(grid.gameObject.name))
+        int id = grid.gameObject.GetInstanceID();
+        if(!gridDic.ContainsKey(id))
             // 딕셔너리에 없다면
         {
-            gridDic.Add(grid.gameObject.name, grid);
+            gridDic.Add(id, grid);
             //딕셔너리에 등록
             countNone++;
             //그리드를 등록할때는 팀을none 으로 넣음
@@ -61,11 +58,15 @@ public class GridManager : Singleton<GridManager>
     }
     public MapGrid GetGrid(GameObject obj)
     {
-        return gridDic[obj.name];
+        int id = obj.GetInstanceID();
+        return gridDic[id];
+        
     }    
 
     public List<MapGrid> GetAllGrids() //InkParticleCollision 에서 한번 호출
     {
+        //Debug.Log($"등록된 그리드 총개수: {gridDic.Count}");
+        //Debug.Log($"None :{countNone}");
         return gridDic.Values.ToList();
         //딕셔너리를 리스트로 바꿔서 반환
     }
