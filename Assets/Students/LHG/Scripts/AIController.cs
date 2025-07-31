@@ -1,10 +1,11 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 
-public class AIController : MonoBehaviour
+public class AIController : MonoBehaviour, IPunObservable
 {
     public MoveModule MoveModule { get; private set; }
     public FireModule FireModule { get; private set; }
@@ -19,23 +20,28 @@ public class AIController : MonoBehaviour
     public Transform spawnPoint;
     private Vector3 _initialPosition;
     private Quaternion _initialRotation;
+    public Team myTeam { get; private set; } = Team.None;
     
-    [SerializeField] Button testDamageBtn;
+    
 
     [Header("모델 설정")]
     public SkinnedMeshRenderer AIRenderer;
 
     [Header("팀 설정")]
     private TeamColorInfo teamColorInfo;
-    public Team myTeam { get; private set; } = Team.None;
 
+    [Header("잉크 파티클 총")]
+    public InkParticleGun inkGun;
+
+    [SerializeField] private PhotonView weaponView;
+    
 
     private void Awake()
     {
-        testDamageBtn.onClick.AddListener(TakeDamage); //테스트코드 삭제할 것.
+        
         //statedic대신 모듈화한 개별 스크립트로 관리
         MoveModule = new MoveModule(this);
-        FireModule = new FireModule(this);
+        FireModule = new FireModule(this, weaponView);
         DetectModule = new DetectModule(this);
 
         StateMachine = new AIStateMachine();
@@ -51,6 +57,7 @@ public class AIController : MonoBehaviour
         Die();
         UpdateAIColor();
         TestTeamSelection(); //테스트코드 삭제할 것.
+        TakeDamage(); //테스트코드 삭제할 것
     }
 
     void OnDrawGizmos()
@@ -61,7 +68,10 @@ public class AIController : MonoBehaviour
 
     public void TakeDamage()
     {
-        health -= 50;
+        if(Input.GetKeyDown(KeyCode.K))
+        {
+            health -= 50;
+        }
     }
 
     public void Respawn()
@@ -119,5 +129,24 @@ public class AIController : MonoBehaviour
             myTeam = Team.Team2;
             Debug.Log($"팀 변경: {myTeam}");
         }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if(stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        else
+        {
+            transform.position = (Vector3)stream.ReceiveNext();
+            transform.rotation = (Quaternion)stream.ReceiveNext();
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        MoveModule.OnCollisionEnter(collision);
     }
 }

@@ -21,7 +21,7 @@ public class DetectModule
     public void Update()
     {
         DetectEnemy();
-        DetectGrid();
+        
     }
 
     private void DetectEnemy()
@@ -34,15 +34,14 @@ public class DetectModule
         {
             Debug.Log("Player 태그 감지됨");
         }
-        
-        
     }
 
     private void DetectGrid()
     {
-        Collider[] hits = Physics.OverlapSphere(_controller.transform.position, detectRadius);
 
-        //TargetGrid = hits.FirstOrDefault(myteam == Team.Team1).transform;
+
+        //기본적으로 발사하고, 우리팀이면 안쏜다 
+
         //TRYGETVALUE, GETCOMPONENT, COMPARETAG
     }
 }

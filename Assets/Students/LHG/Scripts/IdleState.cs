@@ -16,12 +16,14 @@ public class IdleState : AIBaseState
 
         if(_controller.DetectModule.HasEnemy)
         {
-            _controller.FireModule.FireAt(_controller.DetectModule.Target);
-        }
-        
-        if (_controller.DetectModule.HasEnemy)
-        {
+            _controller.FireModule.TryFireAt(_controller.DetectModule.Target);
+            _controller.MoveModule.StopWander();
             _controller.StateMachine.SetState(new ChaseState(_controller));
         }
+        
+        //if (_controller.DetectModule.HasEnemy)
+        //{
+        //    _controller.StateMachine.SetState(new ChaseState(_controller));
+        //}
     }
 }
