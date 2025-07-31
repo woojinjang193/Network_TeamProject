@@ -25,6 +25,6 @@ public class ChaseState : AIBaseState
         }
 
         _controller.MoveModule.MoveTo(target.position);
-        _controller.FireModule.FireAt(target);
+        _controller.FireModule.TryFireAt(target);
     }
 }

@@ -20,6 +20,7 @@ public class AIController : MonoBehaviour, IPunObservable
     public Transform spawnPoint;
     private Vector3 _initialPosition;
     private Quaternion _initialRotation;
+    public Team myTeam { get; private set; } = Team.None;
     
     
 
@@ -28,8 +29,11 @@ public class AIController : MonoBehaviour, IPunObservable
 
     [Header("팀 설정")]
     private TeamColorInfo teamColorInfo;
-    public Team myTeam { get; private set; } = Team.None;
 
+    [Header("잉크 파티클 총")]
+    public InkParticleGun inkGun;
+
+    [SerializeField] private PhotonView weaponView;
     
 
     private void Awake()
@@ -37,7 +41,7 @@ public class AIController : MonoBehaviour, IPunObservable
         
         //statedic대신 모듈화한 개별 스크립트로 관리
         MoveModule = new MoveModule(this);
-        FireModule = new FireModule(this);
+        FireModule = new FireModule(this, weaponView);
         DetectModule = new DetectModule(this);
 
         StateMachine = new AIStateMachine();

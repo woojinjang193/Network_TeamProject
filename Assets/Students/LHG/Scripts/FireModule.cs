@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,19 +7,58 @@ using UnityEngine;
 public class FireModule
 {
     private AIController _controller;
-    private float nextFireTime = 0f;
+    private float nextFireTime;
+    private bool isFiring = false;
 
-    public FireModule(AIController controller)
+    private PhotonView weaponView;
+
+    public FireModule(AIController controller, PhotonView weaponView)
     {
         _controller = controller;
+        this.weaponView = weaponView;
     }
-    public void FireAt(Transform target)
+    //public void FireAt(Transform target)
+    //{
+    //    if (Time.time >= nextFireTime)
+    //    {
+    //        nextFireTime = Time.time + _controller.fireInterval;
+    //        Vector3 dir = (target.position - _controller.transform.position).normalized;
+    //        Debug.DrawRay(_controller.transform.position, dir * 5f, Color.red, 0.2f); //TODO 플레이어 기능의 물감발사를 가져오자 + 발사간격
+
+    //        //타겟으로 회전
+    //        _controller.transform.forward = dir;
+
+    //        //발사on
+    //        if(!_controller.inkGun.mainEmission.enabled)
+
+    //        //inkparticlecollision이것만 껐다켰다하면된다고함
+    //    }
+    //}
+
+    public void TryFireAt(Transform target)
     {
-        if(Time.time >= nextFireTime)
+        if (Time.time >= nextFireTime)
         {
-            Vector3 dir = (target.position - _controller.transform.position).normalized;
-            Debug.DrawRay(_controller.transform.position, dir * 5f, Color.red, 0.2f); //TODO 플레이어 기능의 물감발사를 가져오자 + 발사간격
+            FireStart();
             nextFireTime = Time.time + _controller.fireInterval;
+        }
+    }
+
+    private void FireStart()
+    {
+        if (!isFiring)
+        {
+            isFiring = true;
+            weaponView.RPC("FireParticle", RpcTarget.All, _controller.myTeam, true);
+        }
+    }
+
+    private void StopFire()
+    {
+        if (isFiring)
+        {
+            isFiring = false;
+            weaponView.RPC("FireParticle", RpcTarget.All, _controller.myTeam, false);
         }
     }
 }
