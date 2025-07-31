@@ -123,7 +123,8 @@ public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리�
             //Debug.Log("마스터 클라이언트가 아닙니다.");
             return;
         }
- 
+        //Debug.Log("트리거 충돌.");
+
         int numEnter = particleSys.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter);
         //트리거Enter 한 파티클 수
 
