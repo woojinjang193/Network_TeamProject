@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관리하는 클래스
+public class InkParticleCollision : MonoBehaviour //파티클 충돌을 관리하는 클래스
 {
-    private PhotonView photonV;
+    private PhotonView photonView;
     private TeamColorInfo teamColorInfo;  //팀컬러 정보
     private Team myTeam; //팀 정보
     private ParticleSystem particleSys; // 충돌이벤트를 위한 파티클시스템 변수
@@ -17,18 +17,14 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
     [SerializeField] private float strength; // 강도
 
     private Collider[] colliders = new Collider[10];
-    //충돌때마다 배열을 생성하지 않기위해 미리 생성 (트리거용)
+    //충돌때마다 배열을 생성하지 않기위해 미리 생성
 
-    private Dictionary<Collider, PaintableObj> dicColliderToPaintable = new();
-    //Collider를 키로, PaintableObj를 값으로 딕셔너리 생성
-    private Dictionary<PaintableObj, int> dicPaintableToViewID = new();
-    //PaintableObj를 키로, int를 값으로 딕셔너리 생성
-    private Dictionary<int, PaintableObj> dicViewIDToPaintable = new();
-    //Collider를 키로, PaintableObj를 값으로 딕셔너리 생성
+    private Dictionary<Collider, PaintableObj> paintableObject;
+    //Collider를 키로, PaintableObj를 값으로 딕셔너리를 만들변수
 
     private void Awake()
     {
-        photonV = GetComponent<PhotonView>();
+        photonView = GetComponent<PhotonView>();
         //포톤뷰
 
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
@@ -36,22 +32,20 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
         particleSys = GetComponent<ParticleSystem>();
         //파티클 시스템을 가져옴
 
+        paintableObject = new Dictionary<Collider, PaintableObj> ();
+        //캐싱용 딕셔너리 생성
+
         PaintableObj[] paintableObjs = FindObjectsOfType<PaintableObj>();
         // 모든 PaintableObj를 넣을 배열 생성 
 
-        //배열을 돌면서 PaintableObj 컴포넌트를 가진 객체 안에 콜라이더, 포톤뷰(딕셔너리 키)를 찾음
+        //배열을 돌면서 PaintableObj 컴포넌트를 가진 객체 안에 콜라이더(딕셔너리 키)를 찾음
         for (int i = 0; i < paintableObjs.Length; i++)
         {
             PaintableObj paintableObj = paintableObjs[i];
-            if(paintableObj.TryGetComponent<Collider>(out Collider collider) && paintableObj.TryGetComponent<PhotonView>(out PhotonView pv))
-                //콜라이더와 포톤뷰 컴포넌트를 가져옴
+            if(paintableObj.TryGetComponent<Collider>(out Collider collider))
             {
-                int viewID = pv.ViewID;
-
-                //딕셔너리에 등록
-                dicColliderToPaintable[collider] = paintableObjs[i];
-                dicPaintableToViewID[paintableObjs[i]] = viewID;
-                dicViewIDToPaintable[viewID] = paintableObjs[i];
+                paintableObject[collider] = paintableObj;
+                //딕셔너리에 키(collider) 와 벨류(paintableObj)를 저장
             }
         }
     }
@@ -97,34 +91,35 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
 
             if (collider == null)
             {
+                Debug.Log("콜라이더가 널임");
                 continue;
+            }
+            
+            if (paintableObject.TryGetValue(collider, out PaintableObj paintableObj))
+            //타입 변환에 성공 && 딕셔너리에 키를 넣어 값을 받음
+            {
+                paintableObj.DrawInk(hitPos, radius, hardness, strength, myTeam);
+                continue;
+                //페인트 칠함
+            }
+            
+            Debug.Log(" 페인트 칠할 수 있는 콜라이더가 아님");
+
+            PlayerController player = Manager.Game.GetPlayer(collider);
+            if (player != null)
+            {
+                if(photonView.IsMine)
+                {
+                    Debug.Log("히트플레이어 들어옴");
+                    HitPlayer(player);
+                    //팀판정 및 후처리
+                }
+
             }
             else
             {
-                if (dicColliderToPaintable.TryGetValue(collider, out PaintableObj paintableObj))
-                //타입 변환에 성공 && 딕셔너리에 키를 넣어 값을 받음
-                {
-                    if(dicPaintableToViewID.TryGetValue(paintableObj, out int viewID))
-                        //위에서 받은 값으로 칠해질 오브젝트 viewID 가져옴
-                    {
-                        photonView.RPC("ReportPaint", RpcTarget.MasterClient, hitPos, radius, hardness, strength, (int)myTeam, viewID);
-                        //뷰아이디를 포함해서 마스터 클라이언트한테 보고
-                    }
-
-                }
-
-                PlayerController player = Manager.Game.GetPlayer(collider);
-                //collider 를 키로 플레이어를 받아옴
-                if (player != null)
-                {
-                    if(photonView.IsMine)
-                    {
-                        HitPlayer(player);
-                        //팀판정 및 후처리
-                    }
-
-                }
-            }   
+                Debug.Log("플레이어를 찾지 못함.");
+            }
         }
     }
 
@@ -163,28 +158,6 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
             }
         }
     }
-
-    [PunRPC]
-    private void ReportPaint(Vector3 hitPos, float radius, float hardness, float strength, int teamIndex, int viewID)
-    {
-        photonView.RPC("SyncDrawInk", RpcTarget.All, hitPos, radius, hardness, strength, teamIndex, viewID);
-        //마스터가 넘겨받은 정보로 모든 플레이어가 같은곳에 칠하게 해줌
-    }
-
-    [PunRPC]
-    private void SyncDrawInk(Vector3 hitPos, float radius, float hardness, float strength, int teamIndex, int viewID)
-    {
-        Team team = (Team)teamIndex;
-        //인덱스로 enum 변환
-
-        if (dicViewIDToPaintable.TryGetValue(viewID, out PaintableObj paintableObj))
-            //뷰아이디로 칠해질 오브젝트 받아옴
-        {
-            paintableObj.DrawInk(hitPos, radius, hardness, strength, team);
-            //그림
-        }
-    }
-
 
     private void HitPlayer(PlayerController player)
     {

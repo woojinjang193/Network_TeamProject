@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Squid_Idle : PlayerState
 {
+    private static readonly int IsMove = Animator.StringToHash("IsMove");
     private Player_Squid squidState;
     public Squid_Idle(PlayerController player, StateMachine stateMachine, Player_Squid squidState) : base(player, stateMachine)
     {
@@ -12,11 +13,11 @@ public class Squid_Idle : PlayerState
         HasPhysics = true; 
     }
 
+
     public override void Enter()
     {
-
+        player.squidAnimator.SetBool(IsMove,false);
     }
-
     public override void Update()
     {
         if (player.input.IsJumpPressed && IsGrounded())

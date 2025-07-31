@@ -9,6 +9,7 @@ public class Player_Squid : PlayerState
 
     private float revertTimer = 0f;
     private const float REVERT_DELAY = 0.1f;
+    private Vector3 colCenter = new Vector3(0, 0.2f, 0);
 
     public Player_Squid(PlayerController player, StateMachine stateMachine) : base(player, stateMachine)
     {
@@ -27,8 +28,10 @@ public class Player_Squid : PlayerState
         player.gameObject.layer = LayerMask.NameToLayer("Invincible");
         player.humanModel.SetActive(false);
         player.squidModel.SetActive(true);
+        player.col.direction = 2;
         player.col.height = 1.0f;
-        player.col.radius = 0.5f;
+        player.col.radius = 0.2f;
+        player.col.center = colCenter;
         player.IsVaulting = false;
 
         player.rig.velocity = Vector3.zero;

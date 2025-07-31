@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Squid_Swim : PlayerState
 {
+    private static readonly int IsMove = Animator.StringToHash("IsMove");
     private Player_Squid squidState;
     public Squid_Swim(PlayerController player, StateMachine stateMachine, Player_Squid squidState) : base(player, stateMachine)
     { 
@@ -12,6 +13,10 @@ public class Squid_Swim : PlayerState
         HasPhysics = true; 
     }
 
+    public override void Enter()
+    {
+        player.squidAnimator.SetBool(IsMove,true);
+    }
     public override void Update()
     {
         if (player.input.IsJumpPressed && IsGrounded())
@@ -46,8 +51,14 @@ public class Squid_Swim : PlayerState
         {
             SwimOnGround();
         }
+        SetAnimatorParameter(); 
     }
 
+    public override void Exit()
+    {
+        player.squidAnimator.SetBool(IsMove, false);
+    }
+    
     private void MoveOnWall()
     {
         player.IsVaulting = false;
@@ -75,5 +86,10 @@ public class Squid_Swim : PlayerState
         player.IsVaulting = false;
         SetMove(player.squidSpeed);
         SetPlayerRotation();
+    }
+
+    private void SetAnimatorParameter()
+    {
+        player.squidAnimator.SetFloat("MoveSpeed", player.rig.velocity.magnitude/player.squidSpeed);
     }
 }
