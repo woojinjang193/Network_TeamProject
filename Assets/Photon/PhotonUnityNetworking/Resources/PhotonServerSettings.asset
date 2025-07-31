@@ -44,6 +44,7 @@ MonoBehaviour:
   - SetStartTime
   - TakeDamage
   - SyncCoverageUI
+  - PlayerDie
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
