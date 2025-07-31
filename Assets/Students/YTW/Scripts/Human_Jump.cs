@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Human_Jump : PlayerState
 {
+    private static readonly int JumpTrigger = Animator.StringToHash("JumpTrigger");
+    private static readonly int IsAir = Animator.StringToHash("IsAir");
     private Player_Human humanState;
     public Human_Jump(PlayerController player, StateMachine stateMachine, Player_Human humanState) : base(player, stateMachine)
     {
@@ -18,8 +20,8 @@ public class Human_Jump : PlayerState
         {
             Jump(player.humanJumpForce);
         }
-        player.humanAnimator.SetTrigger("JumpTrigger");
-        player.humanAnimator.SetBool("IsAir", true);
+        player.humanAnimator.SetTrigger(JumpTrigger);
+        player.humanAnimator.SetBool(IsAir, true);
     }
 
     public override void Update()
@@ -47,6 +49,6 @@ public class Human_Jump : PlayerState
 
     public override void Exit()
     {
-        player.humanAnimator.SetBool("IsAir", false);
+        player.humanAnimator.SetBool(IsAir, false);
     }
 }

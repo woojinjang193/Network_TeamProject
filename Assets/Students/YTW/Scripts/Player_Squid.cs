@@ -9,7 +9,7 @@ public class Player_Squid : PlayerState
 
     private float revertTimer = 0f;
     private const float REVERT_DELAY = 0.1f;
-    private Vector3 colCenter = Vector3.zero;
+    private Vector3 colCenter = new Vector3(0, 0.2f, 0);
 
     public Player_Squid(PlayerController player, StateMachine stateMachine) : base(player, stateMachine)
     {

@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private static readonly int MoveX = Animator.StringToHash("MoveX");
     private static readonly int MoveY = Animator.StringToHash("MoveY");
     private static readonly int JumpTrigger = Animator.StringToHash("JumpTrigger");
+    private static readonly int MoveSpeed = Animator.StringToHash("MoveSpeed");
 
     public StateMachine stateMachine { get; private set; }
     public Dictionary<HighState, PlayerState> highStateDic { get; private set; }
@@ -83,6 +84,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private bool isAir;
     private bool isMove;
     private bool isJump;
+    private float networkMoveSpeed;
     
     
     
@@ -297,7 +299,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         
     }
     
-    private void OthersAnimation()
+    private void OthersAnimation() // 로컬 포톤뷰가 아닌 플레이어들 설정
     {
         // 오징어 폼
         if (isSquidNetworked)
@@ -306,21 +308,33 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             squidModel.SetActive(true);
             
             col.direction = 2;
+            col.center = new Vector3(0,0.2f,0);
             col.height = 1.0f;
             col.radius = 0.2f;
-            col.center = Vector3.zero;
 
             if (squidAnimator != null)
             {
-                // squidAnimator.SetBool(IsMove,isMove);
-                // squidAnimator.SetBool(IsAir,isAir);
+                squidAnimator.SetBool(IsMove,isMove);
+                squidAnimator.SetBool(IsAir,isAir);
+                squidAnimator.SetFloat(MoveSpeed, networkMoveSpeed);
+            
+                if (isAir && !isJump)
+                {
+                    isJump = true;
+                    squidAnimator.SetTrigger(JumpTrigger);
+                }
+                else if (!isAir && isJump)
+                {
+                    isJump = false;
+                }
+            
             }
         }
         // 인간 폼
         else
         {
             humanModel.SetActive(true);
-            squidModel.SetActive(isSquidNetworked);
+            squidModel.SetActive(false);
             
             col.direction = 1;
             col.center = new Vector3(0, 0.5f, 0);
@@ -348,18 +362,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 humanAnimator.SetFloat(MoveX, networkMoveX);
                 humanAnimator.SetFloat(MoveY, networkMoveY);
             }
-            
-            // 지연 보상
-            deltaPos = Vector3.Distance(transform.position, networkPos);
-            deltaRot = Quaternion.Angle(transform.rotation, networkRot);
-
-            interpolatePos = deltaPos * Time.deltaTime * PhotonNetwork.SerializationRate;
-            interpolateRot = deltaRot * Time.deltaTime * PhotonNetwork.SerializationRate;
-            
-            transform.position = Vector3.MoveTowards(transform.position, networkPos, interpolatePos);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, networkRot, interpolateRot);
         }
+        
+        // 지연 보상
+        deltaPos = Vector3.Distance(transform.position, networkPos);
+        deltaRot = Quaternion.Angle(transform.rotation, networkRot);
+
+        interpolatePos = deltaPos * Time.deltaTime * PhotonNetwork.SerializationRate;
+        interpolateRot = deltaRot * Time.deltaTime * PhotonNetwork.SerializationRate;
+        
+        transform.position = Vector3.MoveTowards(transform.position, networkPos, interpolatePos);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, networkRot, interpolateRot);
     }
+    
     private void GroundAndInkCheck()
     {
         LayerMask combinedLayer = groundLayer | inkableLayer;
@@ -483,7 +498,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         transform.eulerAngles = playerRotation;
     }
 
-    // test용
+    // TODO : test용
     private void HandleTeamSelection()
     {
         if (Input.GetKeyDown(KeyCode.Z))
@@ -601,12 +616,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 return;
             }
 
-            // 1현재 내 위치를 stream에 실림
+            // 1 현재 내 위치를 stream에 실림
             stream.SendNext(transform.position);
-            // 2현재 내 회전값을 stream에 실림
+            // 2 현재 내 회전값을 stream에 실림
             stream.SendNext(transform.rotation);
             
-            // 3팀정보 전송
+            // 3 팀정보 전송
             stream.SendNext((int)myTeam);
             
             // 현재 내 상태가 오징어 폼인지 아닌지(bool)를 stream에 실림
@@ -636,7 +651,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             // 오징어 폼일때 Send
             else if (stateMachine.CurrentState == highStateDic[HighState.SquidForm])
             {
-                // stream.SendNext(squidAnimator.GetFloat("MoveSpeed"));
+                stream.SendNext(squidAnimator.GetFloat(MoveSpeed));
+                stream.SendNext(squidAnimator.GetBool(IsMove));
+                stream.SendNext(squidAnimator.GetBool(IsAir));
             }
 
         }
@@ -669,7 +686,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             // 오징어 폼일때 수신
             else if (isSquidNetworked && !deadState)
             {
-                // networkMoveSpeed = (float)stream.ReceiveNext();   
+                networkMoveSpeed = (float)stream.ReceiveNext();
+                isMove = (bool)stream.ReceiveNext();
+                isAir = (bool)stream.ReceiveNext();
             }
 
         }
