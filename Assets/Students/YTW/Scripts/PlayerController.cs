@@ -259,6 +259,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         
         stateMachine.Initialize(highStateDic[HighState.HumanForm]);
         
+        // 게임 매니저에 팀 할당
+        StartCoroutine(WaitForTeamAssignment());
+        
         // 카메라 동기화
         if (playerCameraObject == null)
         {
@@ -374,6 +377,26 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         
         transform.position = Vector3.MoveTowards(transform.position, networkPos, interpolatePos);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, networkRot, interpolateRot);
+    }
+
+    private IEnumerator WaitForTeamAssignment()
+    {
+        Debug.Log("[PlayerController] 팀 할당 대기 시작");
+
+        while (!PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("team"))
+        {
+            Debug.Log("[PlayerController] team 속성 대기 중...");
+            yield return null;
+        }
+
+        string teamString = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
+        Debug.Log($"[PlayerController] 받은 team 값: {teamString}");
+
+        if (teamString == "Team1") myTeam = Team.Team1;
+        else if (teamString == "Team2") myTeam = Team.Team2;
+        else myTeam = Team.None;
+
+        Debug.Log($"[PlayerController] 팀 할당 완료: {myTeam}");
     }
     
     private void GroundAndInkCheck()
