@@ -3120,8 +3120,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uD300 1 \uC120\uD0DD"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3551,6 +3551,7 @@ MonoBehaviour:
   roomListContent: {fileID: 1530601422}
   roomListItemPrefab: {fileID: 8123938552457391853, guid: a80713d55b9f7fb48b7711a0a94f40a9, type: 3}
   backButton: {fileID: 699871484}
+  networkManager: {fileID: 749361313}
 --- !u!1 &631218072
 GameObject:
   m_ObjectHideFlags: 0
@@ -5158,8 +5159,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC900\uBE44"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7548,8 +7549,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC2DC\uC791"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7898,8 +7899,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: RoomName
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -10461,8 +10462,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uB098\uAC00\uAE30"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -12093,8 +12094,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uD300 2 \uC120\uD0DD"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

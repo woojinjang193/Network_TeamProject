@@ -2,11 +2,15 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Squid_Swim : PlayerState
 {
     private static readonly int IsMove = Animator.StringToHash("IsMove");
     private Player_Squid squidState;
+    private event UnityAction OnSwimStart ;
+    private event UnityAction OnSwimStop ;
+    private bool isSwiming;
     public Squid_Swim(PlayerController player, StateMachine stateMachine, Player_Squid squidState) : base(player, stateMachine)
     { 
         this.squidState = squidState; 
@@ -15,6 +19,7 @@ public class Squid_Swim : PlayerState
 
     public override void Enter()
     {
+        Debug.Log("squid Swim상태");
         player.squidAnimator.SetBool(IsMove,true);
     }
     public override void Update()
@@ -42,6 +47,10 @@ public class Squid_Swim : PlayerState
         if (player.IsAtWallEdge && player.input.MoveInput.y > 0.1f)
         {
             VaultOverWall();
+            if (isSwiming)
+            {
+                isSwiming = false;
+            }
         }
         else if (player.IsOnWalkableWall)
         {
@@ -50,6 +59,23 @@ public class Squid_Swim : PlayerState
         else
         {
             SwimOnGround();
+            if (isSwiming)
+            {
+                isSwiming = false;
+            }
+        }
+
+        if (OnSwimStart != null)
+        {
+            OnSwimStart.Invoke();
+            OnSwimStart -= SwimStarted;
+            OnSwimStop += SwimEnded;
+        }
+
+        if (OnSwimStop != null && !isSwiming)
+        {
+            OnSwimStop.Invoke();
+            OnSwimStop -= SwimEnded;
         }
         SetAnimatorParameter(); 
     }
@@ -57,10 +83,20 @@ public class Squid_Swim : PlayerState
     public override void Exit()
     {
         player.squidAnimator.SetBool(IsMove, false);
+        if (OnSwimStop != null)
+        {
+            OnSwimStop.Invoke();
+            OnSwimStop = null;
+        }
     }
     
     private void MoveOnWall()
     {
+        if (!isSwiming)
+        {
+            isSwiming = true;
+            OnSwimStart += SwimStarted;
+        }
         player.IsVaulting = false;
         Quaternion cameraYaw = Quaternion.Euler(0, player.mainCamera.transform.eulerAngles.y, 0);
         Vector3 moveDirection = new Vector3(player.input.MoveInput.x, player.input.MoveInput.y, 0);
@@ -91,5 +127,15 @@ public class Squid_Swim : PlayerState
     private void SetAnimatorParameter()
     {
         player.squidAnimator.SetFloat("MoveSpeed", player.rig.velocity.magnitude/player.squidSpeed);
+    }
+
+    private void SwimStarted()
+    {
+        player.squidModel.transform.Rotate(-90,0,0);
+    }
+
+    private void SwimEnded()
+    {
+        player.squidModel.transform.Rotate(90,0,0);
     }
 }
