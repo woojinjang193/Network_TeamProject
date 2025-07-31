@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Students/JWJ/Scenes/JWJ_SampleScene.unity
+    guid: 53cc1fd93a7714348b6987f100079695
   m_configObjects: {}
