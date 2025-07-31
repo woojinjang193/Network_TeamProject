@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,6 +25,16 @@ public class PaintableObj : MonoBehaviour
     private static int StrengthID = Shader.PropertyToID("_Strength"); // 강도
     private static int SplatPosID = Shader.PropertyToID("_SplatPos"); // 그릴 위치
     private static int InkColorID = Shader.PropertyToID("_InkColor"); // 팀 인풋 색깔
+
+    private void Awake()
+    {
+        //포톤뷰 넣었는지 체크
+        if (GetComponent<PhotonView>() == null)
+        {
+            Debug.LogError($"PhotonView 없음: {gameObject.name}");
+        }
+    }
+
 
     private void Start()
     {
