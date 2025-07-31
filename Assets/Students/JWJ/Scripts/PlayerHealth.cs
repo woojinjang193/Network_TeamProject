@@ -34,7 +34,6 @@ public class PlayerHealth : MonoBehaviour
 
             playerController.Die();
         }
-        
     }
 
     public void Respawn()
