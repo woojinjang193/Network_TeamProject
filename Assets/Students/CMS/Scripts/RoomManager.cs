@@ -12,6 +12,8 @@ public class RoomManager : MonoBehaviour
 {
     [SerializeField] private RoomUI roomUI; // RoomUI 참조 추가
 
+    [SerializeField] private int selectedMode = 2; // 1vs1 ~ 4vs4
+
     public Dictionary<int, PlayerPanelItem> playerPanels = new Dictionary<int, PlayerPanelItem>();
 
     private void Awake()
@@ -97,5 +99,12 @@ public class RoomManager : MonoBehaviour
     {
         // 플레이어 속성 변경 시 RoomUI의 플레이어 목록을 업데이트
         roomUI?.UpdatePlayerList(PhotonNetwork.PlayerList.ToList());
+    }
+
+    public void SetGameMode(int mode)
+    {
+        if (mode < 1 || mode > 4) return;
+        selectedMode = mode;
+        Debug.Log($"RoomManager: 선택된 게임 모드 {selectedMode}vs{selectedMode}");
     }
 }

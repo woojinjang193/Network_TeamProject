@@ -1,7 +1,8 @@
+using Photon.Pun;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using System.Collections.Generic;
 
 public class RoomUI : BaseUI
 {
@@ -19,6 +20,12 @@ public class RoomUI : BaseUI
     [SerializeField] private Button team1Button;
     [SerializeField] private Button team2Button;
 
+    [Header("게임모드")]
+    [SerializeField] private Button mode1vs1Button;
+    [SerializeField] private Button mode2vs2Button;
+    [SerializeField] private Button mode3vs3Button;
+    [SerializeField] private Button mode4vs4Button;
+
     private void Awake()
     {
         Debug.Log("RoomUI: Awake 메서드 호출됨."); // 이 로그가 뜨는지 확인
@@ -29,6 +36,11 @@ public class RoomUI : BaseUI
 
         team1Button.onClick.AddListener(() => OnClickChooseTeam("Team1"));
         team2Button.onClick.AddListener(() => OnClickChooseTeam("Team2"));
+
+        mode1vs1Button.onClick.AddListener(() => OnSelectGameMode(1));
+        mode2vs2Button.onClick.AddListener(() => OnSelectGameMode(2));
+        mode3vs3Button.onClick.AddListener(() => OnSelectGameMode(3));
+        mode4vs4Button.onClick.AddListener(() => OnSelectGameMode(4));
     }
 
     public override void Open()
@@ -148,5 +160,12 @@ public class RoomUI : BaseUI
         {
             Debug.LogError("RoomUI: RoomManager가 연결되지 않았습니다.");
         }
+    }
+    private void OnSelectGameMode(int mode)
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        Debug.Log($"RoomUI: {mode}vs{mode} 모드 선택");
+        roomManager?.SetGameMode(mode);
     }
 }
