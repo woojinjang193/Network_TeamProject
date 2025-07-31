@@ -21,7 +21,7 @@ public class RoomManager : MonoBehaviour
 
     public void OnClickGameStart()
     {
-        PhotonNetwork.LoadLevel("GameScene"); //시작시 GameScene 로드
+        PhotonNetwork.LoadLevel("TestScene"); //시작시 GameScene 로드
     }
 
     public void PlayerPanelSpawn(Player player) // 새로운 플레이어가 들어왔을 때 패널 추가
