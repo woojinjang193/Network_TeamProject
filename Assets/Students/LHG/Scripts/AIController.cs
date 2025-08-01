@@ -24,9 +24,6 @@ public class AIController : BaseController
     private Vector3 _initialPosition;
     private Quaternion _initialRotation;
 
-
-    [Header("모델 설정")]
-    public SkinnedMeshRenderer AIRenderer;
     
     protected override void Awake()
     {
@@ -47,19 +44,12 @@ public class AIController : BaseController
             rig.isKinematic = true;
         }
     }
-
-    [Header("팀 설정")]
-    private TeamColorInfo teamColorInfo;
-    private Team myTeam = Team.None;
-    public Team MyTeam => myTeam;
     
     private void Update()
     {
         if (photonView.IsMine)
         {
             StateMachine.Update();
-            UpdateAIColor(); // TODO: 테스트 이후 옮김
-        
             TestTeamSelection(); // TODO: 테스트코드 삭제할 것.
         }
     }
@@ -88,7 +78,7 @@ public class AIController : BaseController
         FireModule = new FireModule(this, weaponView);
         DetectModule = new DetectModule(this);
 
-        StateMachine = new AIStateMachine();
+        StateMachine = GetComponent<AIStateMachine>();
         
         //시작시 idle상태로
         StateMachine.SetState(new IdleState(this));
@@ -205,27 +195,7 @@ public class AIController : BaseController
         IsDead = false;
         StateMachine.SetState(new IdleState(this));
     }
-
-
-
-    private void UpdateAIColor() // TODO : 캐릭터 모델 적용으로 인해 필요없어짐
-    {
-        if (teamColorInfo != null)
-        {
-            Color teamColor = teamColorInfo.GetTeamColor(MyTeam);
-
-            if (AIRenderer != null)
-            {
-                AIRenderer.material.color = teamColor;
-            }
-
-            if (AIRenderer != null)
-            {
-                AIRenderer.material.color = teamColor;
-            }
-        }
-    }
-
+    
     // TODO: 테스트 종료 후 삭제
     private void TestTeamSelection()
     {
@@ -248,7 +218,7 @@ public class AIController : BaseController
             //  transform 전송
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
-            stream.SendNext((int)myTeam);
+            stream.SendNext((int)MyTeam);
             
             // 사망 정보 전송
             stream.SendNext(IsDead);
@@ -264,7 +234,7 @@ public class AIController : BaseController
             // transform 수신
             networkPos = (Vector3)stream.ReceiveNext();
             networkRot = (Quaternion)stream.ReceiveNext();
-            myTeam = (Team)(int)stream.ReceiveNext();
+            MyTeam = (Team)(int)stream.ReceiveNext();
             
             // 사망정보 수신
             IsDead = (bool)stream.ReceiveNext();
