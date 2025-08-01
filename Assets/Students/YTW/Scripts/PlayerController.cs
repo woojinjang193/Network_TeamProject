@@ -1,4 +1,3 @@
-using Cinemachine;
 using Photon.Pun;
 using System;
 using System.Collections;
@@ -16,8 +15,8 @@ public class PlayerController : BaseController
     public PlayerInput input;
     
 
-    private float recenterCooldownTimer = 0f;
-    private const float RECENTER_COOLDOWN = 1.0f;
+    private float recenterCooldownTimer;
+    //private const float RECENTER_COOLDOWN = 1.0f;
 
     [Header("카메라 설정")]
     public GameObject playerCameraObject;
@@ -25,10 +24,6 @@ public class PlayerController : BaseController
     public Camera mainCamera;
     public Transform cameraPivot;
     public GameObject spectatorCamera;
-
-    [Header("모델 설정")]
-    public SkinnedMeshRenderer playerRenderer;
-    public SkinnedMeshRenderer squidRenderer;
 
     [Header("플레이어 설정")]
     public LayerMask groundLayer;
@@ -40,8 +35,9 @@ public class PlayerController : BaseController
     public float gravityScale = 4f;
     public float fallingGravityScale = 7f;
 
-    [Header("무기 설정")]
+    [field:Header("무기 설정")]
     public bool IsFiring { get; set; }
+    [Header("무기 Transform")]
     public Transform weaponTransform;
     public Transform muzzleTransform;
 
@@ -55,8 +51,8 @@ public class PlayerController : BaseController
     private float inkColorThreshold = 1.0f;
     
     // 잉크 감지 시스템 파라매터
-    private float groundCheckTimer = 0f;
-    private const float GROUND_CHECK_INTERVAL = 0.1f; // 1초에 10번 검사
+    //private float groundCheckTimer = 0f;
+    //private const float GROUND_CHECK_INTERVAL = 0.1f; // 1초에 10번 검사
 
     // 플레이어 이동 판정
     public bool IsGrounded { get; private set; }
@@ -65,7 +61,7 @@ public class PlayerController : BaseController
     public InkStatus CurrentWallInkStatus { get; private set; } = InkStatus.NONE;
     public bool IsOnWalkableWall { get; private set; }
     public bool IsAtWallEdge { get; private set; }
-    public bool IsVaulting = false;
+    public bool IsVaulting;
     public Vector3 WallNormal { get; private set; } = Vector3.zero;
 
     protected override void Awake()
@@ -74,11 +70,6 @@ public class PlayerController : BaseController
         base.Awake();
         
         squidAnimator = squidModel.GetComponentInChildren<Animator>();
-
-
-        playerRenderer = humanModel.GetComponent<SkinnedMeshRenderer>();
-        squidRenderer = squidModel.GetComponent<SkinnedMeshRenderer>();
-
         CurHp = MaxHp;
 
         if (photonView.IsMine)
@@ -99,8 +90,6 @@ public class PlayerController : BaseController
         }
     }
 
-    void Start() { }
-
     void FixedUpdate()
     {
         if (photonView.IsMine && stateMachine != null)
@@ -110,11 +99,11 @@ public class PlayerController : BaseController
             {
                 if (rig.velocity.y >= 0)
                 {
-                    rig.velocity += Vector3.up * Physics.gravity.y * (gravityScale - 1) * Time.fixedDeltaTime;
+                    rig.velocity += Vector3.up * (Physics.gravity.y * (gravityScale - 1) * Time.fixedDeltaTime);
                 }
                 else
                 {
-                    rig.velocity += Vector3.up * Physics.gravity.y * (fallingGravityScale - 1) * Time.fixedDeltaTime;
+                    rig.velocity += Vector3.up * (Physics.gravity.y * (fallingGravityScale - 1) * Time.fixedDeltaTime);
                 }
             }
         }
@@ -161,9 +150,6 @@ public class PlayerController : BaseController
                 Respawn();
             }
         }
-
-        // TODO : 테스트 이후 삭제 예정
-        UpdatePlayerColor();
     }
 
     void LateUpdate()
@@ -467,24 +453,6 @@ public class PlayerController : BaseController
         {
             MyTeam = Team.Team2;
             Debug.Log($"팀 변경: {MyTeam}");
-        }
-    }
-
-    private void UpdatePlayerColor()
-    {
-        if (teamColorInfo != null)
-        {
-            Color teamColor = teamColorInfo.GetTeamColor(MyTeam);
-
-            if (playerRenderer != null)
-            {
-                playerRenderer.material.color = teamColor;
-            }
-
-            if (squidRenderer != null)
-            {
-                squidRenderer.material.color = teamColor;
-            }
         }
     }
 
