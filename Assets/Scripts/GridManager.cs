@@ -10,9 +10,12 @@ public class GridManager : Singleton<GridManager>
     [SerializeField] private TMP_Text teamRateText;
     private PhotonView photonView;///
 
-    private int countTeam1 = 0;
+    private int countTeam1  = 0;
     private int countTeam2 = 0;
     private int countNone = 0;
+
+    public float Team1Rate { get; private set; }
+    public float Team2Rate { get; private set; }
 
     private Dictionary<int, MapGrid> gridDic = new(5000);
     //그리드들을 넣어놓을 딕셔너리
@@ -107,8 +110,8 @@ public class GridManager : Singleton<GridManager>
     private void UpdateUI()
     {
         int total = gridDic.Count;
-        float Team1Rate = countTeam1 / (float)total * 100f;
-        float Team2Rate = countTeam2 / (float)total * 100f;
+        Team1Rate = countTeam1 / (float)total * 100f;
+        Team2Rate = countTeam2 / (float)total * 100f;
         teamRateText.text = $"Team1 : {Team1Rate.ToString("F2")}%    Team2 : {Team2Rate.ToString("F2")}%";
 
         photonView.RPC("SyncCoverageUI", RpcTarget.Others, Team1Rate, Team2Rate);
@@ -119,7 +122,6 @@ public class GridManager : Singleton<GridManager>
     {
         teamRateText.text = $"Team1 : {team1Rate:F2}%    Team2 : {team2Rate:F2}%";
     }
-
 
     public string GetWinningTeam()
     {
