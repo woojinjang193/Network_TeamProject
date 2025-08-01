@@ -44,6 +44,7 @@ MonoBehaviour:
   - SetStartTime
   - TakeDamage
   - SyncCoverageUI
+  - PlayerDie
   - ApplyPaint
   - ReportPaint
   - SyncDraw

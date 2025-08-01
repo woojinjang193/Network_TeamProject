@@ -87,8 +87,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private bool isJump;
     private float networkMoveSpeed;
     
-    
-    
     // 잉크 감지 시스템 파라매터
     private float groundCheckTimer = 0f;
     private const float GROUND_CHECK_INTERVAL = 0.1f; // 1초에 10번 검사
@@ -260,7 +258,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         stateMachine.Initialize(highStateDic[HighState.HumanForm]);
         
         // 게임 매니저에 팀 할당
-        StartCoroutine(WaitForTeamAssignment());
+        // TODO : 테스트 끝나면 해제
+        // StartCoroutine(WaitForTeamAssignment());
         
         // 카메라 동기화
         if (playerCameraObject == null)
@@ -403,7 +402,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         LayerMask combinedLayer = groundLayer | inkableLayer;
         Vector3 groundRayStart = transform.position + Vector3.up * 0.1f;
-        float groundRayDistance = 1.5f; // Raycast 길이를 안정적으로 수정
+        float groundRayDistance = 0.6f; // Raycast 길이를 안정적으로 수정
 
         Debug.DrawRay(groundRayStart, Vector3.down * groundRayDistance, Color.red);
 
@@ -430,11 +429,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         // 벽 체크
-        Vector3 wallRayStart = transform.position - transform.up * (col.height / 2 - 0.1f);
+        Vector3 wallRayStart = transform.position + transform.up * (col.height / 2 - 0.1f );
         // 현재 콜라이더의 절대적인 꼭대기 위치 바로 아래에서 레이를 쏨
-        Vector3 edgeRayStart = transform.position + transform.up * (col.height / 2 - 0.1f);
+        Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
 
-        float wallRayDistance = 1f;
+        float wallRayDistance = 1.2f;
         Debug.DrawRay(wallRayStart, transform.forward * wallRayDistance, Color.blue);
 
         if (Physics.Raycast(wallRayStart, transform.forward, out RaycastHit wallHit, wallRayDistance, inkableLayer))
@@ -569,12 +568,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             IsDead = true;
             Debug.Log("플레이어 죽음");
 
-            Die();
+            photonView.RPC("PlayerDie", RpcTarget.All);
         }
     }
     
     // TODO : 죽을 때 처리 필요
-    public void Die()
+    [PunRPC]
+    public void PlayerDie()
     {
         // 원격으로도 죽은 처리 해줘야 함
         IsDead = true;
@@ -586,6 +586,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
+            Debug.Log("본인 PhotonView 아님. Death 처리");
             // 본인의 PhotonView가 아닐 경우
             col.enabled = false;
             humanModel.SetActive(false);
