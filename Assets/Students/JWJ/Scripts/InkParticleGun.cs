@@ -49,7 +49,7 @@ public class InkParticleGun : MonoBehaviourPun
         mainEmission.enabled = false;
         //비활성화
         fireEmission.enabled = false;
-        //비활성화
+        //비활성화 
         SetTeamColor(currentTeam);
 
         mainParticleMain.startSpeed = startSpeedCurve; ///
@@ -62,6 +62,7 @@ public class InkParticleGun : MonoBehaviourPun
 
         //mainParticleMain.startSpeed = particleSpeed;
         //파티클 on off 설정. 마우스가 클릭상태일땐 활성화
+        Debug.Log($" 이거 수행될 때 확인 {photonView.ViewID} 클라이언트 {photonView.IsMine}");
         mainEmission.enabled = mouseButtonDown;
         fireEmission.enabled = mouseButtonDown;
 

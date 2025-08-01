@@ -22,9 +22,18 @@ public class ChaseState : AIBaseState
         if(distance > 10f)
         {
             _controller.StateMachine.SetState(new IdleState(_controller));
+            _controller.FireModule.StopFire();
+            _controller.DetectModule.Target = null;
         }
-
-        _controller.MoveModule.MoveTo(target.position);
+        else if (distance > 3f)
+        {
+            _controller.IsMoving = true;
+            _controller.MoveModule.MoveTo(target.position);
+        }
+        else
+        {
+            _controller.IsMoving = false;
+        }
         _controller.FireModule.TryFireAt(target);
     }
 }

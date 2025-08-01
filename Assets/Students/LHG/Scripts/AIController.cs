@@ -5,105 +5,209 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class AIController : MonoBehaviour, IPunObservable
+public class AIController : BaseController
 {
     public MoveModule MoveModule { get; private set; }
     public FireModule FireModule { get; private set; }
     public DetectModule DetectModule { get; private set; }
     public AIStateMachine StateMachine { get; private set; }
 
-    [SerializeField] public float moveSpeed = 5;
+    [Header("Set Values")]
+    // [SerializeField] public float moveSpeed = 5; 상위로 올림
     [SerializeField] public float fireInterval = 1; //발사간격(초)
-    [SerializeField] public float detectInterval = 3; //탐지간격(초)
-    [SerializeField] public float health = 100;
-
+    [SerializeField] public float detectInterval = 1f; //탐지간격(초)
+    [SerializeField] public float detectRadius = 10f; //탐지 범위(m)
+    
+    
+    [Header("Set Spawn")]
     public Transform spawnPoint;
     private Vector3 _initialPosition;
     private Quaternion _initialRotation;
-    public Team myTeam { get; private set; } = Team.None;
-    
-    
 
     [Header("모델 설정")]
     public SkinnedMeshRenderer AIRenderer;
-
-    [Header("팀 설정")]
-    private TeamColorInfo teamColorInfo;
-
-    [Header("잉크 파티클 총")]
-    public InkParticleGun inkGun;
-
-    [SerializeField] private PhotonView weaponView;
     
-
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         
+        // 휴먼 콜라이더 설정
+        col.direction = 1;
+        col.center = new Vector3(0, 0.5f, 0);
+        col.height = 1.0f;
+        col.radius = 0.25f;
+        
+        if (photonView.IsMine)
+        {
+            MineInit();
+        }
+        else
+        {
+            rig.isKinematic = true;
+        }
+    }
+
+    private void Update()
+    {
+        if (photonView.IsMine)
+        {
+            StateMachine.Update();
+            UpdateAIColor(); // TODO: 테스트 이후 옮김
+        
+            TestTeamSelection(); // TODO: 테스트코드 삭제할 것.
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (photonView.IsMine)
+        {
+            MineAnimationProcess();
+        }
+        if (!photonView.IsMine && !IsDead)
+        {
+            OtherClientProcess();
+        }
+    }
+
+    void OnDrawGizmos()
+    {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, detectRadius);
+    }
+    
+    private void MineInit() //포톤뷰가 본인일 때만 수행
+    {
         //statedic대신 모듈화한 개별 스크립트로 관리
         MoveModule = new MoveModule(this);
         FireModule = new FireModule(this, weaponView);
         DetectModule = new DetectModule(this);
 
         StateMachine = new AIStateMachine();
+        
         //시작시 idle상태로
         StateMachine.SetState(new IdleState(this));
 
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
+        
+        CurHp = MaxHp;
+        IsDead = false;
     }
 
-    private void Update()
+    private void MineAnimationProcess()
     {
-        StateMachine.Update();
-        Die();
-        UpdateAIColor();
-        TestTeamSelection(); //테스트코드 삭제할 것.
-        TakeDamage(); //테스트코드 삭제할 것
-    }
-
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, 10f);
-    }
-
-    public void TakeDamage()
-    {
-        if(Input.GetKeyDown(KeyCode.K))
+        if (humanAnimator != null)
         {
-            health -= 50;
+            // Move 관련 입력 처리
+            humanAnimator.SetBool(IsMove,IsMoving);
+            humanAnimator.SetFloat(MoveX, 0);
+            
+            if (IsMoving)
+            {
+                humanAnimator.SetFloat(MoveY, 1);
+            }
+            else
+            {
+                humanAnimator.SetFloat(MoveY, 0);
+            }
+        }
+    }
+    private void OtherClientProcess() // 원격일 경우의 처리
+    {
+        if (!IsDead && IsDeadState) // 부활 시
+        {
+            IsDeadState = false;
+            humanModel.SetActive(true);
+            col.enabled = true;
+        }
+
+        if (!IsDead && !IsDeadState) // 안죽었을 때
+        {
+            if (humanAnimator != null)
+            {
+                // 애니메이션 상태 파라매터 처리
+                humanAnimator.SetBool(IsMove,IsMoving);
+                
+                // Move 관련 입력 처리
+                humanAnimator.SetFloat(MoveX, networkMoveX);
+                humanAnimator.SetFloat(MoveY, networkMoveY);
+            }
+            // 지연 보상
+            deltaPos = Vector3.Distance(transform.position, networkPos);
+            deltaRot = Quaternion.Angle(transform.rotation, networkRot);
+
+            interpolatePos = deltaPos * Time.deltaTime * PhotonNetwork.SerializationRate;
+            interpolateRot = deltaRot * Time.deltaTime * PhotonNetwork.SerializationRate;
+        
+            transform.position = Vector3.MoveTowards(transform.position, networkPos, interpolatePos);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, networkRot, interpolateRot);
         }
     }
 
-    public void Respawn()
+    [PunRPC]
+    public override void TakeDamage(float amount) // 무기에 의해서, 로컬만 호출됨
     {
-        transform.position = _initialPosition;
-        transform.rotation = _initialRotation;
-        gameObject.SetActive(true);
-        gameObject.GetComponent<Collider>().enabled = true;
+        if (IsDead) return;
+        
+        CurHp -= amount;
+        
+        if (CurHp <= 0)
+        {
+            CurHp = 0;
+            Debug.Log("AI 플레이어 죽음");
+
+            photonView.RPC("AiDie", RpcTarget.All);
+        }
+
+        Debug.Log($"현재 체력{CurHp}");
+
+    }
+
+    [PunRPC]
+    public void AiDie() // 전체 클라이언트에 호출됨. TakeDamage에서 호출
+    {
+        IsDead = true;
+        IsDeadState = true;
+        if (photonView.IsMine)
+        {
+            if (CurHp <= 0)
+            {
+                //TODO hit애니메이션 + 딜레이
+                StateMachine.SetState(new DeathState(this));
+            
+                Debug.Log("AI 사망");
+            }
+        }
+        else
+        {
+            humanModel.SetActive(false);
+            col.enabled = false;
+        }
+    }
+    
+    public void Respawn() // Death 상태에서 호출됨. 본인만 수행
+    {
+        // TODO: 리스폰 포인트로 이동
+            transform.position = _initialPosition;
+            transform.rotation = _initialRotation;
+        
+        humanModel.SetActive(true);
+        col.enabled = true;
         
         
         //AI 리셋
-        health = 100;
+        CurHp = MaxHp;
+        IsDead = false;
         StateMachine.SetState(new IdleState(this));
     }
 
-    public void Die()
-    {
-        if (health <= 0)
-        {
-            //TODO hit애니메이션 + 딜레이
-            StateMachine.SetState(new DeathState(this));
-            
-            Debug.Log("AI 사망");
-        }
-    }
 
 
-    private void UpdateAIColor()
+    private void UpdateAIColor() // TODO : 캐릭터 모델 적용으로 인해 필요없어짐
     {
         if (teamColorInfo != null)
         {
-            Color teamColor = teamColorInfo.GetTeamColor(myTeam);
+            Color teamColor = teamColorInfo.GetTeamColor(MyTeam);
 
             if (AIRenderer != null)
             {
@@ -117,36 +221,60 @@ public class AIController : MonoBehaviour, IPunObservable
         }
     }
 
+    // TODO: 테스트 종료 후 삭제
     private void TestTeamSelection()
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            myTeam = Team.Team1;
-            Debug.Log($"팀 변경: {myTeam}");
+            MyTeam = Team.Team1;
+            Debug.Log($"팀 변경: {MyTeam}");
         }
         if (Input.GetKeyDown(KeyCode.V))
         {
-            myTeam = Team.Team2;
-            Debug.Log($"팀 변경: {myTeam}");
+            MyTeam = Team.Team2;
+            Debug.Log($"팀 변경: {MyTeam}");
         }
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if(stream.IsWriting)
         {
+            //  transform 전송
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
+            
+            // 사망 정보 전송
+            stream.SendNext(IsDead);
+            stream.SendNext(IsDeadState);
+            
+            // 애니메이션 전송
+            stream.SendNext(IsMoving);
+            stream.SendNext(humanAnimator.GetFloat(MoveX));
+            stream.SendNext(humanAnimator.GetFloat(MoveY));
         }
-        else
+        else if(stream.IsReading)
         {
-            transform.position = (Vector3)stream.ReceiveNext();
-            transform.rotation = (Quaternion)stream.ReceiveNext();
+            // transform 수신
+            networkPos = (Vector3)stream.ReceiveNext();
+            networkRot = (Quaternion)stream.ReceiveNext();
+            
+            // 사망정보 수신
+            IsDead = (bool)stream.ReceiveNext();
+            IsDeadState = (bool)stream.ReceiveNext();
+            
+            // 애니메이션 수신
+            IsMoving = (bool)stream.ReceiveNext();
+            networkMoveX = (float)stream.ReceiveNext();
+            networkMoveY = (float)stream.ReceiveNext();
         }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        MoveModule.OnCollisionEnter(collision);
+        if (photonView.IsMine)
+        {
+            MoveModule.OnCollisionEnter(collision);
+        }
     }
 }
