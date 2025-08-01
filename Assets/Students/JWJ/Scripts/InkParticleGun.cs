@@ -6,12 +6,19 @@ using UnityEngine.Android;
 
 public class InkParticleGun : MonoBehaviourPun
 {
-    [SerializeField] private float particleSpeed =20f;
+    [Header("파티클 설정")]
+    [SerializeField] private float particleSpeed = 20f;
     private TeamColorInfo teamColorInfo; //팀 컬러 정보
     [SerializeField] private ParticleSystem mainParticle; //잉크 줄기
     [SerializeField] private ParticleSystem fireEffect; // 무기 주변에 잉크가 튀는 연출
     [SerializeField] private ParticleSystem floorInkEffect; // 충돌부분에 잉크 퍼지는 연출
     [SerializeField] private InkParticleCollision particleCollision; //잉크 충돌 스크립트
+
+    [Header("잉크 탱크 설정")]
+    public float maxInk = 100f;
+    public float currentInk;
+    public float inkConsumptionRate = 15f; // 초당 잉크 소모량
+    public float inkRecoveryRate = 30f; // 초당 잉크 회복량
 
     // 게임시작시 파티클을 off 시켜놓기위해 EmissionModule을 담을 변수들
     private ParticleSystem.EmissionModule mainEmission;
@@ -46,6 +53,7 @@ public class InkParticleGun : MonoBehaviourPun
 
     private void Start()
     {
+        currentInk = maxInk; // 잉크 초기화
         mainEmission.enabled = false;
         //비활성화
         fireEmission.enabled = false;
@@ -58,6 +66,14 @@ public class InkParticleGun : MonoBehaviourPun
     [PunRPC]
     public void FireParticle(Team team, bool mouseButtonDown) //활성화 
     {
+        // 잉크가 없으면 발사 중지
+        if (currentInk <= 0)
+        {
+            mainEmission.enabled = false;
+            fireEmission.enabled = false;
+            return;
+        }
+
         UpdateStartSpeed();
 
         //mainParticleMain.startSpeed = particleSpeed;
@@ -74,6 +90,23 @@ public class InkParticleGun : MonoBehaviourPun
         
         particleCollision.SetTeam(currentTeam);
         //파티클 충돌 스크립트로 넘겨줌
+
+        // 잉크 소모
+        if (mouseButtonDown)
+        {
+            currentInk -= inkConsumptionRate * Time.deltaTime;
+            Debug.Log("잉크 소모중");
+        }
+    }
+
+    // 잉크 회복 (PlayerController에서 호출)
+    public void RecoverInk()
+    {
+        if (currentInk < maxInk)
+        {
+            currentInk += inkRecoveryRate * Time.deltaTime;
+            currentInk = Mathf.Min(currentInk, maxInk); // 최대치를 넘지 않도록
+        }
     }
 
     private void SetTeamColor(Team team) //색 지정

@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +16,8 @@ public class InkTank : MonoBehaviour
     [Header("잉크 잔량")]
     public float MinFillAmount = -0.8f; // 잉크가 완전히 비었을 때
     public float MaxFillAmount = 0.8f; // 잉크가 가득 찼을 때
+
+    private PlayerController myPlayer; // 내 플레이어 참조
 
     private Vector3 prevPos;
     private Vector3 prevRot;
@@ -43,6 +46,20 @@ public class InkTank : MonoBehaviour
     {
         if (inkRenderer == null) return;
 
+        // 내 플레이어를 아직 못 찾았다면 탐색
+        if (myPlayer == null)
+        {
+            FindMyPlayer();
+            if (myPlayer == null) return; // 아직도 못찾았으면 Update 종료
+        }
+
+        // 플레이어를 찾았다면, 잉크 레벨 업데이트
+        if (myPlayer.inkParticleGun != null)
+        {
+            UpdateInkLevel(myPlayer.inkParticleGun.currentInk, myPlayer.inkParticleGun.maxInk);
+        }
+
+        // --- 기존 흔들림 로직 ---
         wobbleAmountToAddX = Mathf.Lerp(wobbleAmountToAddX, 0, Time.deltaTime * RecoveryRate);
         wobbleAmountToAddZ = Mathf.Lerp(wobbleAmountToAddZ, 0, Time.deltaTime * RecoveryRate);
 
@@ -60,6 +77,25 @@ public class InkTank : MonoBehaviour
 
         prevPos = transform.position;
         prevRot = transform.rotation.eulerAngles;
+    }
+
+    private void FindMyPlayer()
+    {
+        // InkTank는 PlayerController의 자식으로 붙어있을 가능성이 높으므로,
+        // 부모에서 먼저 찾아보는 것이 효율적입니다.
+        myPlayer = GetComponentInParent<PlayerController>();
+        if (myPlayer != null && myPlayer.photonView.IsMine) return;
+
+        // 부모에 없다면 전체 씬에서 탐색
+        var players = FindObjectsOfType<PlayerController>();
+        foreach (var player in players)
+        {
+            if (player.photonView.IsMine)
+            {
+                myPlayer = player;
+                return; // 찾았으면 바로 종료
+            }
+        }
     }
 
     // 잉크 탱크의 잔량을 설정

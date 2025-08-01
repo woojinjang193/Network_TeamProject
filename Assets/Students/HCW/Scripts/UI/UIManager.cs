@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class UIManager : MonoBehaviour
+public class UIManager : Singleton<UIManager>
 {
-    public static UIManager Instance { get; private set; }
-
     public BaseUI CurrentUI => uiStack.Count > 0 ? uiStack.Peek() : null;
 
     private Dictionary<Type, BaseUI> uiDictionary = new Dictionary<Type, BaseUI>();
@@ -14,18 +12,9 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private BaseUI startPanel; // 시작 UI만 인스펙터에서 설정
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject); // 씬이 바뀌어도 UIManager는 유지
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        base.Awake();
 
         // 씬에 있는 모든 BaseUI 상속 객체를 찾아 비활성화하고 딕셔너리에 등록
         BaseUI[] allUIs = FindObjectsOfType<BaseUI>(true);
