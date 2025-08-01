@@ -35,13 +35,9 @@ public class FireModule
     //    }
     //}
 
-    public void TryFireAt(Transform target)
+    public void TryFireAt(Transform target) // TODO : 타겟 사용안함
     {
-        if (Time.time >= nextFireTime)
-        {
-            FireStart();
-            nextFireTime = Time.time + _controller.fireInterval;
-        }
+        FireStart();
     }
 
     private void FireStart()
@@ -53,7 +49,7 @@ public class FireModule
         }
     }
 
-    private void StopFire()
+    public void StopFire()
     {
         if (isFiring)
         {

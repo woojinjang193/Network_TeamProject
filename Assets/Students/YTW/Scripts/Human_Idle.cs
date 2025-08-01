@@ -44,6 +44,8 @@ public class Human_Idle : PlayerState
     
     public override void FixedUpdate() 
     {
+        SetPlayerRotation();
+
         float verticalVelocity = player.rig.velocity.y;
 
         Vector3 horizontalVelocity = new Vector3(player.rig.velocity.x, 0f, player.rig.velocity.z);

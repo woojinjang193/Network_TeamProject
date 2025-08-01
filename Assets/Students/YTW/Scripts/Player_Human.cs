@@ -27,11 +27,17 @@ public class Player_Human : PlayerState
         player.gameObject.layer = LayerMask.NameToLayer("Player");
         player.humanModel.SetActive(true);
         player.squidModel.SetActive(false);
+        if (player.inkParticleGun != null)
+        {
+            MeshRenderer gunRenderer = player.inkParticleGun.GetComponentInChildren<MeshRenderer>();
+            if (gunRenderer != null) gunRenderer.enabled = true;
+        }
         player.col.direction = 1;
         player.col.center = colCenter;
         player.col.height = 2.0f;
         player.col.radius = 0.5f;
         subStateMachine.Initialize(lowStateDic[LowState.Idle]);
+
     }
 
     public override void Update()
@@ -44,6 +50,14 @@ public class Player_Human : PlayerState
         {
             if (player.IsGrounded && player.CurrentGroundInkStatus == InkStatus.OUR_TEAM)
             {
+                if (player.IsFiring)
+                {
+                    player.IsFiring = false;
+                    if (player.weaponView != null)
+                    {
+                        player.weaponView.RPC("FireParticle", RpcTarget.All, player.MyTeam, false);
+                    }
+                }
                 this.stateMachine.ChangeState(player.highStateDic[HighState.SquidForm]);
             }
             else if (player.input.IsSquidHeld)
@@ -56,6 +70,8 @@ public class Player_Human : PlayerState
 
     private void HandleShooting()
     {
+        player.IsFiring = player.input.IsFireHeld;
+
         if (player.weaponView != null)
         {
             if (player.input.IsFirePressed)

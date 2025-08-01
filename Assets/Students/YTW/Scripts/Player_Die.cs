@@ -42,7 +42,7 @@ public class Player_Die : PlayerState
         yield return new WaitForSeconds(PlayerController.RESPAWN_TIME);
         Debug.Log($"리스폰 시간{PlayerController.RESPAWN_TIME}");
 
-        player.deadState = false;
+        player.IsDeadState = false;
         player.Respawn();
     }
 
