@@ -35,13 +35,9 @@ public class FireModule
     //    }
     //}
 
-    public void TryFireAt(Transform target)
+    public void TryFireAt(Transform target) // TODO : 타겟 사용안함
     {
-        if (Time.time >= nextFireTime)
-        {
-            FireStart();
-            nextFireTime = Time.time + _controller.fireInterval;
-        }
+        FireStart();
     }
 
     private void FireStart()
@@ -49,16 +45,16 @@ public class FireModule
         if (!isFiring)
         {
             isFiring = true;
-            weaponView.RPC("FireParticle", RpcTarget.All, _controller.myTeam, true);
+            weaponView.RPC("FireParticle", RpcTarget.All, _controller.MyTeam, true);
         }
     }
 
-    private void StopFire()
+    public void StopFire()
     {
         if (isFiring)
         {
             isFiring = false;
-            weaponView.RPC("FireParticle", RpcTarget.All, _controller.myTeam, false);
+            weaponView.RPC("FireParticle", RpcTarget.All, _controller.MyTeam, false);
         }
     }
 }

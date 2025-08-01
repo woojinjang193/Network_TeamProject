@@ -113,7 +113,7 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
 
                 }
 
-                PlayerController player = Manager.Game.GetPlayer(collider);
+                BaseController player = Manager.Game.GetPlayer(collider);
                 //collider 를 키로 플레이어를 받아옴
                 if (player != null)
                 {
@@ -186,7 +186,7 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
     }
 
 
-    private void HitPlayer(PlayerController player)
+    private void HitPlayer(BaseController player)
     {
         if (player.MyTeam == myTeam)
         {

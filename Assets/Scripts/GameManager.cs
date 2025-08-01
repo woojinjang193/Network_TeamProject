@@ -10,7 +10,7 @@ public class GameManager : Singleton<GameManager>
 {
     public bool IsGameEnd {  get; private set; }
 
-    private Dictionary<Collider, PlayerController> playerDic = new();
+    private Dictionary<Collider, BaseController> playerDic = new();
     //플레이어의 콜라이더와 컨트롤러를 넣을 딕셔너리 
 
     [Header("팀별 스폰 위치")]
@@ -60,6 +60,7 @@ public class GameManager : Singleton<GameManager>
 
         Debug.Log("=== [GameManager] Start 끝 ===");
         StartCoroutine(SpawnPlayerWithDelay());
+        GameStart();
     }
 
     [PunRPC]
@@ -118,15 +119,15 @@ public class GameManager : Singleton<GameManager>
         PhotonNetwork.Instantiate(playerPrefabName, spawnPoint.position, spawnPoint.rotation);
     }
 
-    public void RegisterPlayer(Collider col, PlayerController playerController)
+    public void RegisterPlayer(Collider col, BaseController playerController)
     {
         playerDic[col] = playerController;
         //호출되면 그 플레이어의 콜라이더를 딕셔너리에 추가
     }
 
-    public PlayerController GetPlayer(Collider col)
+    public BaseController GetPlayer(Collider col)
     {
-        playerDic.TryGetValue(col, out PlayerController playerController);
+        playerDic.TryGetValue(col, out BaseController playerController);
         //키를 넣으면 playerController를 반환
         return playerController;
 
@@ -157,6 +158,10 @@ public class GameManager : Singleton<GameManager>
         bool isWin = (winningTeam != "Draw") && (myTeam == winningTeam);
 
         FirebaseManager.UploadMatchResult(isWin);
+
+        MatchData.LastRoomName = PhotonNetwork.CurrentRoom.Name;
+
+        PhotonNetwork.LeaveRoom();
 
         SceneManager.LoadScene("LoginScene"); //씬 이름 변경 예정
     }

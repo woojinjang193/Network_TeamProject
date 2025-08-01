@@ -26,32 +26,31 @@ public class MoveModule
     {
         while (true)
         {
-            SetNewRandomTargetPosition();
-            float elapsed = 0f;
-
-            while (elapsed < _wanderTime)
+            float randomDistance = SetNewRandomTargetPosition();
+            if (randomDistance > 7f)
             {
-                MoveTo(_randomPos);
-                elapsed += Time.deltaTime;
+                float elapsed = 0f;
 
-                // 적 발견 시 중단
-                if (_controller.DetectModule.HasEnemy)
+                while (elapsed < _wanderTime)
                 {
-                    StopWander();
-                    yield break;
+                    MoveTo(_randomPos);
+                    elapsed += Time.deltaTime;
+                
+                    float distance = Vector3.Distance(_controller.transform.position, _randomPos);
+                    _controller.IsMoving = distance > 0.1f;
+                
+                    yield return null;
                 }
-
-                yield return null;
             }
-
             yield return null;
         }
     }
 
-    private void SetNewRandomTargetPosition()
+    private float SetNewRandomTargetPosition()
     {
-        Vector2 circle = Random.insideUnitCircle * Random.Range(3f, 6f);
+        Vector2 circle = Random.insideUnitCircle * Random.Range(5f, 12f);
         _randomPos = _controller.transform.position + new Vector3(circle.x, 0, circle.y);
+        return Vector3.Distance(_controller.transform.position, _randomPos);
     }
 
     public void MoveTo(Vector3 targetPos)
