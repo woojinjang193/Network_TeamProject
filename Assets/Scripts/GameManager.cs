@@ -60,6 +60,7 @@ public class GameManager : Singleton<GameManager>
 
         Debug.Log("=== [GameManager] Start 끝 ===");
         StartCoroutine(SpawnPlayerWithDelay());
+        GameStart();
     }
 
     [PunRPC]
@@ -157,6 +158,10 @@ public class GameManager : Singleton<GameManager>
         bool isWin = (winningTeam != "Draw") && (myTeam == winningTeam);
 
         FirebaseManager.UploadMatchResult(isWin);
+
+        MatchData.LastRoomName = PhotonNetwork.CurrentRoom.Name;
+
+        PhotonNetwork.LeaveRoom();
 
         SceneManager.LoadScene("LoginScene"); //씬 이름 변경 예정
     }

@@ -26,13 +26,19 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.ConnectUsingSettings();
         Debug.Log("Photon 서버 연결 시도 중...");
     }
 
     public override void OnConnectedToMaster()
     {
-        Debug.Log("Photon 연결 완료");
+        Debug.Log("마스터 서버 재연결 완료, 방 재입장 시도");
+
+        if (!string.IsNullOrEmpty(MatchData.LastRoomName))
+        {
+            PhotonNetwork.JoinRoom(MatchData.LastRoomName);
+        }
     }
 
     public override void OnDisconnected(DisconnectCause cause)
@@ -172,23 +178,43 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         PhotonNetwork.LeaveRoom();
     }
 
-    public override void OnLeftRoom()  // 방 나간 후 처리
+    public override void OnLeftRoom()
     {
         Debug.Log("방 나감, 로비로 이동");
 
         if (UIManager.Instance != null)
         {
             UIManager.Instance.ReplaceUI(typeof(LobbyUI));
-            if (UIManager.Instance.CurrentUI is LobbyUI lobbyUI)
-            {
-                lobbyUI.ShowMainLobby();
-                lobbyUI.OnReturnFromRoom(); // 버튼 상태 등 복원
-            }
+
+            StartCoroutine(WaitAndCallLobbyUI());
         }
 
         if (roomManager != null)
         {
-            roomManager.PlayerPanelRemove(PhotonNetwork.LocalPlayer); // 현재 플레이어 패널 제거
+            roomManager.PlayerPanelRemove(PhotonNetwork.LocalPlayer);
+        }
+    }
+
+    private IEnumerator WaitAndCallLobbyUI()
+    {
+        // LobbyUI가 생성될 때까지 대기 (최대 1초 정도)
+        float timeout = 1f;
+        float timer = 0f;
+
+        while (!(UIManager.Instance.CurrentUI is LobbyUI) && timer < timeout)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        if (UIManager.Instance.CurrentUI is LobbyUI lobbyUI)
+        {
+            lobbyUI.ShowMainLobby();
+            lobbyUI.OnReturnFromRoom();
+        }
+        else
+        {
+            Debug.LogWarning("LobbyUI에 접근 실패: 시간 초과 또는 UI 생성 실패");
         }
     }
 
