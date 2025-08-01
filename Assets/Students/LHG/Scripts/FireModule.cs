@@ -46,7 +46,6 @@ public class FireModule
         {
             isFiring = true;
             weaponView.RPC("FireParticle", RpcTarget.All, _controller.MyTeam, true);
-            Debug.Log($"FireModule에서 weaponView의 RPC 수행함 : {weaponView.ViewID}");
         }
     }
 

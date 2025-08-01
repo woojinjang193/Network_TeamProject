@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ public class DetectModule
     
     // 값
     public bool HasEnemy => Target != null;
-    public bool HasTargetGrid => TargetGrid != null;
+    private Team myTeam;
     
     // 타이머
     private float detectTimer = 0f;
@@ -31,10 +32,9 @@ public class DetectModule
         }
         else
         {
-            DetectEnemy();
+            DetectEnemyPlayer();
             detectTimer = 0f;
         }
-        
     }
 
     private void DetectEnemy()
@@ -51,6 +51,22 @@ public class DetectModule
         {
             Debug.Log($"플레이어 감지 못함{HasEnemy}");
         }
+    }
+
+    private void DetectEnemyPlayer()
+    {
+        Collider[] hits = Physics.OverlapSphere(_controller.transform.position, _controller.detectRadius);
+        foreach (var hit in hits)
+        {
+            PlayerController player = hit.GetComponent<PlayerController>();
+            if (player != null && player.MyTeam != _controller.MyTeam)
+            {
+                Target = player.transform;
+                Debug.Log($"적 플레이어 감지: {player.photonView.ViewID}");
+                return;
+            }
+        }
+        Target = null; //탐지 실패시 target은 null
     }
 
     private void DetectGrid()

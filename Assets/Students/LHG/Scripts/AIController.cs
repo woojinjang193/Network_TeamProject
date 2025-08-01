@@ -24,6 +24,7 @@ public class AIController : BaseController
     private Vector3 _initialPosition;
     private Quaternion _initialRotation;
 
+
     [Header("모델 설정")]
     public SkinnedMeshRenderer AIRenderer;
     
@@ -47,6 +48,11 @@ public class AIController : BaseController
         }
     }
 
+    [Header("팀 설정")]
+    private TeamColorInfo teamColorInfo;
+    private Team myTeam = Team.None;
+    public Team MyTeam => myTeam;
+    
     private void Update()
     {
         if (photonView.IsMine)
@@ -69,7 +75,6 @@ public class AIController : BaseController
             OtherClientProcess();
         }
     }
-
     void OnDrawGizmos()
     {
             Gizmos.color = Color.yellow;
@@ -243,6 +248,7 @@ public class AIController : BaseController
             //  transform 전송
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
+            stream.SendNext((int)myTeam);
             
             // 사망 정보 전송
             stream.SendNext(IsDead);
@@ -258,6 +264,7 @@ public class AIController : BaseController
             // transform 수신
             networkPos = (Vector3)stream.ReceiveNext();
             networkRot = (Quaternion)stream.ReceiveNext();
+            myTeam = (Team)(int)stream.ReceiveNext();
             
             // 사망정보 수신
             IsDead = (bool)stream.ReceiveNext();
