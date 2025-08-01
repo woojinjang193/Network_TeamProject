@@ -379,7 +379,7 @@ Transform:
   m_GameObject: {fileID: 299019650288268820}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.8000001, z: 0}
+  m_LocalPosition: {x: 0, y: 2.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -400,7 +400,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 3009638640155490613}
   followTransform: {fileID: 5228450255921213285}
-  followDistance: 7
+  followDistance: 6
   heightOffset: 0.7
   yMax: 86
   yMin: -6
@@ -13383,7 +13383,7 @@ Transform:
   m_GameObject: {fileID: 3166489107642997241}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.05799997, z: -6}
+  m_LocalPosition: {x: 0, y: 0, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13422,7 +13422,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 75
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -13471,11 +13471,11 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
-  m_Dithering: 0
+  m_Dithering: 1
   m_ClearDepth: 1
   m_AllowXRRendering: 1
   m_AllowHDROutput: 1
@@ -15458,7 +15458,7 @@ MonoBehaviour:
   squidModel: {fileID: 6239221948279436106}
   humanAnimator: {fileID: 0}
   squidAnimator: {fileID: 0}
-  moveSpeed: 10
+  moveSpeed: 7
   inkParticleGun: {fileID: 1490879616672990739}
   weaponView: {fileID: 0}
   rig: {fileID: 0}
@@ -15476,7 +15476,7 @@ MonoBehaviour:
     m_Bits: 64
   humanJumpForce: 15
   squidJumpForce: 15
-  squidSpeed: 15
+  squidSpeed: 10
   gravityScale: 4
   fallingGravityScale: 7
   inkableLayer:

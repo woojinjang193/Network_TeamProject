@@ -209,6 +209,7 @@ MonoBehaviour:
   col: {fileID: 0}
   fireInterval: 1
   detectInterval: 3
+  detectRadius: 10
   spawnPoint: {fileID: 1206751381785484122}
   AIRenderer: {fileID: 0}
 --- !u!54 &7596396055448253939
