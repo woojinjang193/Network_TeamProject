@@ -1,5 +1,6 @@
-using System;
+using Cinemachine;
 using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -38,8 +39,11 @@ public class PlayerController : BaseController
     [Header("점프 설정")]
     public float gravityScale = 4f;
     public float fallingGravityScale = 7f;
- 
 
+    [Header("무기 설정")]
+    public bool IsFiring { get; set; }
+    public Transform weaponTransform;
+    public Transform muzzleTransform;
 
     [Header("잉크 상호작용 설정")]
     [Tooltip("잉크가 칠해질 수 있는 오브젝트의 레이어")]
@@ -66,6 +70,7 @@ public class PlayerController : BaseController
 
     protected override void Awake()
     {
+
         base.Awake();
         
         squidAnimator = squidModel.GetComponentInChildren<Animator>();
@@ -73,15 +78,15 @@ public class PlayerController : BaseController
 
         playerRenderer = humanModel.GetComponent<SkinnedMeshRenderer>();
         squidRenderer = squidModel.GetComponent<SkinnedMeshRenderer>();
-        
+
         CurHp = MaxHp;
-        
+
         if (photonView.IsMine)
         {
             MineInit();
         }
-        
-        else if(!photonView.IsMine)
+
+        else if (!photonView.IsMine)
         {
             // 이 캐릭터가 다른 플레이어(원격)의 것이므로, 이 캐릭터에 포함된 카메라를 비활성화합니다.
             // 이렇게 해야 다른 플레이어의 카메라가 내 화면에 그려지거나 컨트롤을 방해하는 문제를 막을 수 있습니다.
@@ -113,13 +118,13 @@ public class PlayerController : BaseController
                 }
             }
         }
-        
-        else if(!photonView.IsMine && !IsDead)
+
+        else if (!photonView.IsMine && !IsDead)
         {
             OthersAnimation();
         }
     }
-    
+
     void Update()
     {
         // 본인의 photonView일 경우
@@ -129,7 +134,7 @@ public class PlayerController : BaseController
             {
                 recenterCooldownTimer -= Time.deltaTime;
             }
-            
+
             GroundAndInkCheck();
 
             if (stateMachine != null)
@@ -156,11 +161,11 @@ public class PlayerController : BaseController
                 Respawn();
             }
         }
-        
+
         // TODO : 테스트 이후 삭제 예정
         UpdatePlayerColor();
     }
-    
+
     void LateUpdate()
     {
         if (photonView.IsMine && tpsCamera != null)
@@ -173,23 +178,23 @@ public class PlayerController : BaseController
     public void MineInit()
     {
         input = GetComponent<PlayerInput>();
-        
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        
+
         stateMachine = new StateMachine();
         highStateDic = new Dictionary<HighState, PlayerState>();
-        
+
         highStateDic.Add(HighState.HumanForm, new Player_Human(this, stateMachine));
         highStateDic.Add(HighState.SquidForm, new Player_Squid(this, stateMachine));
-        highStateDic.Add(HighState.Die, new Player_Die(this, stateMachine));       
-        
+        highStateDic.Add(HighState.Die, new Player_Die(this, stateMachine));
+
         stateMachine.Initialize(highStateDic[HighState.HumanForm]);
-        
+
         // 게임 매니저에 팀 할당
         // TODO : 테스트 끝나면 해제
         // StartCoroutine(WaitForTeamAssignment());
-        
+
         // 카메라 동기화
         if (playerCameraObject == null)
         {
@@ -228,9 +233,9 @@ public class PlayerController : BaseController
             spectatorCamera = GameObject.FindWithTag("SpectatorCamera");
             if (spectatorCamera != null) spectatorCamera.SetActive(false); // 처음엔 비활성화
         }
-        
+
     }
-    
+
     private void OthersAnimation() // 로컬 포톤뷰가 아닌 플레이어들 설정
     {
         // 오징어 폼
@@ -238,9 +243,9 @@ public class PlayerController : BaseController
         {
             humanModel.SetActive(false);
             squidModel.SetActive(true);
-            
+
             col.direction = 2;
-            col.center = new Vector3(0,0.2f,0);
+            col.center = new Vector3(0, 0.2f, 0);
             col.height = 1.0f;
             col.radius = 0.2f;
 
@@ -249,7 +254,7 @@ public class PlayerController : BaseController
                 squidAnimator.SetBool(IsMove,IsMoving);
                 squidAnimator.SetBool(IsAir,isAir);
                 squidAnimator.SetFloat(MoveSpeed, networkMoveSpeed);
-            
+
                 if (isAir && !isJump)
                 {
                     isJump = true;
@@ -259,7 +264,7 @@ public class PlayerController : BaseController
                 {
                     isJump = false;
                 }
-            
+
             }
         }
         // 인간 폼
@@ -267,12 +272,12 @@ public class PlayerController : BaseController
         {
             humanModel.SetActive(true);
             squidModel.SetActive(false);
-            
+
             col.direction = 1;
             col.center = new Vector3(0, 0.5f, 0);
             col.height = 1.0f;
             col.radius = 0.25f;
-            
+
             if (humanAnimator != null)
             {
                 // 애니메이션 상태 파라매터 처리
@@ -280,7 +285,7 @@ public class PlayerController : BaseController
                 humanAnimator.SetBool(IsAir,isAir);
                 
                 // 점프 애니메이션 트리거 파라매터 처리
-                if (isAir&&!isJump)
+                if (isAir && !isJump)
                 {
                     humanAnimator.SetTrigger(JumpTrigger);
                     isJump = true;
@@ -289,20 +294,20 @@ public class PlayerController : BaseController
                 {
                     isJump = false;
                 }
-                
+
                 // Move 관련 입력 처리
                 humanAnimator.SetFloat(MoveX, networkMoveX);
                 humanAnimator.SetFloat(MoveY, networkMoveY);
             }
         }
-        
+
         // 지연 보상
         deltaPos = Vector3.Distance(transform.position, networkPos);
         deltaRot = Quaternion.Angle(transform.rotation, networkRot);
 
         interpolatePos = deltaPos * Time.deltaTime * PhotonNetwork.SerializationRate;
         interpolateRot = deltaRot * Time.deltaTime * PhotonNetwork.SerializationRate;
-        
+
         transform.position = Vector3.MoveTowards(transform.position, networkPos, interpolatePos);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, networkRot, interpolateRot);
     }
@@ -326,7 +331,7 @@ public class PlayerController : BaseController
 
         Debug.Log($"[PlayerController] 팀 할당 완료: {MyTeam}");
     }
-    
+
     private void GroundAndInkCheck()
     {
         LayerMask combinedLayer = groundLayer | inkableLayer;
@@ -358,7 +363,7 @@ public class PlayerController : BaseController
         }
 
         // 벽 체크
-        Vector3 wallRayStart = transform.position + transform.up * (col.height / 2 - 0.1f );
+        Vector3 wallRayStart = transform.position + transform.up * (col.height / 2 - 0.1f);
         // 현재 콜라이더의 절대적인 꼭대기 위치 바로 아래에서 레이를 쏨
         Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
 
@@ -443,12 +448,12 @@ public class PlayerController : BaseController
         return InkStatus.NONE;
     }
 
-    public void LookAround()
-    {
-        Vector3 playerRotation = transform.eulerAngles;
-        playerRotation.y = tpsCamera.yRotation;
-        transform.eulerAngles = playerRotation;
-    }
+    //public void LookAround()
+    //{
+    //    Vector3 playerRotation = transform.eulerAngles;
+    //    playerRotation.y = tpsCamera.yRotation;
+    //    transform.eulerAngles = playerRotation;
+    //}
 
     // TODO : test용
     private void HandleTeamSelection()
@@ -482,7 +487,7 @@ public class PlayerController : BaseController
             }
         }
     }
-    
+
     [PunRPC]
     public override void TakeDamage(float amount)
     {
@@ -500,7 +505,7 @@ public class PlayerController : BaseController
             photonView.RPC("PlayerDie", RpcTarget.All);
         }
     }
-    
+
     // TODO : 죽을 때 처리 필요
     [PunRPC]
     public void PlayerDie()
@@ -527,7 +532,7 @@ public class PlayerController : BaseController
     {
         // 체력 초기화
         CurHp = MaxHp;
-        
+
         if (!photonView.IsMine)
         {
             IsDead = false;
@@ -560,7 +565,7 @@ public class PlayerController : BaseController
         // 내가 직접 조종하는 캐릭터에서만 작동
         if (stream.IsWriting)
         {
-                        
+
             // 0 플레이어 사망 정보 전송
             stream.SendNext(IsDeadState);
 
@@ -574,7 +579,7 @@ public class PlayerController : BaseController
             stream.SendNext(transform.position);
             // 2 현재 내 회전값을 stream에 실림
             stream.SendNext(transform.rotation);
-            
+
             // 3 팀정보 전송
             stream.SendNext((int)MyTeam);
             
@@ -612,8 +617,8 @@ public class PlayerController : BaseController
 
         }
         else if (stream.IsReading)
-            // stream.IsWriting이 false, 즉 stream.IsReading일 때
-            // 다른 사람의 컴퓨터에 보이는 내 캐릭터, 또는 내 컴퓨터에 보이는 다른 사람의 캐릭터에서 작동
+        // stream.IsWriting이 false, 즉 stream.IsReading일 때
+        // 다른 사람의 컴퓨터에 보이는 내 캐릭터, 또는 내 컴퓨터에 보이는 다른 사람의 캐릭터에서 작동
         {
             // 0 플레이어 사망정보 수신
             IsDeadState = (bool)stream.ReceiveNext();
@@ -625,7 +630,7 @@ public class PlayerController : BaseController
             MyTeam= (Team)(int)stream.ReceiveNext(); // TODO: 팀변경 테스트 끝나면 지우기
             // 4 오징어 여부
             isSquidNetworked = (bool)stream.ReceiveNext();
-            
+
             // 인간 폼일때 수신
             if (!isSquidNetworked && !IsDeadState)
             {
@@ -655,4 +660,6 @@ public class PlayerController : BaseController
             stateMachine.ChangeState(highStateDic[state]);
         }
     }
+
+
 }
