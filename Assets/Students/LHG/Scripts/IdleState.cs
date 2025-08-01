@@ -11,12 +11,14 @@ public class IdleState : AIBaseState
 
     public override void OnUpdate()
     {
+
         _controller.MoveModule.Wander();
         _controller.DetectModule.Update();
+        _controller.FireModule.TryFireAt(_controller.DetectModule.Target);
 
         if(_controller.DetectModule.HasEnemy)
         {
-            _controller.FireModule.TryFireAt(_controller.DetectModule.Target);
+            Debug.Log($"파이어 시도 들어감{_controller.photonView.ViewID}");
             _controller.MoveModule.StopWander();
             _controller.StateMachine.SetState(new ChaseState(_controller));
         }
