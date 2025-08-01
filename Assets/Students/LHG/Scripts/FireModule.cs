@@ -49,7 +49,7 @@ public class FireModule
         if (!isFiring)
         {
             isFiring = true;
-            weaponView.RPC("FireParticle", RpcTarget.All, _controller.myTeam, true);
+            weaponView.RPC("FireParticle", RpcTarget.All, _controller.MyTeam, true);
         }
     }
 
@@ -58,7 +58,7 @@ public class FireModule
         if (isFiring)
         {
             isFiring = false;
-            weaponView.RPC("FireParticle", RpcTarget.All, _controller.myTeam, false);
+            weaponView.RPC("FireParticle", RpcTarget.All, _controller.MyTeam, false);
         }
     }
 }

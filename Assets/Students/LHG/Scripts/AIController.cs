@@ -20,25 +20,27 @@ public class AIController : MonoBehaviour, IPunObservable
     public Transform spawnPoint;
     private Vector3 _initialPosition;
     private Quaternion _initialRotation;
-    public Team myTeam { get; private set; } = Team.None;
     
     
+
+
 
     [Header("모델 설정")]
     public SkinnedMeshRenderer AIRenderer;
 
     [Header("팀 설정")]
     private TeamColorInfo teamColorInfo;
+    private Team myTeam = Team.None;
+    public Team MyTeam => myTeam;
 
     [Header("잉크 파티클 총")]
     public InkParticleGun inkGun;
 
     [SerializeField] private PhotonView weaponView;
-    
+
 
     private void Awake()
     {
-        
         //statedic대신 모듈화한 개별 스크립트로 관리
         MoveModule = new MoveModule(this);
         FireModule = new FireModule(this, weaponView);
@@ -49,6 +51,8 @@ public class AIController : MonoBehaviour, IPunObservable
         StateMachine.SetState(new IdleState(this));
 
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
+
+
     }
 
     private void Update()
@@ -137,11 +141,13 @@ public class AIController : MonoBehaviour, IPunObservable
         {
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
+            stream.SendNext((int)myTeam);
         }
         else
         {
             transform.position = (Vector3)stream.ReceiveNext();
             transform.rotation = (Quaternion)stream.ReceiveNext();
+            myTeam = (Team)(int)stream.ReceiveNext();
         }
     }
 
