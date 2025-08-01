@@ -78,7 +78,7 @@ public class AIController : BaseController
         FireModule = new FireModule(this, weaponView);
         DetectModule = new DetectModule(this);
 
-        StateMachine = GetComponent<AIStateMachine>();
+        StateMachine = gameObject.GetOrAddComponent<AIStateMachine>();
         
         //시작시 idle상태로
         StateMachine.SetState(new IdleState(this));

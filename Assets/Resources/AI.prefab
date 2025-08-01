@@ -103,6 +103,10 @@ MonoBehaviour:
   fireEffect: {fileID: 7006917918409375696}
   floorInkEffect: {fileID: 7546236359864912240}
   particleCollision: {fileID: 4574279244435825261}
+  maxInk: 100
+  currentInk: 0
+  inkConsumptionRate: 15
+  inkRecoveryRate: 30
 --- !u!114 &6667127375753194441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,7 +215,6 @@ MonoBehaviour:
   detectInterval: 3
   detectRadius: 10
   spawnPoint: {fileID: 1206751381785484122}
-  AIRenderer: {fileID: 0}
 --- !u!54 &7596396055448253939
 Rigidbody:
   m_ObjectHideFlags: 0
