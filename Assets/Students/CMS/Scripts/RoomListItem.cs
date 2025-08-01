@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RoomListItem : MonoBehaviour
+public class RoomListItem : MonoBehaviourPun
 {
     [SerializeField] private TMP_Text roomNameText;  // 방 이름 텍스트
     [SerializeField] private TMP_Text maxPlayerText; // 현재 인원 / 최대 인원 텍스트
@@ -27,7 +27,10 @@ public class RoomListItem : MonoBehaviour
 
     public void JoinRoom()
     {
-        PhotonNetwork.JoinRoom(roomName);
-        joinButton.onClick.RemoveListener(JoinRoom);
+        if (PhotonNetwork.NetworkClientState == ClientState.JoinedLobby)
+        {
+            PhotonNetwork.JoinRoom(roomName);
+            joinButton.onClick.RemoveAllListeners();
+        }
     }
 }

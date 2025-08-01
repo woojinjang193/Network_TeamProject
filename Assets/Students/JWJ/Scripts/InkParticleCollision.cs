@@ -196,7 +196,7 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
         else if (player.MyTeam != myTeam)
         {
             Debug.Log("적 입니다.");
-            player.photonView.RPC("TakeDamage", player.photonView.Owner, 0.2f);
+            player.photonView.RPC("TakeDamage", player.photonView.Owner, 1f);
         }
         else
         {

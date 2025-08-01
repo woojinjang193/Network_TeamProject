@@ -11,7 +11,10 @@ public class RoomListUI : BaseUI
     [SerializeField] private Transform roomListContent; // 스크롤뷰의 Content 넣기
     [SerializeField] private GameObject roomListItemPrefab; // 각 방 정보를 표시할 UI 프리팹
     [SerializeField] private Button backButton;
-
+    
+    [Header("참조")]
+    [SerializeField] private NetworkManager networkManager;
+    
     private Dictionary<string, RoomListItemUI> roomListItems = new Dictionary<string, RoomListItemUI>();
 
     private UIManager uiManager;
@@ -27,6 +30,7 @@ public class RoomListUI : BaseUI
     {
         gameObject.SetActive(true);
         // TODO: 방 목록을 Photon에서 받아와서 업데이트하는 로직 추가
+        UpdateRoomList(networkManager.cachedRoomList);
     }
 
     public override void Close()
@@ -42,7 +46,7 @@ public class RoomListUI : BaseUI
         }
     }
 
-    public void UpdateRoomList(List<Photon.Realtime.RoomInfo> roomList)
+    public void UpdateRoomList(List<RoomInfo> roomList)
     {
         // 방 목록 UI를 업데이트하는 로직
         foreach (Transform child in roomListContent)

@@ -16,6 +16,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 
     private string _desiredRoomNameOnFail;     // 빠른 입장 실패 시 사용할 방 이름을 임시 저장하는 변수
+    public List<RoomInfo> cachedRoomList =  new List<RoomInfo>();
 
     private void Awake()
     {
@@ -131,6 +132,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
+        cachedRoomList.Clear();
+        cachedRoomList = roomList;
+        
         if (UIManager.Instance != null && UIManager.Instance.CurrentUI is RoomListUI roomListUI)
         {
             roomListUI.UpdateRoomList(roomList);
