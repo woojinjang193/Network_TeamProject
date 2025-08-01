@@ -13,7 +13,7 @@ public class AIController : MonoBehaviour, IPunObservable
     public AIStateMachine StateMachine { get; private set; }
 
     [SerializeField] public float moveSpeed = 5;
-    [SerializeField] public float fireInterval = 1; //발사간격(초)
+    [SerializeField] public float fireInterval = 5; //발사간격(초)
     [SerializeField] public float detectInterval = 3; //탐지간격(초)
     [SerializeField] public float health = 100;
 

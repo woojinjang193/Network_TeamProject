@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
@@ -9,9 +10,13 @@ public class DetectModule
     public Transform Target { get; private set; }
     public Transform TargetGrid { get; private set; }
     public bool HasEnemy => Target != null;
-    public bool HasTargetGrid => TargetGrid != null;
+    //public bool HasTargetGrid => TargetGrid != null;
 
     private float detectRadius = 10f;
+    private Team myTeam;
+
+
+    
 
     public DetectModule(AIController controller)
     {
@@ -20,8 +25,8 @@ public class DetectModule
 
     public void Update()
     {
-        DetectEnemy();
-        
+        //DetectEnemy();
+        DetectEnemyPlayer();
     }
 
     private void DetectEnemy()
@@ -34,6 +39,22 @@ public class DetectModule
         {
             Debug.Log("Player 태그 감지됨");
         }
+    }
+
+    private void DetectEnemyPlayer()
+    {
+        Collider[] hits = Physics.OverlapSphere(_controller.transform.position, detectRadius);
+        foreach (var hit in hits)
+        {
+            PlayerController player = hit.GetComponent<PlayerController>();
+            if (player != null && player.MyTeam != _controller.MyTeam)
+            {
+                Target = player.transform;
+                Debug.Log($"적 플레이어 감지: {player.photonView.ViewID}");
+                return;
+            }
+        }
+        Target = null; //탐지 실패시 target은 null
     }
 
     private void DetectGrid()
