@@ -1,5 +1,6 @@
-using System;
+using Cinemachine;
 using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,10 +57,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [Header("무기 설정")]
     public InkParticleGun inkParticleGun;
     public PhotonView weaponView;
+    public bool IsFiring { get; set; }
+    public Transform weaponTransform;
+    public Transform muzzleTransform;
+
 
     [Header("팀 설정")]
     private TeamColorInfo teamColorInfo;
- 
+
     private Team myTeam = Team.None;
     public Team MyTeam => myTeam;
 
@@ -86,7 +91,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private bool isMove;
     private bool isJump;
     private float networkMoveSpeed;
-    
+
     // 잉크 감지 시스템 파라매터
     private float groundCheckTimer = 0f;
     private const float GROUND_CHECK_INTERVAL = 0.1f; // 1초에 10번 검사
@@ -95,7 +100,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private float curHp;
     public float CurHp
     {
-        get { return curHp;}
+        get { return curHp; }
         private set { curHp = value; }
     }
     private float maxHp = 100f;
@@ -108,7 +113,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private bool isDead;
     public bool IsDead
     {
-        get { return isDead;}
+        get { return isDead; }
         set { isDead = value; }
     }
 
@@ -133,7 +138,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             weaponView = inkParticleGun.GetComponent<PhotonView>();
         }
-        
+
         humanAnimator = humanModel.GetComponentInChildren<Animator>();
         squidAnimator = squidModel.GetComponentInChildren<Animator>();
 
@@ -141,15 +146,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         playerRenderer = humanModel.GetComponent<SkinnedMeshRenderer>();
         squidRenderer = squidModel.GetComponent<SkinnedMeshRenderer>();
-        
+
         CurHp = MaxHp;
-        
+
         if (photonView.IsMine)
         {
             MineInit();
         }
-        
-        else if(!photonView.IsMine)
+
+        else if (!photonView.IsMine)
         {
             // 이 캐릭터가 다른 플레이어(원격)의 것이므로, 이 캐릭터에 포함된 카메라를 비활성화합니다.
             // 이렇게 해야 다른 플레이어의 카메라가 내 화면에 그려지거나 컨트롤을 방해하는 문제를 막을 수 있습니다.
@@ -160,7 +165,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             rig.isKinematic = true;
         }
-        
+
         Manager.Game.RegisterPlayer(col, this);
 
     }
@@ -184,13 +189,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 }
             }
         }
-        
-        else if(!photonView.IsMine && !IsDead)
+
+        else if (!photonView.IsMine && !IsDead)
         {
             OthersAnimation();
         }
     }
-    
+
     void Update()
     {
         // 본인의 photonView일 경우
@@ -200,7 +205,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 recenterCooldownTimer -= Time.deltaTime;
             }
-            
+
             GroundAndInkCheck();
 
             if (stateMachine != null)
@@ -222,16 +227,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         else
         {
             // 리스폰 조건 체크
-            if ( IsDead && !deadState)
+            if (IsDead && !deadState)
             {
                 Respawn();
             }
         }
-        
+
         // TODO : 테스트 이후 삭제 예정
         UpdatePlayerColor();
     }
-    
+
     void LateUpdate()
     {
         if (photonView.IsMine && tpsCamera != null)
@@ -244,23 +249,23 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public void MineInit()
     {
         input = GetComponent<PlayerInput>();
-        
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        
+
         stateMachine = new StateMachine();
         highStateDic = new Dictionary<HighState, PlayerState>();
-        
+
         highStateDic.Add(HighState.HumanForm, new Player_Human(this, stateMachine));
         highStateDic.Add(HighState.SquidForm, new Player_Squid(this, stateMachine));
-        highStateDic.Add(HighState.Die, new Player_Die(this, stateMachine));       
-        
+        highStateDic.Add(HighState.Die, new Player_Die(this, stateMachine));
+
         stateMachine.Initialize(highStateDic[HighState.HumanForm]);
-        
+
         // 게임 매니저에 팀 할당
         // TODO : 테스트 끝나면 해제
         // StartCoroutine(WaitForTeamAssignment());
-        
+
         // 카메라 동기화
         if (playerCameraObject == null)
         {
@@ -299,9 +304,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             spectatorCamera = GameObject.FindWithTag("SpectatorCamera");
             if (spectatorCamera != null) spectatorCamera.SetActive(false); // 처음엔 비활성화
         }
-        
+
     }
-    
+
     private void OthersAnimation() // 로컬 포톤뷰가 아닌 플레이어들 설정
     {
         // 오징어 폼
@@ -309,18 +314,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             humanModel.SetActive(false);
             squidModel.SetActive(true);
-            
+
             col.direction = 2;
-            col.center = new Vector3(0,0.2f,0);
+            col.center = new Vector3(0, 0.2f, 0);
             col.height = 1.0f;
             col.radius = 0.2f;
 
             if (squidAnimator != null)
             {
-                squidAnimator.SetBool(IsMove,isMove);
-                squidAnimator.SetBool(IsAir,isAir);
+                squidAnimator.SetBool(IsMove, isMove);
+                squidAnimator.SetBool(IsAir, isAir);
                 squidAnimator.SetFloat(MoveSpeed, networkMoveSpeed);
-            
+
                 if (isAir && !isJump)
                 {
                     isJump = true;
@@ -330,7 +335,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 {
                     isJump = false;
                 }
-            
+
             }
         }
         // 인간 폼
@@ -338,20 +343,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             humanModel.SetActive(true);
             squidModel.SetActive(false);
-            
+
             col.direction = 1;
             col.center = new Vector3(0, 0.5f, 0);
             col.height = 1.0f;
             col.radius = 0.25f;
-            
+
             if (humanAnimator != null)
             {
                 // 애니메이션 상태 파라매터 처리
-                humanAnimator.SetBool(IsMove,isMove);
-                humanAnimator.SetBool(IsAir,isAir);
-                
+                humanAnimator.SetBool(IsMove, isMove);
+                humanAnimator.SetBool(IsAir, isAir);
+
                 // 점프 애니메이션 트리거 파라매터 처리
-                if (isAir&&!isJump)
+                if (isAir && !isJump)
                 {
                     humanAnimator.SetTrigger(JumpTrigger);
                     isJump = true;
@@ -360,20 +365,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 {
                     isJump = false;
                 }
-                
+
                 // Move 관련 입력 처리
                 humanAnimator.SetFloat(MoveX, networkMoveX);
                 humanAnimator.SetFloat(MoveY, networkMoveY);
             }
         }
-        
+
         // 지연 보상
         deltaPos = Vector3.Distance(transform.position, networkPos);
         deltaRot = Quaternion.Angle(transform.rotation, networkRot);
 
         interpolatePos = deltaPos * Time.deltaTime * PhotonNetwork.SerializationRate;
         interpolateRot = deltaRot * Time.deltaTime * PhotonNetwork.SerializationRate;
-        
+
         transform.position = Vector3.MoveTowards(transform.position, networkPos, interpolatePos);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, networkRot, interpolateRot);
     }
@@ -397,7 +402,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         Debug.Log($"[PlayerController] 팀 할당 완료: {myTeam}");
     }
-    
+
     private void GroundAndInkCheck()
     {
         LayerMask combinedLayer = groundLayer | inkableLayer;
@@ -429,7 +434,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         // 벽 체크
-        Vector3 wallRayStart = transform.position + transform.up * (col.height / 2 - 0.1f );
+        Vector3 wallRayStart = transform.position + transform.up * (col.height / 2 - 0.1f);
         // 현재 콜라이더의 절대적인 꼭대기 위치 바로 아래에서 레이를 쏨
         Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
 
@@ -514,12 +519,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         return InkStatus.NONE;
     }
 
-    public void LookAround()
-    {
-        Vector3 playerRotation = transform.eulerAngles;
-        playerRotation.y = tpsCamera.yRotation;
-        transform.eulerAngles = playerRotation;
-    }
+    //public void LookAround()
+    //{
+    //    Vector3 playerRotation = transform.eulerAngles;
+    //    playerRotation.y = tpsCamera.yRotation;
+    //    transform.eulerAngles = playerRotation;
+    //}
 
     // TODO : test용
     private void HandleTeamSelection()
@@ -553,7 +558,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
     }
-    
+
     [PunRPC]
     public void TakeDamage(float amount)
     {
@@ -571,7 +576,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             photonView.RPC("PlayerDie", RpcTarget.All);
         }
     }
-    
+
     // TODO : 죽을 때 처리 필요
     [PunRPC]
     public void PlayerDie()
@@ -598,7 +603,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         // 체력 초기화
         CurHp = MaxHp;
-        
+
         if (!photonView.IsMine)
         {
             IsDead = false;
@@ -631,7 +636,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         // 내가 직접 조종하는 캐릭터에서만 작동
         if (stream.IsWriting)
         {
-                        
+
             // 0 플레이어 사망 정보 전송
             stream.SendNext(deadState);
 
@@ -645,10 +650,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             stream.SendNext(transform.position);
             // 2 현재 내 회전값을 stream에 실림
             stream.SendNext(transform.rotation);
-            
+
             // 3 팀정보 전송
             stream.SendNext((int)myTeam);
-            
+
             // 현재 내 상태가 오징어 폼인지 아닌지(bool)를 stream에 실림
             // (stateMachine.CurrentState가 SquidForm 상태와 같으면 true, 아니면 false가 실림)
             if (stateMachine != null && highStateDic != null && highStateDic.ContainsKey(HighState.SquidForm))
@@ -683,8 +688,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         }
         else if (stream.IsReading)
-            // stream.IsWriting이 false, 즉 stream.IsReading일 때
-            // 다른 사람의 컴퓨터에 보이는 내 캐릭터, 또는 내 컴퓨터에 보이는 다른 사람의 캐릭터에서 작동
+        // stream.IsWriting이 false, 즉 stream.IsReading일 때
+        // 다른 사람의 컴퓨터에 보이는 내 캐릭터, 또는 내 컴퓨터에 보이는 다른 사람의 캐릭터에서 작동
         {
             // 0 플레이어 사망정보 수신
             deadState = (bool)stream.ReceiveNext();
@@ -693,15 +698,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             // 2 회전
             networkRot = (Quaternion)stream.ReceiveNext();
             // 3 팀 정보
-            myTeam= (Team)(int)stream.ReceiveNext(); // TODO: 팀변경 테스트 끝나면 지우기
+            myTeam = (Team)(int)stream.ReceiveNext(); // TODO: 팀변경 테스트 끝나면 지우기
             // 4 오징어 여부
             isSquidNetworked = (bool)stream.ReceiveNext();
-            
+
             // 인간 폼일때 수신
             if (!isSquidNetworked && !deadState)
             {
                 // 5 움직이는지
-                isMove =  (bool)stream.ReceiveNext();
+                isMove = (bool)stream.ReceiveNext();
                 // 6 공중인지
                 isAir = (bool)stream.ReceiveNext();
                 // 7,8 이동 파라매터 
@@ -726,4 +731,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             stateMachine.ChangeState(highStateDic[state]);
         }
     }
+
+
 }

@@ -50,15 +50,7 @@ public class Human_Move : PlayerState
         if (IsGrounded())
         {
             SetMove(currentSpeed);
-
-            if (player.input.IsFireHeld)
-            {
-                player.LookAround();
-            }
-            else
-            {
-                SetPlayerRotation();
-            }
+            SetPlayerRotation();
         }
 
         UpdateAnimationParameters();

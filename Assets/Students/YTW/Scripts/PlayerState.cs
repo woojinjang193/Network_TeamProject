@@ -48,12 +48,17 @@ public class PlayerState : BaseState
     }
     protected void SetPlayerRotation()
     {
+        if (player.IsFiring)
+        {
+            return;
+        }
+
         Vector3 lookDirection = player.rig.velocity;
         lookDirection.y = 0;
 
         if (lookDirection.sqrMagnitude > 0.01f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+            Quaternion targetRotation = Quaternion.LookRotation(lookDirection.normalized);
             player.transform.rotation = Quaternion.Slerp(player.transform.rotation, targetRotation, Time.fixedDeltaTime * 15f);
         }
     }
