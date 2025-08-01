@@ -109,14 +109,13 @@ public class AIController : BaseController
     }
     private void OtherClientProcess() // 원격일 경우의 처리
     {
-        if (!IsDead && IsDeadState) // 부활 시
+        if (!IsDead && !humanModel.activeSelf) // 부활 시
         {
-            IsDeadState = false;
             humanModel.SetActive(true);
             col.enabled = true;
         }
 
-        if (!IsDead && !IsDeadState) // 안죽었을 때
+        else if (!IsDead && humanModel.activeSelf) // 안죽었을 때
         {
             if (humanAnimator != null)
             {
@@ -145,7 +144,7 @@ public class AIController : BaseController
         if (IsDead) return;
         
         CurHp -= amount;
-        
+        hitRoutine ??= StartCoroutine(HitRoutine());
         if (CurHp <= 0)
         {
             CurHp = 0;
@@ -180,7 +179,7 @@ public class AIController : BaseController
         }
     }
     
-    public void Respawn() // Death 상태에서 호출됨. 본인만 수행
+    public void Respawn() // DeathState 상태에서 호출됨. 본인만 수행
     {
         // TODO: 리스폰 포인트로 이동
             transform.position = _initialPosition;
@@ -228,6 +227,9 @@ public class AIController : BaseController
             stream.SendNext(IsMoving);
             stream.SendNext(humanAnimator.GetFloat(MoveX));
             stream.SendNext(humanAnimator.GetFloat(MoveY));
+            
+            // 얼굴 정보 전송
+            stream.SendNext((int)faceType);
         }
         else if(stream.IsReading)
         {
@@ -244,6 +246,9 @@ public class AIController : BaseController
             IsMoving = (bool)stream.ReceiveNext();
             networkMoveX = (float)stream.ReceiveNext();
             networkMoveY = (float)stream.ReceiveNext();
+            
+            // 얼굴 정보 수신
+            FaceOff((FaceType)(int)stream.ReceiveNext());
         }
     }
 

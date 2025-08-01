@@ -11,7 +11,6 @@ public class PlayerController : BaseController
     public StateMachine stateMachine { get; private set; }
     public Dictionary<HighState, PlayerState> highStateDic { get; private set; }
 
-    //public Rigidbody rig;
     public PlayerInput input;
     
 
@@ -68,7 +67,6 @@ public class PlayerController : BaseController
     {
 
         base.Awake();
-        
         squidAnimator = squidModel.GetComponentInChildren<Animator>();
         CurHp = MaxHp;
 
@@ -105,6 +103,15 @@ public class PlayerController : BaseController
                 {
                     rig.velocity += Vector3.up * (Physics.gravity.y * (fallingGravityScale - 1) * Time.fixedDeltaTime);
                 }
+            }
+
+            if (IsFiring && hitRoutine == null)
+            {
+                FaceOff(FaceType.Upset);
+            }
+            else if (!IsFiring && hitRoutine == null)
+            {
+                FaceOff(FaceType.Idle);
             }
         }
 
@@ -227,8 +234,15 @@ public class PlayerController : BaseController
         // 오징어 폼
         if (isSquidNetworked)
         {
-            humanModel.SetActive(false);
-            squidModel.SetActive(true);
+            if (humanModel.activeSelf)
+            {
+                humanModel.SetActive(false);
+            }
+
+            if (!squidModel.activeSelf)
+            {
+                squidModel.SetActive(true);
+            }
 
             col.direction = 2;
             col.center = new Vector3(0, 0.2f, 0);
@@ -269,7 +283,7 @@ public class PlayerController : BaseController
                 // 애니메이션 상태 파라매터 처리
                 humanAnimator.SetBool(IsMove,IsMoving);
                 humanAnimator.SetBool(IsAir,isAir);
-                
+                // TODO: 공격 시 애니메이션 처리 IsFiring
                 // 점프 애니메이션 트리거 파라매터 처리
                 if (isAir && !isJump)
                 {
@@ -462,6 +476,7 @@ public class PlayerController : BaseController
         if (IsDead) return;
 
         CurHp -= amount;
+        hitRoutine ??= StartCoroutine(HitRoutine());
         Debug.Log($"현재 체력{CurHp}");
 
         if (CurHp <= 0)
@@ -574,6 +589,8 @@ public class PlayerController : BaseController
                 // 7,8 이동 파라매터
                 stream.SendNext(humanAnimator.GetFloat(MoveX));
                 stream.SendNext(humanAnimator.GetFloat(MoveY));
+                // 9 현재 얼굴
+                stream.SendNext((int)faceType);
             }
             // 오징어 폼일때 Send
             else if (stateMachine.CurrentState == highStateDic[HighState.SquidForm])
@@ -609,6 +626,8 @@ public class PlayerController : BaseController
                 // 7,8 이동 파라매터 
                 networkMoveX = (float)stream.ReceiveNext();
                 networkMoveY = (float)stream.ReceiveNext();
+                // 9 현재 얼굴
+                FaceOff((FaceType)(int)stream.ReceiveNext());
             }
             // 오징어 폼일때 수신
             else if (isSquidNetworked && !IsDeadState)
@@ -628,6 +647,8 @@ public class PlayerController : BaseController
             stateMachine.ChangeState(highStateDic[state]);
         }
     }
+
+
 
 
 }

@@ -3178,7 +3178,7 @@ GameObject:
   - component: {fileID: 2248838063628156160}
   - component: {fileID: 6878194016956388040}
   m_Layer: 8
-  m_Name: Player_CharacterTest2
+  m_Name: Player_Yellow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9214,7 +9214,7 @@ ParticleSystem:
         m_RotationOrder: 4
     maxLights: 20
   TrailModule:
-    enabled: 1
+    enabled: 0
     mode: 1
     ratio: 1
     lifetime:

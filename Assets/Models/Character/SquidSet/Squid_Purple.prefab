@@ -143,8 +143,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1838535856791722114}
-  - component: {fileID: 2737194908267017809}
-  - component: {fileID: 5445857443164861445}
   - component: {fileID: 8879486244721808761}
   m_Layer: 0
   m_Name: Squid_Purple
@@ -172,49 +170,6 @@ Transform:
   - {fileID: 1969178028798877322}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!205 &2737194908267017809
-LODGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 574513755089632486}
-  serializedVersion: 2
-  m_LocalReferencePoint: {x: 0.00021976233, y: 0.6442893, z: 0.059823036}
-  m_Size: 2.7009306
-  m_FadeMode: 2
-  m_AnimateCrossFading: 1
-  m_LastLODIsBillboard: 0
-  m_LODs:
-  - screenRelativeHeight: 0.8493443
-    fadeTransitionWidth: 0
-    renderers:
-    - renderer: {fileID: 4511483356605350119}
-  - screenRelativeHeight: 0.6014177
-    fadeTransitionWidth: 0
-    renderers:
-    - renderer: {fileID: 5959664110011230792}
-  - screenRelativeHeight: 0.2986963
-    fadeTransitionWidth: 0
-    renderers:
-    - renderer: {fileID: 5991257872205079751}
-  - screenRelativeHeight: 0.05
-    fadeTransitionWidth: 0
-    renderers:
-    - renderer: {fileID: 7198492403080559563}
-  m_Enabled: 1
---- !u!114 &5445857443164861445
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 574513755089632486}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1298a53563ecb344a7dc75a8fce154c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!95 &8879486244721808761
 Animator:
   serializedVersion: 5

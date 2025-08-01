@@ -11,7 +11,6 @@ public class IdleState : AIBaseState
 
     public override void OnUpdate()
     {
-
         _controller.MoveModule.Wander();
         _controller.DetectModule.Update();
         _controller.FireModule.TryFireAt(_controller.DetectModule.Target);

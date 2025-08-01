@@ -18,6 +18,7 @@ public class MoveModule
     {
         if (_wanderRoutine == null)
         {
+            _controller.FaceOff(FaceType.Idle);
             _wanderRoutine = _controller.StartCoroutine(WanderRoutine());
         }
     }

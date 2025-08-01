@@ -27,6 +27,7 @@ public class ChaseState : AIBaseState
         }
         else if (distance > 3f)
         {
+            _controller.FaceOff(FaceType.Upset);
             _controller.IsMoving = true;
             _controller.MoveModule.MoveTo(target.position);
         }

@@ -12,12 +12,14 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     protected static readonly int IsAir = Animator.StringToHash("IsAir");
     protected static readonly int JumpTrigger = Animator.StringToHash("JumpTrigger");
     protected static readonly int MoveSpeed = Animator.StringToHash("MoveSpeed");
+    protected static readonly int HitTrigger = Animator.StringToHash("HitTrigger");
     
-    [Header("플레이어 모델")]
+    [Header("Debug- 플레이어 모델")]
     public GameObject humanModel;
     public GameObject squidModel;
     public Animator humanAnimator;
     public Animator squidAnimator;
+    public HumanFace humanFace;
     
     [Header("값 설정")]
     [SerializeField] public float moveSpeed = 5;
@@ -37,6 +39,13 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
         get { return myTeam; }
         set { myTeam = value; }
     }
+    
+    // 피격 시 설정
+    protected Coroutine hitRoutine;
+    private float hitRecoveryTimer = 0.5f;
+    
+    // 얼굴 타입. FaceOff 함수에 의해서 자동으로 변경됨
+    public FaceType faceType;
     
     // 컴포넌트 참조
     public Rigidbody rig;
@@ -93,6 +102,8 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
 
     protected virtual void Awake()
     {
+        humanFace = humanModel.GetComponent<HumanFace>();
+        faceType = FaceType.Idle;
         col = GetComponent<CapsuleCollider>();
         rig = GetComponent<Rigidbody>();
         humanAnimator = humanModel.GetComponent<Animator>();
@@ -106,4 +117,37 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     
     public abstract void TakeDamage(float amount);
     public abstract void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info);
+    
+    public void FaceOff(FaceType type) // 얼굴 변경 함수. 로컬에 의해서만 호출됨. other는 알아서 변경됨
+    {
+        if (faceType == type) return; // 같은 얼굴이므로 return;
+        for (int i = 0; i < humanFace.faceModel.Count; i++)
+        {
+            if (i == (int)type)
+            {
+                humanFace.faceModel[i].SetActive(true);
+            }
+            else
+            {
+                humanFace.faceModel[i].SetActive(false);
+            }
+        }
+        faceType = type;
+    }
+
+    protected IEnumerator HitRoutine()
+    {
+        FaceOff(FaceType.Hit);
+        photonView.RPC("TriggerHitAnimation",RpcTarget.AllViaServer);
+        yield return new WaitForSeconds(hitRecoveryTimer);
+        StopCoroutine(hitRoutine);
+        hitRoutine = null;
+    }
+
+    [PunRPC]
+    protected void TriggerHitAnimation() // 코루틴 HitRoutine에 의해서 호출됨. 로컬만 호출하기 때문에 RPC로 처리.
+    {
+        humanAnimator.SetTrigger(HitTrigger);
+    }
+    
 }
