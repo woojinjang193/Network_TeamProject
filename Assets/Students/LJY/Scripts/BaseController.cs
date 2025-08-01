@@ -101,7 +101,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
         {
             weaponView = inkParticleGun.GetComponent<PhotonView>();
         }
-        
+        Manager.Game.RegisterPlayer(col, this);
     }
     
     public abstract void TakeDamage(float amount);

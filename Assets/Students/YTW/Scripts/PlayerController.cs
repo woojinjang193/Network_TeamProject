@@ -92,9 +92,6 @@ public class PlayerController : BaseController
 
             rig.isKinematic = true;
         }
-        
-        Manager.Game.RegisterPlayer(col, this);
-
     }
 
     void Start() { }
