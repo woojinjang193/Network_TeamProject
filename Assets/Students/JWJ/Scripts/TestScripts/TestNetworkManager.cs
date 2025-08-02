@@ -14,7 +14,7 @@ public class TestNetworkManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         //PhotonNetwork.JoinRandomOrCreateRoom();
-        PhotonNetwork.JoinOrCreateRoom("TestRoom1515", new RoomOptions() { MaxPlayers = 8 }, TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom("TestRoom151ads5", new RoomOptions() { MaxPlayers = 8 }, TypedLobby.Default);
     }
 
     public override void OnCreatedRoom()
@@ -31,7 +31,7 @@ public class TestNetworkManager : MonoBehaviourPunCallbacks
     private void PlayerSpawn()
     {
         Vector3 spawnPos = new Vector3(Random.Range(0, 5), 1, Random.Range(0, 5));
-        PhotonNetwork.Instantiate("Player_CharacterTest", spawnPos, Quaternion.identity);
+        PhotonNetwork.Instantiate("Player_CharacterTest2", spawnPos, Quaternion.identity);
         if(PhotonNetwork.IsMasterClient)
         {
             Manager.Game.GameStart();
