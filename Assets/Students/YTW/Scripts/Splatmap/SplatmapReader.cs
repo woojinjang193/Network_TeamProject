@@ -33,7 +33,7 @@ public static class SplatmapReader
 
                 Color readColor = tex.GetPixel(0, 0);
 
-                UnityEngine.Object.Destroy(tex);
+                UnityEngine.Object.DestroyImmediate(tex);
 
                 // 저장해두었던 콜백 함수를 호출하여 최종 결과를 전달합니다.
                 onCallback?.Invoke(readColor);

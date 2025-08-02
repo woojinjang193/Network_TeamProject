@@ -105,6 +105,11 @@ public class PlayerController : BaseController
                 }
             }
 
+            if (humanAnimator.GetBool(Fire) != IsFiring)
+            {
+                humanAnimator.SetBool(Fire, IsFiring);
+            }
+            
             if (IsFiring && hitRoutine == null)
             {
                 FaceOff(FaceType.Upset);
@@ -591,6 +596,8 @@ public class PlayerController : BaseController
                 stream.SendNext(humanAnimator.GetFloat(MoveY));
                 // 9 현재 얼굴
                 stream.SendNext((int)faceType);
+                // 10 공격 여부 전송
+                stream.SendNext(IsFiring);
             }
             // 오징어 폼일때 Send
             else if (stateMachine.CurrentState == highStateDic[HighState.SquidForm])
@@ -628,6 +635,8 @@ public class PlayerController : BaseController
                 networkMoveY = (float)stream.ReceiveNext();
                 // 9 현재 얼굴
                 FaceOff((FaceType)(int)stream.ReceiveNext());
+                // 10 공격 상태 수신
+                FireStatus((bool)stream.ReceiveNext());
             }
             // 오징어 폼일때 수신
             else if (isSquidNetworked && !IsDeadState)
@@ -638,6 +647,13 @@ public class PlayerController : BaseController
             }
 
         }
+    }
+
+    private void FireStatus(bool isFire)
+    {
+        if (IsFiring == isFire) return;
+        IsFiring = isFire;
+        humanAnimator.SetBool(Fire,isFire);
     }
 
     public void ChangeHighState(HighState state)

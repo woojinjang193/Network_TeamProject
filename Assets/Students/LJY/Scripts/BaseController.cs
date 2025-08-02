@@ -12,7 +12,9 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     protected static readonly int IsAir = Animator.StringToHash("IsAir");
     protected static readonly int JumpTrigger = Animator.StringToHash("JumpTrigger");
     protected static readonly int MoveSpeed = Animator.StringToHash("MoveSpeed");
-    protected static readonly int HitTrigger = Animator.StringToHash("HitTrigger");
+    protected static readonly int Fire = Animator.StringToHash("FiringNow");
+    private static readonly int HitTrigger = Animator.StringToHash("HitTrigger");
+    
     
     [Header("Debug- 플레이어 모델")]
     public GameObject humanModel;
