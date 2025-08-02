@@ -1,11 +1,12 @@
 using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 
-public class GridManager : Singleton<GridManager>
+public class GridManager : Singleton<GridManager>, IInRoomCallbacks
 {
     [SerializeField] private TMP_Text teamRateText;
     private PhotonView photonView;///
@@ -45,6 +46,16 @@ public class GridManager : Singleton<GridManager>
     private void Start()
     {
         Debug.Log("그리드매니저 스타트");
+    }
+
+    private void OnEnable()
+    {
+        PhotonNetwork.AddCallbackTarget(this);
+    }
+
+    private void OnDisable()
+    {
+        PhotonNetwork.RemoveCallbackTarget(this);
     }
 
     public void RegisterGrid(MapGrid grid)
@@ -129,4 +140,49 @@ public class GridManager : Singleton<GridManager>
         else if (countTeam2 > countTeam1) return "Team2";
         else return "Draw";
     }
+
+
+   public void OnMasterClientSwitched(Player newMasterClient)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            CountGridsByNewMaster();
+        }
+    }
+
+    private void CountGridsByNewMaster()
+    {
+        countTeam1 = 0;
+        countTeam2 = 0;
+        countNone = 0;
+
+        foreach (MapGrid grid in gridDic.Values)
+        {
+
+            if(grid.team == Team.Team1)
+            {
+                countTeam1++;
+            }
+
+            else if(grid.team == Team.Team2)
+            {
+                countTeam2++;
+            }
+
+            else if(grid.team == Team.None)
+            {
+                countNone++;
+            }
+
+        }
+        UpdateUI();
+    }
+
+
+    // 인터페이스때문에 필요하지만 안씀
+    public void OnPlayerEnteredRoom(Player newPlayer) { }
+    public void OnPlayerLeftRoom(Player otherPlayer) { }
+    public void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged) { }
+    public void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps) { }
 }
+
