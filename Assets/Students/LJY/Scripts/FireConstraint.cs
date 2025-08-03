@@ -79,9 +79,9 @@ public class FireConstraint : MonoBehaviourPun,IPunObservable
     {
         if (stream.IsWriting)
         {
-            // 1 에임 타겟 위치 수신
+            // 1 에임 타겟 위치 전송
             stream.SendNext(fireTarget.position);
-            // 2 현재 Rig weight 수신
+            // 2 현재 Rig weight 전송
             stream.SendNext(rigging.weight);
         }
         else if (stream.IsReading)

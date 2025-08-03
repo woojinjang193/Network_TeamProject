@@ -90,7 +90,6 @@ public class InkParticleGun : MonoBehaviourPun
         particleCollision.SetTeam(currentTeam);
         //파티클 충돌 스크립트로 넘겨줌
 
-        // 잉크 소모
         if (mouseButtonDown)
         {
             currentInk -= inkConsumptionRate * Time.deltaTime;

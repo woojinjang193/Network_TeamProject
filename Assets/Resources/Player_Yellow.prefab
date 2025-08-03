@@ -3421,6 +3421,7 @@ GameObject:
   - component: {fileID: 136405903027858837}
   - component: {fileID: 8396958581167823015}
   - component: {fileID: 1553484432327971773}
+  - component: {fileID: 4296911861889506247}
   m_Layer: 0
   m_Name: Yellow Character
   m_TagString: Untagged
@@ -3523,6 +3524,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigging: {fileID: 3890178535353385396}
   fireTarget: {fileID: 741459721213103613}
+--- !u!114 &4296911861889506247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4068761598643019202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 1553484432327971773}
+  sceneViewId: 6
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4122246036969543332
 GameObject:
   m_ObjectHideFlags: 0
@@ -7792,7 +7816,6 @@ MonoBehaviour:
   mainCamera: {fileID: 8522659092319889307}
   cameraPivot: {fileID: 1852899015784486684}
   spectatorCamera: {fileID: 0}
-  AimTarget: {fileID: 741459721213103613}
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -7829,7 +7852,7 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 7536521998823292980}
-  sceneViewId: 0
+  sceneViewId: 7
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &8141727061416001963
@@ -8238,13 +8261,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1165729368902609740}
     m_Modifications:
+    - target: {fileID: 1274490366309508779, guid: 5c93318fda2ccb441a61a0a1f5d86bd7, type: 3}
+      propertyPath: InitialModule.gravityModifier.scalar
+      value: 2.8
+      objectReference: {fileID: 0}
     - target: {fileID: 3034771827523623759, guid: 5c93318fda2ccb441a61a0a1f5d86bd7, type: 3}
       propertyPath: sceneViewId
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4066715006709320994, guid: 5c93318fda2ccb441a61a0a1f5d86bd7, type: 3}
       propertyPath: sceneViewId
-      value: 0
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5460279142374366100, guid: 5c93318fda2ccb441a61a0a1f5d86bd7, type: 3}
       propertyPath: m_LocalPosition.x

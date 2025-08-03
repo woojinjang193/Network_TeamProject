@@ -30,6 +30,8 @@ public class PlayerController : BaseController
     public float humanJumpForce = 15f;
     public float squidJumpForce = 15f;
     public float squidSpeed = 8f;
+    private Vector3 squidColCenter = new Vector3(0,0.5f,0);
+    private Vector3 humanColCenter = new Vector3(0,1f,0);
 
     [Header("점프 설정")]
     public float gravityScale = 4f;
@@ -251,9 +253,9 @@ public class PlayerController : BaseController
             }
 
             col.direction = 2;
-            col.center = new Vector3(0, 0.2f, 0);
-            col.height = 1.0f;
-            col.radius = 0.2f;
+            col.center = squidColCenter;
+            col.height = 0.5f;
+            col.radius = 0.45f;
 
             if (squidAnimator != null)
             {
@@ -280,9 +282,9 @@ public class PlayerController : BaseController
             squidModel.SetActive(false);
 
             col.direction = 1;
-            col.center = new Vector3(0, 0.5f, 0);
-            col.height = 1.0f;
-            col.radius = 0.25f;
+            col.center = humanColCenter;
+            col.height = 2.0f;
+            col.radius = 0.5f;
 
             if (humanAnimator != null)
             {

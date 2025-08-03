@@ -32,12 +32,6 @@ public class AIController : BaseController
     {
         base.Awake();
         
-        // 휴먼 콜라이더 설정
-        col.direction = 1;
-        col.center = new Vector3(0, 0.5f, 0);
-        col.height = 1.0f;
-        col.radius = 0.25f;
-        
         if (photonView.IsMine)
         {
             MineInit();
@@ -45,6 +39,18 @@ public class AIController : BaseController
         else
         {
             rig.isKinematic = true;
+        }
+    }
+    
+    private void FixedUpdate()
+    {
+        if (photonView.IsMine)
+        {
+            MineAnimationProcess();
+        }
+        if (!photonView.IsMine && !IsDead)
+        {
+            OtherClientProcess();
         }
     }
     
@@ -57,15 +63,12 @@ public class AIController : BaseController
         }
     }
 
-    private void FixedUpdate()
+    void Start()
     {
-        if (photonView.IsMine)
+        // 맨 처음 게임 시작 시 원격은 Ink발사가 안되는 문제 해결
+        if (!photonView.IsMine)
         {
-            MineAnimationProcess();
-        }
-        if (!photonView.IsMine && !IsDead)
-        {
-            OtherClientProcess();
+            inkParticleGun.FireParticle(MyTeam,true);
         }
     }
     void OnDrawGizmos()

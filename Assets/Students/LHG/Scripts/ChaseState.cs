@@ -6,6 +6,9 @@ using UnityEngine;
 /// </summary>
 public class ChaseState : AIBaseState
 {
+    private float resetTime = 1f;
+    private float closeTimer = 0f;
+    private Vector3 direction;
     public ChaseState(AIController controller) : base(controller){}
 
     public override void OnUpdate()
@@ -27,12 +30,22 @@ public class ChaseState : AIBaseState
         }
         else if (distance > 3f)
         {
-            _controller.FaceOff(FaceType.Upset);
-            _controller.IsMoving = true;
-            _controller.MoveModule.MoveTo(target.position);
+            if (closeTimer > 0f)
+            {
+                closeTimer -= Time.deltaTime;
+            }
+            else
+            {
+                _controller.FaceOff(FaceType.Upset);
+                _controller.IsMoving = true;
+                _controller.MoveModule.MoveTo(target.position);
+            }
         }
         else
         {
+            closeTimer  = resetTime;
+            direction = _controller.MoveModule.GetDirection(target.position);
+            _controller.MoveModule.RotateToTarget(direction);
             _controller.IsMoving = false;
         }
         _controller.FireModule.TryFireAt(target);
