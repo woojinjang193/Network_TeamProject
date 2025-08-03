@@ -24,6 +24,9 @@ public class AIController : BaseController
     private Vector3 _initialPosition;
     private Quaternion _initialRotation;
 
+
+    [HideInInspector]
+    public bool isFiring;
     
     protected override void Awake()
     {
@@ -105,6 +108,8 @@ public class AIController : BaseController
             {
                 humanAnimator.SetFloat(MoveY, 0);
             }
+            // 공격 중이면 공격 모션
+            humanAnimator.SetBool(Fire,isFiring);
         }
     }
     private void OtherClientProcess() // 원격일 경우의 처리
@@ -125,6 +130,9 @@ public class AIController : BaseController
                 // Move 관련 입력 처리
                 humanAnimator.SetFloat(MoveX, networkMoveX);
                 humanAnimator.SetFloat(MoveY, networkMoveY);
+                
+                // 공격 중이면 공격 모션
+                humanAnimator.SetBool(Fire,isFiring);
             }
             // 지연 보상
             deltaPos = Vector3.Distance(transform.position, networkPos);
@@ -162,6 +170,7 @@ public class AIController : BaseController
     {
         IsDead = true;
         IsDeadState = true;
+        Instantiate(dieParticle, transform);
         if (photonView.IsMine)
         {
             if (CurHp <= 0)
@@ -227,9 +236,12 @@ public class AIController : BaseController
             stream.SendNext(IsMoving);
             stream.SendNext(humanAnimator.GetFloat(MoveX));
             stream.SendNext(humanAnimator.GetFloat(MoveY));
+            stream.SendNext(humanAnimator.GetBool(Fire));
             
             // 얼굴 정보 전송
             stream.SendNext((int)faceType);
+            
+            
         }
         else if(stream.IsReading)
         {
@@ -246,6 +258,7 @@ public class AIController : BaseController
             IsMoving = (bool)stream.ReceiveNext();
             networkMoveX = (float)stream.ReceiveNext();
             networkMoveY = (float)stream.ReceiveNext();
+            isFiring = (bool)stream.ReceiveNext();
             
             // 얼굴 정보 수신
             FaceOff((FaceType)(int)stream.ReceiveNext());

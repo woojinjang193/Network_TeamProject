@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 public enum InkStatus { NONE, OUR_TEAM, ENEMY_TEAM }
 
@@ -16,7 +17,7 @@ public class PlayerController : BaseController
 
     private float recenterCooldownTimer;
     //private const float RECENTER_COOLDOWN = 1.0f;
-
+    
     [Header("카메라 설정")]
     public GameObject playerCameraObject;
     public ThirdPersonCamera tpsCamera;
@@ -368,7 +369,7 @@ public class PlayerController : BaseController
         }
 
         // 벽 체크
-        Vector3 wallRayStart = transform.position + transform.up * (col.height / 2 - 0.1f);
+        Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
         // 현재 콜라이더의 절대적인 꼭대기 위치 바로 아래에서 레이를 쏨
         Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
 
@@ -476,7 +477,7 @@ public class PlayerController : BaseController
     }
 
     [PunRPC]
-    public override void TakeDamage(float amount)
+    public override void TakeDamage(float amount) //InkParticleCollision에 의해서 들어옴 로컬만 수행
     {
         if (IsDead) return;
 
@@ -496,8 +497,9 @@ public class PlayerController : BaseController
 
     // TODO : 죽을 때 처리 필요
     [PunRPC]
-    public void PlayerDie()
+    public void PlayerDie() // TakeDamage의 조건에 따라서 들어옴. 전역 수행
     {
+        Instantiate(dieParticle, transform);
         // 원격으로도 죽은 처리 해줘야 함
         IsDead = true;
         IsDeadState = true;

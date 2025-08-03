@@ -15,6 +15,8 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     protected static readonly int Fire = Animator.StringToHash("FiringNow");
     private static readonly int HitTrigger = Animator.StringToHash("HitTrigger");
     
+    [Header("파티클 프리팹 참조")]
+    [SerializeField] protected ParticleSystem dieParticle;
     
     [Header("Debug- 플레이어 모델")]
     public GameObject humanModel;
@@ -44,7 +46,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     
     // 피격 시 설정
     protected Coroutine hitRoutine;
-    private float hitRecoveryTimer = 0.5f;
+    private float hitRecoveryTimer = 0.4f;
     
     // 얼굴 타입. FaceOff 함수에 의해서 자동으로 변경됨
     public FaceType faceType;
