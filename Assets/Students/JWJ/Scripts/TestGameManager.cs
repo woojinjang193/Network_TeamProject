@@ -103,7 +103,8 @@ public class TestGameManager : Singleton<GameManager>
         //string myTeam = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
 
         //승리 팀 판단
-        string winningTeam = GridManager.Instance.GetWinningTeam();
+        string winningTeam = Manager.Grid.GetWinningTeam();
+        //string winningTeam = GridManager.Instance.GetWinningTeam();
         //Debug.Log($"내 팀: {myTeam}, 승리 팀: {winningTeam}");
 
         //팀이 이긴 경우

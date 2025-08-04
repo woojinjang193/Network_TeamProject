@@ -8,14 +8,14 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : Singleton<GameManager>
 {
-    public bool IsGameEnd {  get; private set; }
+    public bool IsGameEnd { get; private set; }
 
     private Dictionary<Collider, BaseController> playerDic = new();
-    //플레이어의 콜라이더와 컨트롤러를 넣을 딕셔너리 
 
     [Header("팀별 스폰 위치")]
     [SerializeField] public Transform[] team1SpawnPoints;   // Team1 스폰 
     [SerializeField] public Transform[] team2SpawnPoints;   // Team2 스폰 
+    
     [SerializeField] private string playerPrefabName = "Player_CharacterTest";
 
     private double startTime;
@@ -29,23 +29,18 @@ public class GameManager : Singleton<GameManager>
         photonView = GetComponent<PhotonView>();
         DontDestroyOnLoad(gameObject);
     }
+
     private void Start()
     {
         Debug.Log("=== [GameManager] Start ===");
+        StartCoroutine(InitAfterPhotonReady());
+    }
 
-        Debug.Log("[GameManager] LocalPlayer CustomProperties 상태:");
-        foreach (var kv in PhotonNetwork.LocalPlayer.CustomProperties)
+    private IEnumerator InitAfterPhotonReady()
+    {
+        while (!PhotonNetwork.IsConnectedAndReady || PhotonNetwork.LocalPlayer == null || !PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("team"))
         {
-            Debug.Log($"  Key: {kv.Key}, Value: {kv.Value}");
-        }
-
-        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("team", out object teamVal))
-        {
-            Debug.Log($"[GameManager] LocalPlayer 팀 정보: {teamVal}");
-        }
-        else
-        {
-            Debug.LogWarning("[GameManager] LocalPlayer 팀 정보가 없음 (team 키가 없음)");
+            yield return null;
         }
 
         Debug.Log("=== 전체 플레이어 팀 정보 확인 ===");
@@ -54,13 +49,15 @@ public class GameManager : Singleton<GameManager>
             string nick = player.NickName;
             string team = player.CustomProperties.TryGetValue("team", out object t) ? t.ToString() : "없음";
             bool ready = player.CustomProperties.TryGetValue("Ready", out object r) && (bool)r;
-
             Debug.Log($"닉네임: {nick}, 팀: {team}, Ready: {ready}, ActorNumber: {player.ActorNumber}");
         }
 
-        Debug.Log("=== [GameManager] Start 끝 ===");
-        StartCoroutine(SpawnPlayerWithDelay());
-        GameStart();
+        yield return StartCoroutine(SpawnPlayerWithDelay());
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            GameStart();  // 마스터만 호출
+        }
     }
 
     [PunRPC]
@@ -69,7 +66,6 @@ public class GameManager : Singleton<GameManager>
         startTime = start;
         StartCoroutine(GameTimer());
     }
- 
 
     private IEnumerator GameTimer()
     {
@@ -77,14 +73,10 @@ public class GameManager : Singleton<GameManager>
         {
             double elapsed = PhotonNetwork.Time - startTime;
             float remaining = matchDuration - (float)elapsed;
-
-            if (remaining <= 0)
-                break;
-
+            if (remaining <= 0) break;
             UpdateTimerUI(remaining);
             yield return null;
         }
-
         GameEnd();
     }
 
@@ -102,7 +94,6 @@ public class GameManager : Singleton<GameManager>
 
         string team = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
         int actorIndex = PhotonNetwork.LocalPlayer.ActorNumber; // 고유 번호로 spawn 위치를 결정
-
         Transform[] spawnArray = team == "Team1" ? team1SpawnPoints : team2SpawnPoints;
 
         if (spawnArray.Length == 0)
@@ -113,9 +104,6 @@ public class GameManager : Singleton<GameManager>
 
         // 겹치지 않도록 mod 연산 사용
         Transform spawnPoint = spawnArray[actorIndex % spawnArray.Length];
-
-        Debug.Log($"[{team}] 팀 위치에 플레이어 스폰 at {spawnPoint.name}");
-
         PhotonNetwork.Instantiate(playerPrefabName, spawnPoint.position, spawnPoint.rotation);
     }
 
@@ -127,10 +115,8 @@ public class GameManager : Singleton<GameManager>
 
     public BaseController GetPlayer(Collider col)
     {
-        playerDic.TryGetValue(col, out BaseController playerController);
-        //키를 넣으면 playerController를 반환
+        playerDic.TryGetValue(col, out BaseController playerController); //키를 넣으면 playerController를 반환
         return playerController;
-
     }
 
     public void GameStart()
@@ -162,7 +148,5 @@ public class GameManager : Singleton<GameManager>
         MatchData.LastRoomName = PhotonNetwork.CurrentRoom.Name;
 
         PhotonNetwork.LeaveRoom();
-
-        SceneManager.LoadScene("LoginScene"); //씬 이름 변경 예정
     }
 }

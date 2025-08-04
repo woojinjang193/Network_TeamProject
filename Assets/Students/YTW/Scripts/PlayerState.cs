@@ -48,7 +48,7 @@ public class PlayerState : BaseState
     }
     protected void SetPlayerRotation()
     {
-        if (player.IsFiring || player.modelRoot == null)
+        if (player.IsFiring || player.ModelTransform == null)
         {
             return;
         }
@@ -59,7 +59,7 @@ public class PlayerState : BaseState
         if (lookDirection.sqrMagnitude > 0.01f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(lookDirection.normalized);
-            player.modelRoot.rotation = Quaternion.Slerp(player.modelRoot.rotation, targetRotation, Time.fixedDeltaTime * 15f);
+            player.ModelTransform.rotation = Quaternion.Slerp(player.ModelTransform.rotation, targetRotation, Time.fixedDeltaTime * 15f);
         }
     }
 
@@ -76,7 +76,7 @@ public class PlayerState : BaseState
         }
         worldMoveDirection.y = 0;
 
-        Vector3 localMoveDirection = player.transform.InverseTransformDirection(worldMoveDirection.normalized);
+        Vector3 localMoveDirection = player.ModelTransform.InverseTransformDirection(worldMoveDirection.normalized);
 
         player.humanAnimator.SetFloat(MoveX, localMoveDirection.x, 0.1f, Time.fixedDeltaTime);
         player.humanAnimator.SetFloat(MoveY, localMoveDirection.z, 0.1f, Time.fixedDeltaTime);

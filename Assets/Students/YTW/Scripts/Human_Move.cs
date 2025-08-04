@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class Human_Move : PlayerState
 {
+    private static readonly int Y = Animator.StringToHash("MoveY");
+    private static readonly int X = Animator.StringToHash("MoveX");
+    private static readonly int IsMove = Animator.StringToHash("IsMove");
     private Player_Human humanState;
 
     public Human_Move(PlayerController player, StateMachine stateMachine, Player_Human humanState) : base(player, stateMachine)
@@ -16,7 +19,7 @@ public class Human_Move : PlayerState
     public override void Enter()
     {
         Debug.Log("Human_Move 상태");
-        player.humanAnimator.SetBool("IsMove", true);
+        player.humanAnimator.SetBool(IsMove, true);
     }
 
     public override void Update()
@@ -58,12 +61,12 @@ public class Human_Move : PlayerState
     
     public override void Exit()
     {
-        player.humanAnimator.SetBool("IsMove", false);
+        player.humanAnimator.SetBool(IsMove, false);
 
         if (player.humanAnimator != null)
         {
-            player.humanAnimator.SetFloat("MoveX", 0f);
-            player.humanAnimator.SetFloat("MoveY", 0f);
+            player.humanAnimator.SetFloat(X, 0f);
+            player.humanAnimator.SetFloat(Y, 0f);
         }
         
     }

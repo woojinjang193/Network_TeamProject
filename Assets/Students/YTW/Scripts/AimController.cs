@@ -57,7 +57,7 @@ public class AimController : MonoBehaviour
             Vector3 playerLookDirection = mainCamera.transform.forward;
             playerLookDirection.y = 0;
             Quaternion playerTargetRotation = Quaternion.LookRotation(playerLookDirection);
-            player.modelRoot.rotation = Quaternion.Slerp(player.modelRoot.rotation, playerTargetRotation, Time.deltaTime * bodyRotationSpeed);
+            player.ModelTransform.rotation = Quaternion.Slerp(player.ModelTransform.rotation, playerTargetRotation, Time.deltaTime * bodyRotationSpeed);
 
             // 총을 정확히 목표 지점을 향하도록 최종적으로 회전
             if (weaponTransform != null)

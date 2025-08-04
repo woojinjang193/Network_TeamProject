@@ -11,6 +11,9 @@ public class FireConstraint : MonoBehaviourPun,IPunObservable
     [SerializeField] public Rig rigging;
     [SerializeField] public Transform fireTarget;
     
+    [Header("Set Values")]
+    [SerializeField] private float bodyRotationSpeed = 15f;
+    
     
     private PlayerController player;
     private Ray ray;
@@ -38,6 +41,7 @@ public class FireConstraint : MonoBehaviourPun,IPunObservable
             {
                 RayCastToCamera(); //카메라 정중앙에 레이캐스트
                 ChangeWeight(1f); // weight변경해서 애니메이션 리깅 적용
+                RotateModel();
             }
             else
             {
@@ -74,6 +78,15 @@ public class FireConstraint : MonoBehaviourPun,IPunObservable
             return;
         }
         rigging.weight = Mathf.Lerp(rigging.weight, rigWeight, Time.deltaTime*10);
+    }
+
+    private void RotateModel()
+    {
+        Vector3 playerLookDirection = fireTarget.transform.position - player.transform.position;
+        playerLookDirection.y = 0;
+        Quaternion playerTargetRotation = Quaternion.LookRotation(playerLookDirection);
+        player.ModelTransform.rotation = Quaternion.Slerp(player.ModelTransform.rotation, playerTargetRotation, Time.deltaTime * bodyRotationSpeed);
+
     }
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
