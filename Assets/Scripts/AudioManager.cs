@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
@@ -132,24 +133,6 @@ public class AudioManager : SingletonPun<AudioManager>
         {
             Destroy(go, outClip.clipSource.length); // 루프 재생이 아닐 경우, 길이가 끝나면 파괴
         }
-    }
-
-    
-    // private void PlayDefaultBGM() // 기본 배경음악 재생. 게임 시작과 동시에 틀어준다.
-    // {
-    //     bgmSource.clip = defaultBGM.clipSource;
-    //     bgmSource.volume = defaultBGM.volume;
-    //     bgmSource.loop = defaultBGM.loop;
-    //     
-    //     bgmSource.Play();
-    // }
-    public void PlayDefaultAmbient()
-    {
-        ambientSource.clip = defaultAmbient.clipSource;
-        ambientSource.volume = defaultAmbient.volume;
-        ambientSource.loop = defaultAmbient.loop;
-        
-        ambientSource.Play();
     }
     
     public void SwitchBGM(string bgmName, float fadeTime = 0.3f) // 배경 음악 변경 시 사용
@@ -409,6 +392,30 @@ public class AudioManager : SingletonPun<AudioManager>
         ambientSource.clip = null;
     }
 
+    public void SetFireSound(BaseController player)
+    {
+        if (!audioDict.TryGetValue("Fire", out AudioData outFire))
+        {
+            Debug.LogWarning("Fire 오디오 소스가 없음");
+            return;
+        }
+
+        GameObject go = new GameObject("FireSound");
+        AudioSource audio = go.AddComponent<AudioSource>();
+        
+        audio.clip = outFire.clipSource;
+        audio.volume = outFire.volume;
+        audio.loop = true; // 루프 켜줌
+        audio.playOnAwake = false; // 생기자마자 재생 X
+        audio.spatialBlend = 1f; // 3D효과
+        audio.transform.SetParent(player.transform); // 부모설정
+        if (outFire.mixerGroup) // 믹서 그룹 설정
+        {
+            audio.outputAudioMixerGroup = outFire.mixerGroup;
+        }
+        
+        player.fireSound = audio;
+    }
 
     public enum MixerType{Master,BGM,SFX}
 }

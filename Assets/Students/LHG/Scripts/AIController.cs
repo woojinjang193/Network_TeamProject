@@ -26,10 +26,6 @@ public class AIController : BaseController
     private Vector3 _initialPosition;
     private Quaternion _initialRotation;
 
-    [HideInInspector]
-    public bool isFiring;
-
-
     /// <summary>
     /// 봇 바닥탐지 관련. player controller에서 참고함
     /// </summary>
@@ -137,7 +133,7 @@ public class AIController : BaseController
                 humanAnimator.SetFloat(MoveY, 0);
             }
             // 공격 중이면 공격 모션
-            humanAnimator.SetBool(Fire, isFiring);
+            humanAnimator.SetBool(Fire, IsFiring);
         }
     }
     private void OtherClientProcess() // 원격일 경우의 처리
@@ -160,7 +156,7 @@ public class AIController : BaseController
                 humanAnimator.SetFloat(MoveY, networkMoveY);
 
                 // 공격 중이면 공격 모션
-                humanAnimator.SetBool(Fire, isFiring);
+                humanAnimator.SetBool(Fire, IsFiring);
             }
             // 지연 보상
             deltaPos = Vector3.Distance(transform.position, networkPos);
@@ -286,7 +282,7 @@ public class AIController : BaseController
             IsMoving = (bool)stream.ReceiveNext();
             networkMoveX = (float)stream.ReceiveNext();
             networkMoveY = (float)stream.ReceiveNext();
-            isFiring = (bool)stream.ReceiveNext();
+            IsFiring = (bool)stream.ReceiveNext();
 
             // 얼굴 정보 수신
             FaceOff((FaceType)(int)stream.ReceiveNext());

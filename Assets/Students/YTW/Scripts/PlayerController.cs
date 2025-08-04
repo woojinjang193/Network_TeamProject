@@ -39,8 +39,6 @@ public class PlayerController : BaseController
     public float gravityScale = 4f;
     public float fallingGravityScale = 7f;
 
-    [field:Header("무기 설정")]
-    public bool IsFiring { get; set; }
     [Header("무기 Transform")]
     public Transform weaponTransform;
     public Transform muzzleTransform;
@@ -176,6 +174,15 @@ public class PlayerController : BaseController
         {
             tpsCamera.CameraUpdate(input.MouseInput.x, input.MouseInput.y);
 
+        }
+
+        if (IsFiring&&!fireSound.isPlaying)
+        {
+            fireSound.Play();
+        }
+        else if (!IsFiring && fireSound.isPlaying)
+        {
+            fireSound.Stop();
         }
     }
 

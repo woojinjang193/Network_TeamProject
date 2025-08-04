@@ -41,18 +41,18 @@ public class FireModule
 
     private void FireStart()
     {
-        if (!_controller.isFiring)
+        if (!_controller.IsFiring)
         {
-            _controller.isFiring = true;
+            _controller.IsFiring = true;
             weaponView.RPC("FireParticle", RpcTarget.All, _controller.MyTeam, true);
         }
     }
 
     public void StopFire()
     {
-        if (_controller.isFiring)
+        if (_controller.IsFiring)
         {
-            _controller.isFiring = false;
+            _controller.IsFiring = false;
             weaponView.RPC("FireParticle", RpcTarget.All, _controller.MyTeam, false);
         }
     }
