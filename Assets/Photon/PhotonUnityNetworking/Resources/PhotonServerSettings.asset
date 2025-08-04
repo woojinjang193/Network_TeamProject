@@ -50,6 +50,8 @@ MonoBehaviour:
   - SyncDraw
   - SyncDrawInk
   - AiDie
+  - TriggerHitAnimation
+  - ShowResultUI
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
