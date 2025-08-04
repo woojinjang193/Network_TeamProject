@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
-public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+public class SingletonPun<T> : MonoBehaviourPun where T : MonoBehaviourPun
 {
     private static T instance;
     public static T Instance
@@ -44,7 +44,6 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         instance = null;
     }
-
 
     public virtual void DestroyManager()
     {
