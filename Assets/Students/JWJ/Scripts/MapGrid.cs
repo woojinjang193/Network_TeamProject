@@ -6,7 +6,7 @@ using UnityEngine;
 public class MapGrid : MonoBehaviour
 {
     public Team team = Team.None;
-    //private MeshRenderer rander;///그리드 테스트용
+    //private MeshRenderer render;///그리드 테스트용
 
     private void Start()
     {
@@ -14,12 +14,12 @@ public class MapGrid : MonoBehaviour
         Manager.Grid.RegisterGrid(this);///
         //그리드를 매니저에 등록
         //Debug.Log($"그리드등록 {this.name}");
-        //rander = GetComponent<MeshRenderer>();/// 그리드 테스트용
+        //render = GetComponent<MeshRenderer>();/// 그리드 테스트용
     }
 
     public void SetGrid(Team newTeam)
     {
-        //rander.material.color = Color.red;///그리드 테스트용
+        //render.material.color = Color.red;///그리드 테스트용
         if (team == newTeam) // 이미 같은팀의 그리드라면
         {
             //Debug.Log($"이미 {newTeam}의 영역입니다.");

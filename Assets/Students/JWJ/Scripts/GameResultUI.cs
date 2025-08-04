@@ -1,6 +1,7 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.ExceptionServices;
 using TMPro;
@@ -67,14 +68,14 @@ public class GameResultUI : MonoBehaviour
     }
 
 
-    public void UIOpen(string winTeam)
+    public void UIOpen(string winTeam, float team1Rate, float team2Rate)
     {
         winnerTeam = winTeam;
-        resultCam.gameObject.SetActive(true); 
+        resultCam.gameObject.SetActive(true);
 
         //그리드매니저에서 팀 점유율 가져옴
-        team1RateValue = Manager.Grid.Team1Rate / 100;
-        team2RateValue = Manager.Grid.Team2Rate / 100;
+        team1RateValue = team1Rate;
+        team2RateValue = team2Rate;
         firstShowRateValue = Mathf.Min(team1RateValue, team2RateValue) * 0.5f;
         //두 수중 작은것의 50%
         StartCoroutine(GameResultUICoroutine());
