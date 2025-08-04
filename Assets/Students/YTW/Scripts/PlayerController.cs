@@ -534,18 +534,6 @@ public class PlayerController : BaseController
             return;
         }
 
-        // TODO : 스폰 위치 결정 예정 : 스폰 위치를 팀마다 배열로 넣어놓고 랜덤뽑기.
-        // 스폰포인트 오브젝트 및 스크립트 작성해서 활용. 맵마다 달라야 함
-        //string team = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
-        //Transform[] spawnPoints = (team == "Team1")
-        //    ? Manager.Game.team1SpawnPoints 
-        //    : Manager.Game.team2SpawnPoints;
-
-        //Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-
-        // 위치 및 상태 초기화
-        //transform.position = spawnPoint.position;
-        //transform.rotation = spawnPoint.rotation;
         if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("team", out object teamValue))
         {
             string team = teamValue.ToString();
