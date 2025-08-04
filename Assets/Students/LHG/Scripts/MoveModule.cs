@@ -56,10 +56,20 @@ public class MoveModule
 
     public void MoveTo(Vector3 targetPos)
     {
+        float currentSpeed = _controller.moveSpeed;
+
+        if (_controller.CurrentGroundInkStatus == InkStatus.ENEMY_TEAM)
+        {
+            currentSpeed *= _controller.enemyInkSpeedModifier;
+        }
+
         Vector3 direction = GetDirection(targetPos);
-        _controller.transform.position += direction * (_controller.moveSpeed * Time.deltaTime);
+        _controller.transform.position += direction * (currentSpeed * Time.deltaTime);
         
         RotateToTarget(direction);
+
+        
+        
     }
 
     public void StopWander()

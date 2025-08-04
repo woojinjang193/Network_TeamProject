@@ -56,4 +56,6 @@ public class FireModule
             weaponView.RPC("FireParticle", RpcTarget.All, _controller.MyTeam, false);
         }
     }
+
+    
 }
