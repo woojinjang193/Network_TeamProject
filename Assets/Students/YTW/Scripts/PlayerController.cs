@@ -377,7 +377,7 @@ public class PlayerController : BaseController
             CurrentGroundInkStatus = InkStatus.NONE;
         }
 
-        Vector3 wallDirection = modelRoot.forward;
+        Vector3 wallDirection = ModelTransform.forward;
         Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
         Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
         float wallRayDistance = 1.2f;

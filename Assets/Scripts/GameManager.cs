@@ -28,6 +28,7 @@ public class GameManager : Singleton<GameManager>
         base.Awake();
         photonView = GetComponent<PhotonView>();
         DontDestroyOnLoad(gameObject);
+        Manager.Game = this;
     }
 
     private void Start()
@@ -137,7 +138,7 @@ public class GameManager : Singleton<GameManager>
         string myTeam = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
 
         //승리 팀 판단
-        string winningTeam = GridManager.Instance.GetWinningTeam();
+        string winningTeam = Manager.Grid.GetWinningTeam();
         Debug.Log($"내 팀: {myTeam}, 승리 팀: {winningTeam}");
 
         //팀이 이긴 경우
