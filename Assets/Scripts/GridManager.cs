@@ -6,7 +6,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 
-public class GridManager : Singleton<GridManager>, IInRoomCallbacks
+public class GridManager : MonoBehaviour, IInRoomCallbacks
 {
     [SerializeField] private TMP_Text teamRateText;
     private PhotonView photonView;///
@@ -21,11 +21,12 @@ public class GridManager : Singleton<GridManager>, IInRoomCallbacks
     private Dictionary<int, MapGrid> gridDic = new(5000);
     //그리드들을 넣어놓을 딕셔너리
 
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
+        photonView = GetComponent<PhotonView>();//
+        Manager.Grid = this;
 
-        if(teamRateText == null)
+        if (teamRateText == null)
         {
             GameObject teamRateTextPrefab = Resources.Load<GameObject>("UI/CoverageRateCanvas");
             if (teamRateTextPrefab != null)
@@ -40,7 +41,7 @@ public class GridManager : Singleton<GridManager>, IInRoomCallbacks
             }
         }
 
-        photonView = GetComponent<PhotonView>();//
+        
 
     }
     private void Start()
