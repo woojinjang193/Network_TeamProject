@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
 
 public class AudioManager : SingletonPun<AudioManager>
 {
@@ -15,10 +17,6 @@ public class AudioManager : SingletonPun<AudioManager>
     // 기본음 세팅
     private AudioData defaultBGM; // 별도의 명령이 없을 경우 재생하는 배경음악
     private AudioData defaultAmbient; // '' 백색소음
-
-    [Header("Set Values")] [SerializeField]
-    private float fadeDuration = 0.3f;
-
 
     // 믹서 세팅
     private AudioMixer mixer;  // 볼륨을 관리하는 오디오 믹서
@@ -33,6 +31,9 @@ public class AudioManager : SingletonPun<AudioManager>
     
     private Coroutine bgmFadeRoutine;
     private Coroutine ambFadeRoutine;
+    private Coroutine stopRoutine;
+    private Coroutine startBgmRoutine;
+    private Coroutine startAmbRoutine;
     
     private Dictionary<string, AudioData> audioDict = new();
     
@@ -73,46 +74,33 @@ public class AudioManager : SingletonPun<AudioManager>
     }
     private void Start()
     {
-        // 백색소음 재생
-        PlayDefaultAmbient();
+        VolumeLoad();
+        // 기본 백색소음 재생
+        SwitchAmbient("defaultAmbient",1f);
         // 기본 배경음악 재생
-        PlayDefaultBGM();
+        SwitchBGM("defaultBGM",1f);
     }
 
-    // TODO : 오디오 매니저 테스트
-    private void Update()
+    private void VolumeLoad()
     {
-        string testClip = "testClip";
-        string switchBGM = "testBgm";
-        string switchAmbient = "testAmb";
-        string effectClip = "testEffect";
-        
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        float value;
+        if (PlayerPrefs.HasKey("MasterVolume"))
         {
-            photonView.RPC("PlayClip",RpcTarget.All,testClip,Vector3.zero);
-            //PlayClip(testClip, Vector3.zero);
+            value = PlayerPrefs.GetFloat("MasterVolume");
+            mixer.SetFloat("MasterVolume", Mathf.Log10(Mathf.Clamp(value,0.0001f,1f))*20);
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        if (PlayerPrefs.HasKey("BGMVolume"))
         {
-            SwitchBGM(switchBGM);
+            value = PlayerPrefs.GetFloat("BGMVolume");
+            mixer.SetFloat("BGMVolume", Mathf.Log10(Mathf.Clamp(value,0.0001f,1f))*20);
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha3))
+        if (PlayerPrefs.HasKey("SFXVolume"))
         {
-            SwitchAmbient(switchAmbient);
+            value = PlayerPrefs.GetFloat("SFXVolume");
+            mixer.SetFloat("SFXVolume", Mathf.Log10(Mathf.Clamp(value,0.0001f,1f))*20);
         }
-
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            PlayEffect(effectClip);
-        }
-        // 볼륨 조절 테스트
-        SetAudioVolume(MixerType.Master,masterSlider.value);
-        SetAudioVolume(MixerType.BGM,bgmSlider.value);
-        SetAudioVolume(MixerType.SFX,sfxSlider.value);
-        // 재생 되고 있는지 테스트
-        Debug.Log($"브금 재생중 : {bgmSource.isPlaying} / 볼륨 : {bgmSource.volume}");
     }
     
     [PunRPC]
@@ -147,14 +135,14 @@ public class AudioManager : SingletonPun<AudioManager>
     }
 
     
-    private void PlayDefaultBGM() // 기본 배경음악 재생. 게임 시작과 동시에 틀어준다.
-    {
-        bgmSource.clip = defaultBGM.clipSource;
-        bgmSource.volume = defaultBGM.volume;
-        bgmSource.loop = defaultBGM.loop;
-        
-        bgmSource.Play();
-    }
+    // private void PlayDefaultBGM() // 기본 배경음악 재생. 게임 시작과 동시에 틀어준다.
+    // {
+    //     bgmSource.clip = defaultBGM.clipSource;
+    //     bgmSource.volume = defaultBGM.volume;
+    //     bgmSource.loop = defaultBGM.loop;
+    //     
+    //     bgmSource.Play();
+    // }
     public void PlayDefaultAmbient()
     {
         ambientSource.clip = defaultAmbient.clipSource;
@@ -176,6 +164,18 @@ public class AudioManager : SingletonPun<AudioManager>
         // 이미 재생중이면 return;
         if (bgmSource.isPlaying && bgmSource.clip == newBgm.clipSource) return;
         
+        // 재생중이 아니고, 클립도 비어 있으면 갈아끼우기
+        if (!bgmSource.isPlaying && bgmSource.clip == null)
+        {
+            if (startBgmRoutine != null)
+            {
+                StopCoroutine(startBgmRoutine);
+                startBgmRoutine = null;
+            }
+            startBgmRoutine = StartCoroutine(StartBGMRoutine(newBgm, fadeTime));
+            return;
+        }
+        
         // fade 루틴이 진행중이였으면 중지
         if (bgmFadeRoutine != null)
         {
@@ -188,7 +188,31 @@ public class AudioManager : SingletonPun<AudioManager>
 
     }
 
-    // 페이드를 담당하는 코루틴
+    // BGM 페이드 인 코루틴
+    private IEnumerator StartBGMRoutine(AudioData newBgm, float fadeTime)
+    {
+        // 클립 지정
+        bgmSource.clip = newBgm.clipSource;
+        bgmSource.volume = 0f;
+        bgmSource.loop = newBgm.loop;
+        bgmSource.Play();
+
+        // 페이드 인
+        float fadeTimer = 0f;
+        while (fadeTimer < fadeTime)
+        {
+            fadeTimer += Time.deltaTime;
+            bgmSource.volume = Mathf.Lerp(0f, newBgm.volume, fadeTimer / fadeTime);
+            yield return null;
+        }
+        
+        // 페이드 종료
+        bgmSource.volume = newBgm.volume;
+        StopCoroutine(startBgmRoutine);
+        startBgmRoutine = null;
+    }
+    
+    // BGM 페이드 아웃/인을 담당하는 코루틴
     private IEnumerator FadeBGM(AudioData newBgm, float fadeTime)
     {
         float fadeTimer = 0f;
@@ -219,13 +243,10 @@ public class AudioManager : SingletonPun<AudioManager>
         
         // 페이드 종료
         bgmSource.volume = newBgm.volume;
-        if (bgmFadeRoutine == null)
-        {
-            Debug.Log("이거 널임");
-        }
         StopCoroutine(bgmFadeRoutine);
         bgmFadeRoutine = null;
     }
+    
 
     public void SwitchAmbient(string ambName,float fadeTime = 0.3f) // 백색 소음 변경 시 사용
     {
@@ -238,6 +259,16 @@ public class AudioManager : SingletonPun<AudioManager>
         // 플레이 중인데 같은 엠비언트 재생 중
         if (ambientSource.isPlaying && ambientSource.clip == newAmb.clipSource) return;
 
+        if (!ambientSource.isPlaying && ambientSource.clip == null)
+        {
+            if (startAmbRoutine != null)
+            {
+                StopCoroutine(startAmbRoutine);
+                startAmbRoutine = null;
+            }
+
+            startAmbRoutine = StartCoroutine(StartAmbientRoutine(newAmb, fadeTime));
+        }
         // fade 루틴이 진행중이였으면 중지
         if (ambFadeRoutine != null)
         {
@@ -249,6 +280,30 @@ public class AudioManager : SingletonPun<AudioManager>
         ambFadeRoutine = StartCoroutine(FadeAmbient(newAmb,fadeTime));
     }
 
+    // 재생 중이지 않을 때 페이드 인 시작
+    private IEnumerator StartAmbientRoutine(AudioData newAmb, float fadeTime)
+    {
+        ambientSource.clip = newAmb.clipSource;
+        ambientSource.volume = 0f;
+        ambientSource.loop = newAmb.loop;
+        ambientSource.Play();
+        
+        // 페이드 인
+        float fadeTimer = 0f;
+        while (fadeTimer < fadeTime)
+        {
+            fadeTimer += Time.deltaTime;
+            ambientSource.volume = Mathf.Lerp(0f, newAmb.volume, fadeTimer / fadeTime);
+            yield return null;
+        }
+        
+        // 페이드 종료
+        ambientSource.volume = newAmb.volume;
+        StopCoroutine(startAmbRoutine);
+        startAmbRoutine = null;
+    }
+    
+    // 페이드 아웃/인 변경
     private IEnumerator FadeAmbient(AudioData newAmbient, float fadeTime)
     {
         float fadeTimer = 0f;
@@ -307,18 +362,51 @@ public class AudioManager : SingletonPun<AudioManager>
         {
             case MixerType.Master:
                 mixer.SetFloat("MasterVolume", Mathf.Log10(Mathf.Clamp(volume,0.0001f,1f))*20);
+                PlayerPrefs.SetFloat("MasterVolume", volume);
                 break;
             case MixerType.BGM:
                 mixer.SetFloat("BGMVolume", Mathf.Log10(Mathf.Clamp(volume,0.0001f,1f))*20);
+                PlayerPrefs.SetFloat("BGMVolume", volume);
                 break;
             case MixerType.SFX:
                 mixer.SetFloat("SFXVolume", Mathf.Log10(Mathf.Clamp(volume,0.0001f,1f))*20);
+                PlayerPrefs.SetFloat("SFXVolume", volume);
                 break;
             default:
                 Debug.LogWarning($"믹서 타입이 잘못들어옴{type}");
                 return;
         }
         
+    }
+
+    public void StopAllSounds()
+    {
+        if (stopRoutine != null)
+        {
+            StopCoroutine(stopRoutine);
+            stopRoutine = null;
+        }
+        stopRoutine = StartCoroutine(StopAllSoundRoutine());
+    }
+
+    private IEnumerator StopAllSoundRoutine()
+    {
+        float fadeTimer = 0f;
+        float fadeTime = 1f;
+        float startVolume = bgmSource.volume; 
+        while (fadeTimer < fadeTime)
+        {
+            fadeTimer += Time.deltaTime;
+
+            bgmSource.volume = Mathf.Lerp(startVolume, 0f, fadeTimer / fadeTime);
+            ambientSource.volume = Mathf.Lerp(startVolume, 0f, fadeTimer / fadeTime);
+            yield return null;
+        }
+
+        bgmSource.Stop();
+        ambientSource.Stop();
+        bgmSource.clip = null;
+        ambientSource.clip = null;
     }
 
 

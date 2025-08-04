@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ecc62fea9bc31847961e0a667b4fd5b, type: 3}
-  m_Name: testClip
+  m_Name: GameSetImpact
   m_EditorClassIdentifier: 
-  clipName: testClip
-  clipSource: {fileID: 8300000, guid: a91c82177e875f24c81c4cadd470a89f, type: 3}
-  volume: 1
-  loop: 1
+  clipName: Impact
+  clipSource: {fileID: 8300000, guid: 5ce9e19c1ed3f02418e7dc77844dcfda, type: 3}
+  volume: 0.7
+  loop: 0
   mixerGroup: {fileID: 8063154892423865753, guid: e76f20a7c7b3a534b8bc98098cf2246b, type: 2}

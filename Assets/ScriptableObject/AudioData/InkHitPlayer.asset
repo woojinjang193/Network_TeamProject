@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ecc62fea9bc31847961e0a667b4fd5b, type: 3}
   m_Name: InkHitPlayer
   m_EditorClassIdentifier: 
-  clipName: 
-  clipSource: {fileID: 0}
-  volume: 1
+  clipName: HitPlayer
+  clipSource: {fileID: 8300000, guid: c4d6ea87223a38940a48925eb6280969, type: 3}
+  volume: 0.6
   loop: 0
+  mixerGroup: {fileID: 0}

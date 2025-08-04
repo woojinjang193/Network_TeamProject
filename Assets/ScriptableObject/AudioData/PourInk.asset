@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ecc62fea9bc31847961e0a667b4fd5b, type: 3}
-  m_Name: testAmb
+  m_Name: PourInk
   m_EditorClassIdentifier: 
-  clipName: testAmb
-  clipSource: {fileID: 8300000, guid: 44ee6aa0c066a4240946d77816d40105, type: 3}
-  volume: 1
-  loop: 1
-  mixerGroup: {fileID: -8976598623936957593, guid: e76f20a7c7b3a534b8bc98098cf2246b, type: 2}
+  clipName: PourInk
+  clipSource: {fileID: 8300000, guid: 1261845e0d53b5d43a801f6f31320afa, type: 3}
+  volume: 0.707
+  loop: 0
+  mixerGroup: {fileID: 8063154892423865753, guid: e76f20a7c7b3a534b8bc98098cf2246b, type: 2}

@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ecc62fea9bc31847961e0a667b4fd5b, type: 3}
-  m_Name: FireSound
+  m_Name: BGM_Stage2
   m_EditorClassIdentifier: 
-  clipName: 
-  clipSource: {fileID: 0}
-  volume: 1
-  loop: 0
+  clipName: Stage2
+  clipSource: {fileID: 8300000, guid: 4b83dfa7f32f69f4ca1290f676480318, type: 3}
+  volume: 0.5
+  loop: 1
+  mixerGroup: {fileID: -8976598623936957593, guid: e76f20a7c7b3a534b8bc98098cf2246b, type: 2}

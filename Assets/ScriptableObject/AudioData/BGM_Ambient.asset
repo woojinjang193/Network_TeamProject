@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ecc62fea9bc31847961e0a667b4fd5b, type: 3}
-  m_Name: testDAmb
+  m_Name: BGM_Ambient
   m_EditorClassIdentifier: 
   clipName: defaultAmbient
-  clipSource: {fileID: 8300000, guid: 2995aa25c6a4f5f4496a9c51a379116e, type: 3}
-  volume: 1
+  clipSource: {fileID: 8300000, guid: 00dc319a57939e64192aad0c037625af, type: 3}
+  volume: 0.05
   loop: 1
   mixerGroup: {fileID: -8976598623936957593, guid: e76f20a7c7b3a534b8bc98098cf2246b, type: 2}
