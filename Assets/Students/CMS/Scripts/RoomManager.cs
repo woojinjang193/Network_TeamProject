@@ -117,39 +117,4 @@ public class RoomManager : MonoBehaviour
     {
         roomUI?.UpdatePlayerList(PhotonNetwork.PlayerList.ToList());
     }
-    private IEnumerator ReturnToLastRoomFlow()
-    {
-        // 1. 연결될 때까지 대기
-        yield return new WaitUntil(() => PhotonNetwork.IsConnectedAndReady);
-
-        // 2. 아직 로비에 없다면 로비 입장 요청
-        if (!PhotonNetwork.InLobby)
-        {
-            // JoinLobby 중인지 확인 후 대기
-            while (PhotonNetwork.NetworkClientState == ClientState.JoiningLobby)
-            {
-                Debug.Log("[ReturnToLastRoomFlow] 로비 입장 중... 대기 중");
-                yield return null;
-            }
-
-            PhotonNetwork.JoinLobby();
-        }
-
-        // 3. 로비에 진입할 때까지 대기
-        yield return new WaitUntil(() =>
-            PhotonNetwork.InLobby &&
-            PhotonNetwork.NetworkClientState == ClientState.JoinedLobby);
-
-        Debug.Log("[ReturnToLastRoomFlow] 로비 입장 완료");
-
-        // 4. 약간 대기 (Photon 내부 처리 안정화)
-        yield return new WaitForSeconds(0.2f);
-
-        // 5. 방 입장 시도
-        if (!string.IsNullOrEmpty(MatchData.LastRoomName))
-        {
-            Debug.Log($"[DEBUG] JoinRoom 시도: {MatchData.LastRoomName}");
-            PhotonNetwork.JoinRoom(MatchData.LastRoomName);
-        }
-    }
 }
