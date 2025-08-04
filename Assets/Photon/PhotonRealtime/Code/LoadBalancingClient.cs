@@ -4101,7 +4101,7 @@ namespace Photon.Realtime
     ///
     /// </remarks>
     /// \ingroup callbacks
-    public interface IInRoomCallbacks
+    public interface  IInRoomCallbacks
     {
         /// <summary>
         /// Called when a remote player entered the room. This Player is already added to the playerlist.
