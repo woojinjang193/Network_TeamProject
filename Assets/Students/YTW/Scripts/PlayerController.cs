@@ -371,23 +371,23 @@ public class PlayerController : BaseController
             CurrentGroundInkStatus = InkStatus.NONE;
         }
 
+        Vector3 wallDirection = modelRoot.forward;
         // 벽 체크
         Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
         // 현재 콜라이더의 절대적인 꼭대기 위치 바로 아래에서 레이를 쏨
         Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
 
         float wallRayDistance = 1.2f;
-        Debug.DrawRay(wallRayStart, transform.forward * wallRayDistance, Color.blue);
+        Debug.DrawRay(wallRayStart, wallDirection * wallRayDistance, Color.blue);
 
-        if (Physics.Raycast(wallRayStart, transform.forward, out RaycastHit wallHit, wallRayDistance, inkableLayer))
+        if (Physics.Raycast(wallRayStart, wallDirection, out RaycastHit wallHit, wallRayDistance, inkableLayer))
         {
             WallNormal = wallHit.normal;
             if (wallHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
             {
                 SplatmapReader.ReadPixel(paintableObj.splatMap, wallHit.textureCoord, OnWallColorRead);
 
-                // 머리 높이 레이캐스트를 발사하여 벽 상단을 확인
-                if (IsOnWalkableWall && !Physics.Raycast(edgeRayStart, transform.forward, wallRayDistance, inkableLayer))
+                if (IsOnWalkableWall && !Physics.Raycast(edgeRayStart, wallDirection, wallRayDistance, inkableLayer))
                 {
                     IsAtWallEdge = true;
                 }
