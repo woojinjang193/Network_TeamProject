@@ -13,8 +13,9 @@ public class GameManager : Singleton<GameManager>
     private Dictionary<Collider, BaseController> playerDic = new();
 
     [Header("팀별 스폰 위치")]
-    [SerializeField] private Transform[] team1SpawnPoints; // Team1 스폰 
-    [SerializeField] private Transform[] team2SpawnPoints; // Team2 스폰 
+    [SerializeField] public Transform[] team1SpawnPoints;   // Team1 스폰 
+    [SerializeField] public Transform[] team2SpawnPoints;   // Team2 스폰 
+    
     [SerializeField] private string playerPrefabName = "Player_CharacterTest";
 
     private double startTime;

@@ -28,6 +28,7 @@ public class PlayerController : BaseController
     [Header("플레이어 설정")]
     [SerializeField] public Transform ModelTransform;
     public LayerMask groundLayer;
+    public float maxSlopeAngle = 45f;
     public float humanJumpForce = 15f;
     public float squidJumpForce = 15f;
     public float squidSpeed = 8f;
@@ -50,6 +51,7 @@ public class PlayerController : BaseController
     [Tooltip("적 팀 잉크 위에서의 이동 속도 감소 배율")]
     [Range(0.1f, 1f)]
     public float enemyInkSpeedModifier = 0.5f;
+    // 잉크 얼마나 잘 감지할지
     [SerializeField, Range(0.1f, 2.0f)]
     private float inkColorThreshold = 1.0f;
     
@@ -346,6 +348,7 @@ public class PlayerController : BaseController
 
     private void GroundAndInkCheck()
     {
+        // 바닥 체크 ray
         LayerMask combinedLayer = groundLayer | inkableLayer;
         Vector3 groundRayStart = transform.position + Vector3.up * 0.1f;
         float groundRayDistance = 0.6f; // Raycast 길이를 안정적으로 수정
@@ -374,39 +377,51 @@ public class PlayerController : BaseController
             CurrentGroundInkStatus = InkStatus.NONE;
         }
 
-        // 벽 체크
+        Vector3 wallDirection = modelRoot.forward;
         Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
-        // 현재 콜라이더의 절대적인 꼭대기 위치 바로 아래에서 레이를 쏨
         Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
-
         float wallRayDistance = 1.2f;
-        Debug.DrawRay(wallRayStart, transform.forward * wallRayDistance, Color.blue);
+        Debug.DrawRay(wallRayStart, wallDirection * wallRayDistance, Color.blue);
 
-        if (Physics.Raycast(wallRayStart, transform.forward, out RaycastHit wallHit, wallRayDistance, inkableLayer))
+        // 벽 체크 ray
+        if (Physics.Raycast(wallRayStart, wallDirection, out RaycastHit wallHit, wallRayDistance, inkableLayer))
         {
-            WallNormal = wallHit.normal;
-            if (wallHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
-            {
-                SplatmapReader.ReadPixel(paintableObj.splatMap, wallHit.textureCoord, OnWallColorRead);
+            // 부딪힌 표면의 경사각을 계산
+            float surfaceAngle = Vector3.Angle(Vector3.up, wallHit.normal);
 
-                // 머리 높이 레이캐스트를 발사하여 벽 상단을 확인
-                if (IsOnWalkableWall && !Physics.Raycast(edgeRayStart, transform.forward, wallRayDistance, inkableLayer))
+            // 경사각이 설정된 maxSlopeAngle보다 클 때만 벽으로 취급
+            if (surfaceAngle > maxSlopeAngle)
+            {
+                WallNormal = wallHit.normal;
+                if (wallHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
                 {
-                    IsAtWallEdge = true;
+                    SplatmapReader.ReadPixel(paintableObj.splatMap, wallHit.textureCoord, OnWallColorRead);
+
+                    if (IsOnWalkableWall && !Physics.Raycast(edgeRayStart, wallDirection, wallRayDistance, inkableLayer))
+                    {
+                        IsAtWallEdge = true;
+                    }
+                    else
+                    {
+                        IsAtWallEdge = false;
+                    }
                 }
                 else
                 {
+                    CurrentWallInkStatus = InkStatus.NONE;
+                    IsOnWalkableWall = false;
                     IsAtWallEdge = false;
                 }
             }
             else
             {
+                WallNormal = Vector3.zero;
                 CurrentWallInkStatus = InkStatus.NONE;
                 IsOnWalkableWall = false;
                 IsAtWallEdge = false;
             }
         }
-        else
+        else 
         {
             WallNormal = Vector3.zero;
             CurrentWallInkStatus = InkStatus.NONE;
@@ -537,18 +552,41 @@ public class PlayerController : BaseController
             return;
         }
 
-        // TODO : 스폰 위치 결정 예정 : 스폰 위치를 팀마다 배열로 넣어놓고 랜덤뽑기.
-        // 스폰포인트 오브젝트 및 스크립트 작성해서 활용. 맵마다 달라야 함
-        //string team = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
-        //Transform[] spawnPoints = (team == "Team1")
-        //    ? Manager.Game.team1SpawnPoints 
-        //    : Manager.Game.team2SpawnPoints;
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("team", out object teamValue))
+        {
+            string team = teamValue.ToString();
+            // GameManager 인스턴스에서 팀별 스폰 포인트 배열을 가져옴
+            Transform[] spawnPoints = (team == "Team1")
+                ? GameManager.Instance.team1SpawnPoints
+                : GameManager.Instance.team2SpawnPoints;
 
-        //Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+            if (spawnPoints != null && spawnPoints.Length > 0)
+            {
+                // ActorNumber를 사용하여 이 플레이어의 고유 스폰 위치를 결정
+                int actorIndex = PhotonNetwork.LocalPlayer.ActorNumber;
+                Transform spawnPoint = spawnPoints[actorIndex % spawnPoints.Length];
 
-        // 위치 및 상태 초기화
-        //transform.position = spawnPoint.position;
-        //transform.rotation = spawnPoint.rotation;
+                // 위치 및 회전 초기화
+                transform.position = spawnPoint.position;
+                transform.rotation = spawnPoint.rotation;
+
+                // 물리 상태 초기화 (순간이동 후 잔여 속도 제거)
+                rig.velocity = Vector3.zero;
+                rig.angularVelocity = Vector3.zero;
+            }
+            else
+            {
+                Debug.LogError($"팀 '{team}'에 대한 스폰 포인트가 설정되지 않았거나 비어 있습니다! 기본 위치로 리스폰합니다.");
+                transform.position = new Vector3(0, 5, 0);
+                transform.rotation = Quaternion.identity;
+            }
+        }
+        else
+        {
+            Debug.LogError("플레이어의 팀 정보를 찾을 수 없어 리스폰 위치를 결정할 수 없습니다. 기본 위치로 리스폰합니다.");
+            transform.position = new Vector3(0, 5, 0);
+            transform.rotation = Quaternion.identity;
+        }
 
         stateMachine.ChangeState(highStateDic[HighState.HumanForm]);
         Debug.Log("플레이어 리스폰");

@@ -2978,7 +2978,6 @@ MonoBehaviour:
   particleSpeed: 20
   mainParticle: {fileID: 9049334530937948975}
   fireEffect: {fileID: 380173301807833963}
-  floorInkEffect: {fileID: 192860544777830131}
   particleCollision: {fileID: 4151679093665508556}
   maxInk: 100
   currentInk: 0
@@ -3003,7 +3002,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 0
+  sceneViewId: 21
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &2560178878259534965
@@ -3205,7 +3204,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4241138501113066366
 Transform:
   m_ObjectHideFlags: 0
@@ -3236,13 +3235,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a128e42a12a49ed42a615a94409aef82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dieParticle: {fileID: 417761080263594739, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
   humanModel: {fileID: 3633241901636206559}
   squidModel: {fileID: 1203836637672770272}
   humanAnimator: {fileID: 0}
   squidAnimator: {fileID: 0}
+  humanFace: {fileID: 0}
   moveSpeed: 10
   inkParticleGun: {fileID: 923992536721296673}
   weaponView: {fileID: 0}
+  faceType: 0
   rig: {fileID: 0}
   col: {fileID: 0}
   input: {fileID: 0}
@@ -3288,7 +3290,7 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 1995463346312928341}
-  sceneViewId: 0
+  sceneViewId: 22
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &3410483075890032642
@@ -10128,6 +10130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15de207409c239a45a33e377cd16fb78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  splash: {fileID: 0}
   radius: 3
   hardness: 0
   strength: 0.5
@@ -10150,7 +10153,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 0
+  sceneViewId: 20
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &4856041403337528177
