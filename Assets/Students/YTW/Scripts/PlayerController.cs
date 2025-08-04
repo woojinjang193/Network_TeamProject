@@ -546,6 +546,41 @@ public class PlayerController : BaseController
         // 위치 및 상태 초기화
         //transform.position = spawnPoint.position;
         //transform.rotation = spawnPoint.rotation;
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("team", out object teamValue))
+        {
+            string team = teamValue.ToString();
+            // GameManager 인스턴스에서 팀별 스폰 포인트 배열을 가져옴
+            Transform[] spawnPoints = (team == "Team1")
+                ? GameManager.Instance.team1SpawnPoints
+                : GameManager.Instance.team2SpawnPoints;
+
+            if (spawnPoints != null && spawnPoints.Length > 0)
+            {
+                // ActorNumber를 사용하여 이 플레이어의 고유 스폰 위치를 결정
+                int actorIndex = PhotonNetwork.LocalPlayer.ActorNumber;
+                Transform spawnPoint = spawnPoints[actorIndex % spawnPoints.Length];
+
+                // 위치 및 회전 초기화
+                transform.position = spawnPoint.position;
+                transform.rotation = spawnPoint.rotation;
+
+                // 물리 상태 초기화 (순간이동 후 잔여 속도 제거)
+                rig.velocity = Vector3.zero;
+                rig.angularVelocity = Vector3.zero;
+            }
+            else
+            {
+                Debug.LogError($"팀 '{team}'에 대한 스폰 포인트가 설정되지 않았거나 비어 있습니다! 기본 위치로 리스폰합니다.");
+                transform.position = new Vector3(0, 5, 0);
+                transform.rotation = Quaternion.identity;
+            }
+        }
+        else
+        {
+            Debug.LogError("플레이어의 팀 정보를 찾을 수 없어 리스폰 위치를 결정할 수 없습니다. 기본 위치로 리스폰합니다.");
+            transform.position = new Vector3(0, 5, 0);
+            transform.rotation = Quaternion.identity;
+        }
 
         stateMachine.ChangeState(highStateDic[HighState.HumanForm]);
         Debug.Log("플레이어 리스폰");
