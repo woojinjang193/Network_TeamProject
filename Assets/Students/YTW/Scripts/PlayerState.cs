@@ -48,7 +48,7 @@ public class PlayerState : BaseState
     }
     protected void SetPlayerRotation()
     {
-        if (player.IsFiring)
+        if (player.IsFiring || player.modelRoot == null)
         {
             return;
         }
@@ -59,7 +59,7 @@ public class PlayerState : BaseState
         if (lookDirection.sqrMagnitude > 0.01f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(lookDirection.normalized);
-            player.transform.rotation = Quaternion.Slerp(player.transform.rotation, targetRotation, Time.fixedDeltaTime * 15f);
+            player.modelRoot.rotation = Quaternion.Slerp(player.modelRoot.rotation, targetRotation, Time.fixedDeltaTime * 15f);
         }
     }
 
