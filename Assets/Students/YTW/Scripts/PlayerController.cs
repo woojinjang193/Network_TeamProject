@@ -17,7 +17,6 @@ public class PlayerController : BaseController
 
     private float recenterCooldownTimer;
     //private const float RECENTER_COOLDOWN = 1.0f;
-    public Transform modelRoot;
 
     [Header("카메라 설정")]
     public GameObject playerCameraObject;
@@ -27,6 +26,7 @@ public class PlayerController : BaseController
     public GameObject spectatorCamera;
 
     [Header("플레이어 설정")]
+    [SerializeField] public Transform ModelTransform;
     public LayerMask groundLayer;
     public float humanJumpForce = 15f;
     public float squidJumpForce = 15f;
@@ -313,12 +313,15 @@ public class PlayerController : BaseController
         // 지연 보상
         deltaPos = Vector3.Distance(transform.position, networkPos);
         deltaRot = Quaternion.Angle(transform.rotation, networkRot);
+        deltaModelRot = Quaternion.Angle(ModelTransform.rotation, networkModelRot);
 
         interpolatePos = deltaPos * Time.deltaTime * PhotonNetwork.SerializationRate;
         interpolateRot = deltaRot * Time.deltaTime * PhotonNetwork.SerializationRate;
+        interpolateModelRot = deltaModelRot * Time.deltaTime * PhotonNetwork.SerializationRate;
 
         transform.position = Vector3.MoveTowards(transform.position, networkPos, interpolatePos);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, networkRot, interpolateRot);
+        ModelTransform.rotation = Quaternion.RotateTowards(ModelTransform.rotation, networkModelRot, interpolateModelRot);
     }
 
     private IEnumerator WaitForTeamAssignment()
@@ -603,6 +606,8 @@ public class PlayerController : BaseController
                 stream.SendNext((int)faceType);
                 // 10 공격 여부 전송
                 stream.SendNext(IsFiring);
+                // 11 모델 회전 전송
+                stream.SendNext(ModelTransform.rotation);
             }
             // 오징어 폼일때 Send
             else if (stateMachine.CurrentState == highStateDic[HighState.SquidForm])
@@ -642,6 +647,8 @@ public class PlayerController : BaseController
                 FaceOff((FaceType)(int)stream.ReceiveNext());
                 // 10 공격 상태 수신
                 FireStatus((bool)stream.ReceiveNext());
+                // 11 모델 회전 수신
+                networkModelRot = (Quaternion)stream.ReceiveNext();
             }
             // 오징어 폼일때 수신
             else if (isSquidNetworked && !IsDeadState)

@@ -56,17 +56,22 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     public CapsuleCollider col;
     
     // 네트워크 파라매터
+    private bool isMove;
     protected float networkMoveX;
     protected float networkMoveY;
     protected Vector3 networkPos;
     protected Quaternion networkRot;
+    protected Quaternion networkModelRot;
     protected float deltaPos;
     protected float deltaRot;
+    protected float deltaModelRot;
     protected float interpolatePos;
     protected float interpolateRot;
+    protected float interpolateModelRot;
     protected bool isSquidNetworked;
     protected bool isAir;
-    protected bool isMove;
+    
+    
     public bool IsMoving
     {
         get{return isMove;}
