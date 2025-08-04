@@ -63,13 +63,29 @@ public class MoveModule
             currentSpeed *= _controller.enemyInkSpeedModifier;
         }
 
-        Vector3 direction = GetDirection(targetPos);
-        _controller.transform.position += direction * (currentSpeed * Time.deltaTime);
-        
-        RotateToTarget(direction);
+        if(!_controller.agent.hasPath || _controller.agent.destination != targetPos)
+        {
+            _controller.agent.SetDestination(targetPos);
+        }
 
-        
-        
+        if(_controller.agent.pathPending == false && _controller.agent.remainingDistance > _controller.agent.stoppingDistance)
+        {
+            Vector3 direction = (_controller.agent.steeringTarget - _controller.transform.position).normalized;
+            direction.y = 0;
+
+            _controller.transform.position += direction * (currentSpeed * Time.deltaTime);
+            RotateToTarget(direction);
+            _controller.IsMoving = true;
+        }
+        else
+        {
+            _controller.IsMoving = false;
+        }
+
+
+        //Vector3 direction = GetDirection(targetPos);
+        //_controller.transform.position += direction * (currentSpeed * Time.deltaTime);
+        //RotateToTarget(direction);
     }
 
     public void StopWander()

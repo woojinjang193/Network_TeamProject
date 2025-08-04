@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.UI;
+using UnityEngine.AI;
 
 
 public class AIController : BaseController
@@ -42,6 +43,9 @@ public class AIController : BaseController
     [Range(0.1f, 1f)]
     public float enemyInkSpeedModifier = 0.5f;
 
+    //네브매쉬관련
+    public NavMeshAgent agent { get; private set; }
+
     protected override void Awake()
     {
         base.Awake();
@@ -66,8 +70,6 @@ public class AIController : BaseController
         {
             OtherClientProcess();
         }
-
-        
     }
 
     private void Update()
@@ -112,6 +114,10 @@ public class AIController : BaseController
 
         CurHp = MaxHp;
         IsDead = false;
+
+        agent = GetComponent<NavMeshAgent>();
+        agent.updatePosition = false;
+        agent.updateRotation = false;
     }
 
     private void MineAnimationProcess()
