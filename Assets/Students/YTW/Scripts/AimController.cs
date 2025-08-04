@@ -9,7 +9,6 @@ public class AimController : MonoBehaviour
     public float lookAtWeight = 0.8f;
     public float bodyRotationSpeed = 15f;
 
-    // 내부에서 사용할 컴포넌트 변수
     private Animator humanAnimator;
     private Camera mainCamera;
     private Transform weaponTransform;
@@ -52,14 +51,13 @@ public class AimController : MonoBehaviour
             targetPoint = ray.GetPoint(200f);
         }
 
-        // 발사 중일 때만 몸 회전과 총 조준을 실행
         if (player.IsFiring)
         {
-            // 몸 전체를 카메라의 수평 방향으로 부드럽게 회전
+
             Vector3 playerLookDirection = mainCamera.transform.forward;
             playerLookDirection.y = 0;
             Quaternion playerTargetRotation = Quaternion.LookRotation(playerLookDirection);
-            player.transform.rotation = Quaternion.Slerp(player.transform.rotation, playerTargetRotation, Time.deltaTime * bodyRotationSpeed);
+            player.modelRoot.rotation = Quaternion.Slerp(player.modelRoot.rotation, playerTargetRotation, Time.deltaTime * bodyRotationSpeed);
 
             // 총을 정확히 목표 지점을 향하도록 최종적으로 회전
             if (weaponTransform != null)
@@ -91,7 +89,6 @@ public class AimController : MonoBehaviour
             }
             return;
         }
-        // IK를 이용해 상체가 조준점을 바라보게 합니다.
         humanAnimator.SetLookAtWeight(lookAtWeight);
         humanAnimator.SetLookAtPosition(targetPoint);
     }
