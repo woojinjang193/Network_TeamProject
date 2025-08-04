@@ -28,6 +28,7 @@ public class PlayerController : BaseController
 
     [Header("플레이어 설정")]
     public LayerMask groundLayer;
+    public float maxSlopeAngle = 45f;
     public float humanJumpForce = 15f;
     public float squidJumpForce = 15f;
     public float squidSpeed = 8f;
@@ -50,6 +51,7 @@ public class PlayerController : BaseController
     [Tooltip("적 팀 잉크 위에서의 이동 속도 감소 배율")]
     [Range(0.1f, 1f)]
     public float enemyInkSpeedModifier = 0.5f;
+    // 잉크 얼마나 잘 감지할지
     [SerializeField, Range(0.1f, 2.0f)]
     private float inkColorThreshold = 1.0f;
     
@@ -343,6 +345,7 @@ public class PlayerController : BaseController
 
     private void GroundAndInkCheck()
     {
+        // 바닥 체크 ray
         LayerMask combinedLayer = groundLayer | inkableLayer;
         Vector3 groundRayStart = transform.position + Vector3.up * 0.1f;
         float groundRayDistance = 0.6f; // Raycast 길이를 안정적으로 수정
@@ -372,38 +375,50 @@ public class PlayerController : BaseController
         }
 
         Vector3 wallDirection = modelRoot.forward;
-        // 벽 체크
         Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
-        // 현재 콜라이더의 절대적인 꼭대기 위치 바로 아래에서 레이를 쏨
         Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
-
         float wallRayDistance = 1.2f;
         Debug.DrawRay(wallRayStart, wallDirection * wallRayDistance, Color.blue);
 
+        // 벽 체크 ray
         if (Physics.Raycast(wallRayStart, wallDirection, out RaycastHit wallHit, wallRayDistance, inkableLayer))
         {
-            WallNormal = wallHit.normal;
-            if (wallHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
-            {
-                SplatmapReader.ReadPixel(paintableObj.splatMap, wallHit.textureCoord, OnWallColorRead);
+            // 부딪힌 표면의 경사각을 계산
+            float surfaceAngle = Vector3.Angle(Vector3.up, wallHit.normal);
 
-                if (IsOnWalkableWall && !Physics.Raycast(edgeRayStart, wallDirection, wallRayDistance, inkableLayer))
+            // 경사각이 설정된 maxSlopeAngle보다 클 때만 벽으로 취급
+            if (surfaceAngle > maxSlopeAngle)
+            {
+                WallNormal = wallHit.normal;
+                if (wallHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
                 {
-                    IsAtWallEdge = true;
+                    SplatmapReader.ReadPixel(paintableObj.splatMap, wallHit.textureCoord, OnWallColorRead);
+
+                    if (IsOnWalkableWall && !Physics.Raycast(edgeRayStart, wallDirection, wallRayDistance, inkableLayer))
+                    {
+                        IsAtWallEdge = true;
+                    }
+                    else
+                    {
+                        IsAtWallEdge = false;
+                    }
                 }
                 else
                 {
+                    CurrentWallInkStatus = InkStatus.NONE;
+                    IsOnWalkableWall = false;
                     IsAtWallEdge = false;
                 }
             }
             else
             {
+                WallNormal = Vector3.zero;
                 CurrentWallInkStatus = InkStatus.NONE;
                 IsOnWalkableWall = false;
                 IsAtWallEdge = false;
             }
         }
-        else
+        else 
         {
             WallNormal = Vector3.zero;
             CurrentWallInkStatus = InkStatus.NONE;
