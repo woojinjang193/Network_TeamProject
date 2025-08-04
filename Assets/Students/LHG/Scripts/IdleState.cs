@@ -9,9 +9,12 @@ public class IdleState : AIBaseState
 {
     public IdleState(AIController controller) : base(controller) { }
 
+    public override void OnEnter()
+    {
+        _controller.DetectModule.detectTimer = 0f;
+    }
     public override void OnUpdate()
     {
-
         _controller.MoveModule.Wander();
         _controller.DetectModule.Update();
         _controller.FireModule.TryFireAt(_controller.DetectModule.Target);

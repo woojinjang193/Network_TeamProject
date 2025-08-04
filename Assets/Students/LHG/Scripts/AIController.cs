@@ -24,16 +24,13 @@ public class AIController : BaseController
     private Vector3 _initialPosition;
     private Quaternion _initialRotation;
 
+
+    [HideInInspector]
+    public bool isFiring;
     
     protected override void Awake()
     {
         base.Awake();
-        
-        // 휴먼 콜라이더 설정
-        col.direction = 1;
-        col.center = new Vector3(0, 0.5f, 0);
-        col.height = 1.0f;
-        col.radius = 0.25f;
         
         if (photonView.IsMine)
         {
@@ -42,6 +39,18 @@ public class AIController : BaseController
         else
         {
             rig.isKinematic = true;
+        }
+    }
+    
+    private void FixedUpdate()
+    {
+        if (photonView.IsMine)
+        {
+            MineAnimationProcess();
+        }
+        if (!photonView.IsMine && !IsDead)
+        {
+            OtherClientProcess();
         }
     }
     
@@ -54,15 +63,12 @@ public class AIController : BaseController
         }
     }
 
-    private void FixedUpdate()
+    void Start()
     {
-        if (photonView.IsMine)
+        // 맨 처음 게임 시작 시 원격은 Ink발사가 안되는 문제 해결
+        if (!photonView.IsMine)
         {
-            MineAnimationProcess();
-        }
-        if (!photonView.IsMine && !IsDead)
-        {
-            OtherClientProcess();
+            inkParticleGun.FireParticle(MyTeam,true);
         }
     }
     void OnDrawGizmos()
@@ -78,7 +84,7 @@ public class AIController : BaseController
         FireModule = new FireModule(this, weaponView);
         DetectModule = new DetectModule(this);
 
-        StateMachine = GetComponent<AIStateMachine>();
+        StateMachine = gameObject.GetOrAddComponent<AIStateMachine>();
         
         //시작시 idle상태로
         StateMachine.SetState(new IdleState(this));
@@ -105,18 +111,19 @@ public class AIController : BaseController
             {
                 humanAnimator.SetFloat(MoveY, 0);
             }
+            // 공격 중이면 공격 모션
+            humanAnimator.SetBool(Fire,isFiring);
         }
     }
     private void OtherClientProcess() // 원격일 경우의 처리
     {
-        if (!IsDead && IsDeadState) // 부활 시
+        if (!IsDead && !humanModel.activeSelf) // 부활 시
         {
-            IsDeadState = false;
             humanModel.SetActive(true);
             col.enabled = true;
         }
 
-        if (!IsDead && !IsDeadState) // 안죽었을 때
+        else if (!IsDead && humanModel.activeSelf) // 안죽었을 때
         {
             if (humanAnimator != null)
             {
@@ -126,6 +133,9 @@ public class AIController : BaseController
                 // Move 관련 입력 처리
                 humanAnimator.SetFloat(MoveX, networkMoveX);
                 humanAnimator.SetFloat(MoveY, networkMoveY);
+                
+                // 공격 중이면 공격 모션
+                humanAnimator.SetBool(Fire,isFiring);
             }
             // 지연 보상
             deltaPos = Vector3.Distance(transform.position, networkPos);
@@ -145,7 +155,7 @@ public class AIController : BaseController
         if (IsDead) return;
         
         CurHp -= amount;
-        
+        hitRoutine ??= StartCoroutine(HitRoutine());
         if (CurHp <= 0)
         {
             CurHp = 0;
@@ -163,6 +173,7 @@ public class AIController : BaseController
     {
         IsDead = true;
         IsDeadState = true;
+        Instantiate(dieParticle, transform);
         if (photonView.IsMine)
         {
             if (CurHp <= 0)
@@ -180,7 +191,7 @@ public class AIController : BaseController
         }
     }
     
-    public void Respawn() // Death 상태에서 호출됨. 본인만 수행
+    public void Respawn() // DeathState 상태에서 호출됨. 본인만 수행
     {
         // TODO: 리스폰 포인트로 이동
             transform.position = _initialPosition;
@@ -228,6 +239,12 @@ public class AIController : BaseController
             stream.SendNext(IsMoving);
             stream.SendNext(humanAnimator.GetFloat(MoveX));
             stream.SendNext(humanAnimator.GetFloat(MoveY));
+            stream.SendNext(humanAnimator.GetBool(Fire));
+            
+            // 얼굴 정보 전송
+            stream.SendNext((int)faceType);
+            
+            
         }
         else if(stream.IsReading)
         {
@@ -244,6 +261,10 @@ public class AIController : BaseController
             IsMoving = (bool)stream.ReceiveNext();
             networkMoveX = (float)stream.ReceiveNext();
             networkMoveY = (float)stream.ReceiveNext();
+            isFiring = (bool)stream.ReceiveNext();
+            
+            // 얼굴 정보 수신
+            FaceOff((FaceType)(int)stream.ReceiveNext());
         }
     }
 

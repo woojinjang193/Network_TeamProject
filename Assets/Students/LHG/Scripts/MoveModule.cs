@@ -18,6 +18,7 @@ public class MoveModule
     {
         if (_wanderRoutine == null)
         {
+            _controller.FaceOff(FaceType.Idle);
             _wanderRoutine = _controller.StartCoroutine(WanderRoutine());
         }
     }
@@ -55,16 +56,10 @@ public class MoveModule
 
     public void MoveTo(Vector3 targetPos)
     {
-        Vector3 direction = (targetPos - _controller.transform.position).normalized;
-        direction.y = 0;
-        _controller.transform.position += direction * _controller.moveSpeed * Time.deltaTime;
-
-        if (direction != Vector3.zero)
-            _controller.transform.rotation = Quaternion.Slerp(
-                _controller.transform.rotation,
-                Quaternion.LookRotation(direction),
-                Time.deltaTime * 5f
-            );
+        Vector3 direction = GetDirection(targetPos);
+        _controller.transform.position += direction * (_controller.moveSpeed * Time.deltaTime);
+        
+        RotateToTarget(direction);
     }
 
     public void StopWander()
@@ -80,13 +75,38 @@ public class MoveModule
     public void OnCollisionEnter(Collision collision)
     {
         ContactPoint contact = collision.contacts[0];
-        float angle = Vector3.Angle(contact.normal, Vector3.up);
+        float angle = Vector3.Dot(contact.normal, -_controller.transform.forward);
 
-        if (angle > 45f) // 벽이라고 판단
+        if (angle > 0.5f) // 벽이라고 판단
         {
             Debug.Log("벽 충돌시 이동 중단 및 재설정");
             StopWander();
             Wander();
+        }
+    }
+
+    public Vector3 GetDirection(Vector3 targetPos)
+    {
+        Vector3 direction = (targetPos - _controller.transform.position).normalized;
+        direction.y = 0;
+        return direction;
+    }
+
+    public void RotateToTarget(Vector3 direction)
+    {
+        if (Vector3.Dot(direction, _controller.transform.forward)>0.98f)
+            // 거의 각도가 맞으니 return;
+        {
+            return;
+        }
+        
+        if (direction != Vector3.zero)
+        {
+            _controller.transform.rotation = Quaternion.Slerp(
+                _controller.transform.rotation,
+                Quaternion.LookRotation(direction),
+                Time.deltaTime * 5f
+            );
         }
     }
 }

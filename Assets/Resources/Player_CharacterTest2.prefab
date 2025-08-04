@@ -808,7 +808,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60.000004
+  field of view: 75
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -857,11 +857,11 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
-  m_Dithering: 0
+  m_Dithering: 1
   m_ClearDepth: 1
   m_AllowXRRendering: 1
   m_AllowHDROutput: 1
@@ -2866,7 +2866,6 @@ GameObject:
   - component: {fileID: 7578200829712500236}
   - component: {fileID: 5668943791761944499}
   - component: {fileID: 8022915252237979882}
-  - component: {fileID: 550689511250938753}
   - component: {fileID: 923992536721296673}
   - component: {fileID: 3092662488737773498}
   m_Layer: 0
@@ -2942,27 +2941,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &550689511250938753
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2535743798069594488}
-  m_Material: {fileID: 13400000, guid: 114f767a83c86c441a86ce32dc16ba4a, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &923992536721296673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2980,6 +2958,10 @@ MonoBehaviour:
   fireEffect: {fileID: 380173301807833963}
   floorInkEffect: {fileID: 192860544777830131}
   particleCollision: {fileID: 4151679093665508556}
+  maxInk: 100
+  currentInk: 0
+  inkConsumptionRate: 15
+  inkRecoveryRate: 30
 --- !u!114 &3092662488737773498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3215,9 +3197,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 306522169560681248}
   - {fileID: 5266697012429601727}
   - {fileID: 7578200829712500236}
-  - {fileID: 306522169560681248}
   - {fileID: 7641482301345163525}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3233,31 +3215,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a128e42a12a49ed42a615a94409aef82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  humanModel: {fileID: 3633241901636206559}
+  squidModel: {fileID: 1203836637672770272}
   humanAnimator: {fileID: 0}
   squidAnimator: {fileID: 0}
+  moveSpeed: 7
+  inkParticleGun: {fileID: 923992536721296673}
+  weaponView: {fileID: 0}
   rig: {fileID: 0}
-  input: {fileID: 0}
   col: {fileID: 0}
+  input: {fileID: 0}
   playerCameraObject: {fileID: 8410999822390816552}
   tpsCamera: {fileID: 0}
   mainCamera: {fileID: 9103138114427329405}
   cameraPivot: {fileID: 7641482301345163525}
   spectatorCamera: {fileID: 0}
-  humanModel: {fileID: 3633241901636206559}
-  squidModel: {fileID: 1203836637672770272}
-  playerRenderer: {fileID: 0}
-  squidRenderer: {fileID: 0}
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  moveSpeed: 10
   humanJumpForce: 15
   squidJumpForce: 15
-  squidSpeed: 15
+  squidSpeed: 10
   gravityScale: 4
   fallingGravityScale: 7
-  inkParticleGun: {fileID: 923992536721296673}
-  weaponView: {fileID: 0}
   weaponTransform: {fileID: 7578200829712500236}
   muzzleTransform: {fileID: 2887296725088420237}
   inkableLayer:
@@ -3265,7 +3245,6 @@ MonoBehaviour:
     m_Bits: 64
   enemyInkSpeedModifier: 0.5
   inkColorThreshold: 1
-  deadState: 0
   IsVaulting: 0
 --- !u!114 &2995348089923851064
 MonoBehaviour:
@@ -4359,6 +4338,7 @@ GameObject:
   - component: {fileID: 306522169560681248}
   - component: {fileID: 7207762314006966074}
   - component: {fileID: 6698042484016370131}
+  - component: {fileID: 7417672793041139217}
   m_Layer: 0
   m_Name: Yellow Character
   m_TagString: Untagged
@@ -4421,6 +4401,22 @@ MonoBehaviour:
   player: {fileID: 0}
   lookAtWeight: 0.8
   bodyRotationSpeed: 10
+--- !u!114 &7417672793041139217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3633241901636206559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 230ae005ffc91324ea28a9200c2fed01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceModel:
+  - {fileID: 97054947663882229}
+  - {fileID: 7966129774693313724}
+  - {fileID: 1234887905954401131}
 --- !u!1 &3755137710323887154
 GameObject:
   m_ObjectHideFlags: 0
@@ -23862,7 +23858,7 @@ Transform:
   m_GameObject: {fileID: 8410999822390816552}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.8000001, z: 0}
+  m_LocalPosition: {x: 0, y: 2.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

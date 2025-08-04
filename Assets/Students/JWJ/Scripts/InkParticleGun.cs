@@ -11,7 +11,7 @@ public class InkParticleGun : MonoBehaviourPun
     private TeamColorInfo teamColorInfo; //팀 컬러 정보
     [SerializeField] private ParticleSystem mainParticle; //잉크 줄기
     [SerializeField] private ParticleSystem fireEffect; // 무기 주변에 잉크가 튀는 연출
-    [SerializeField] private ParticleSystem floorInkEffect; // 충돌부분에 잉크 퍼지는 연출
+    //[SerializeField] private ParticleSystem floorInkEffect; // 충돌부분에 잉크 퍼지는 연출
     [SerializeField] private InkParticleCollision particleCollision; //잉크 충돌 스크립트
 
     [Header("잉크 탱크 설정")]
@@ -27,7 +27,7 @@ public class InkParticleGun : MonoBehaviourPun
     //파티클 색 변경을 위해 MainModule 을 담을 변수들
     private ParticleSystem.MainModule mainParticleMain;
     private ParticleSystem.MainModule fireEffectMain;
-    private ParticleSystem.MainModule floorInkEffectMain;
+    //private ParticleSystem.MainModule floorInkEffectMain;
 
     private Team currentTeam = Team.None;
 
@@ -46,7 +46,7 @@ public class InkParticleGun : MonoBehaviourPun
         //main 들
         mainParticleMain = mainParticle.main;
         fireEffectMain = fireEffect.main;
-        floorInkEffectMain = floorInkEffect.main;///
+        //floorInkEffectMain = floorInkEffect.main;///
 
         startSpeedCurve = new ParticleSystem.MinMaxCurve(particleSpeed, particleSpeed + 5);///
     }
@@ -78,7 +78,6 @@ public class InkParticleGun : MonoBehaviourPun
 
         //mainParticleMain.startSpeed = particleSpeed;
         //파티클 on off 설정. 마우스가 클릭상태일땐 활성화
-        Debug.Log($" 이거 수행될 때 확인 {photonView.ViewID} 클라이언트 {photonView.IsMine}");
         mainEmission.enabled = mouseButtonDown;
         fireEmission.enabled = mouseButtonDown;
 
@@ -91,7 +90,6 @@ public class InkParticleGun : MonoBehaviourPun
         particleCollision.SetTeam(currentTeam);
         //파티클 충돌 스크립트로 넘겨줌
 
-        // 잉크 소모
         if (mouseButtonDown)
         {
             currentInk -= inkConsumptionRate * Time.deltaTime;
@@ -119,7 +117,7 @@ public class InkParticleGun : MonoBehaviourPun
         ///파티클에 팀컬러 지정
         mainParticleMain.startColor = teamColor;
         fireEffectMain.startColor = teamColor;
-        floorInkEffectMain.startColor = teamColor;
+        //floorInkEffectMain.startColor = teamColor;
     }
 
     private void UpdateStartSpeed() ///

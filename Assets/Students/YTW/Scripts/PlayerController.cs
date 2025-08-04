@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 public enum InkStatus { NONE, OUR_TEAM, ENEMY_TEAM }
 
@@ -11,13 +12,12 @@ public class PlayerController : BaseController
     public StateMachine stateMachine { get; private set; }
     public Dictionary<HighState, PlayerState> highStateDic { get; private set; }
 
-    //public Rigidbody rig;
     public PlayerInput input;
     
 
     private float recenterCooldownTimer;
     //private const float RECENTER_COOLDOWN = 1.0f;
-
+    
     [Header("카메라 설정")]
     public GameObject playerCameraObject;
     public ThirdPersonCamera tpsCamera;
@@ -30,6 +30,8 @@ public class PlayerController : BaseController
     public float humanJumpForce = 15f;
     public float squidJumpForce = 15f;
     public float squidSpeed = 8f;
+    private Vector3 squidColCenter = new Vector3(0,0.5f,0);
+    private Vector3 humanColCenter = new Vector3(0,1f,0);
 
     [Header("점프 설정")]
     public float gravityScale = 4f;
@@ -68,7 +70,6 @@ public class PlayerController : BaseController
     {
 
         base.Awake();
-        
         squidAnimator = squidModel.GetComponentInChildren<Animator>();
         CurHp = MaxHp;
 
@@ -105,6 +106,20 @@ public class PlayerController : BaseController
                 {
                     rig.velocity += Vector3.up * (Physics.gravity.y * (fallingGravityScale - 1) * Time.fixedDeltaTime);
                 }
+            }
+
+            if (humanAnimator.GetBool(Fire) != IsFiring)
+            {
+                humanAnimator.SetBool(Fire, IsFiring);
+            }
+            
+            if (IsFiring && hitRoutine == null)
+            {
+                FaceOff(FaceType.Upset);
+            }
+            else if (!IsFiring && hitRoutine == null)
+            {
+                FaceOff(FaceType.Idle);
             }
         }
 
@@ -227,13 +242,20 @@ public class PlayerController : BaseController
         // 오징어 폼
         if (isSquidNetworked)
         {
-            humanModel.SetActive(false);
-            squidModel.SetActive(true);
+            if (humanModel.activeSelf)
+            {
+                humanModel.SetActive(false);
+            }
+
+            if (!squidModel.activeSelf)
+            {
+                squidModel.SetActive(true);
+            }
 
             col.direction = 2;
-            col.center = new Vector3(0, 0.2f, 0);
-            col.height = 1.0f;
-            col.radius = 0.2f;
+            col.center = squidColCenter;
+            col.height = 0.5f;
+            col.radius = 0.45f;
 
             if (squidAnimator != null)
             {
@@ -260,16 +282,16 @@ public class PlayerController : BaseController
             squidModel.SetActive(false);
 
             col.direction = 1;
-            col.center = new Vector3(0, 0.5f, 0);
-            col.height = 1.0f;
-            col.radius = 0.25f;
+            col.center = humanColCenter;
+            col.height = 2.0f;
+            col.radius = 0.5f;
 
             if (humanAnimator != null)
             {
                 // 애니메이션 상태 파라매터 처리
                 humanAnimator.SetBool(IsMove,IsMoving);
                 humanAnimator.SetBool(IsAir,isAir);
-                
+                // TODO: 공격 시 애니메이션 처리 IsFiring
                 // 점프 애니메이션 트리거 파라매터 처리
                 if (isAir && !isJump)
                 {
@@ -349,7 +371,7 @@ public class PlayerController : BaseController
         }
 
         // 벽 체크
-        Vector3 wallRayStart = transform.position + transform.up * (col.height / 2 - 0.1f);
+        Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
         // 현재 콜라이더의 절대적인 꼭대기 위치 바로 아래에서 레이를 쏨
         Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
 
@@ -457,11 +479,12 @@ public class PlayerController : BaseController
     }
 
     [PunRPC]
-    public override void TakeDamage(float amount)
+    public override void TakeDamage(float amount) //InkParticleCollision에 의해서 들어옴 로컬만 수행
     {
         if (IsDead) return;
 
         CurHp -= amount;
+        hitRoutine ??= StartCoroutine(HitRoutine());
         Debug.Log($"현재 체력{CurHp}");
 
         if (CurHp <= 0)
@@ -476,8 +499,9 @@ public class PlayerController : BaseController
 
     // TODO : 죽을 때 처리 필요
     [PunRPC]
-    public void PlayerDie()
+    public void PlayerDie() // TakeDamage의 조건에 따라서 들어옴. 전역 수행
     {
+        Instantiate(dieParticle, transform);
         // 원격으로도 죽은 처리 해줘야 함
         IsDead = true;
         IsDeadState = true;
@@ -574,6 +598,10 @@ public class PlayerController : BaseController
                 // 7,8 이동 파라매터
                 stream.SendNext(humanAnimator.GetFloat(MoveX));
                 stream.SendNext(humanAnimator.GetFloat(MoveY));
+                // 9 현재 얼굴
+                stream.SendNext((int)faceType);
+                // 10 공격 여부 전송
+                stream.SendNext(IsFiring);
             }
             // 오징어 폼일때 Send
             else if (stateMachine.CurrentState == highStateDic[HighState.SquidForm])
@@ -609,6 +637,10 @@ public class PlayerController : BaseController
                 // 7,8 이동 파라매터 
                 networkMoveX = (float)stream.ReceiveNext();
                 networkMoveY = (float)stream.ReceiveNext();
+                // 9 현재 얼굴
+                FaceOff((FaceType)(int)stream.ReceiveNext());
+                // 10 공격 상태 수신
+                FireStatus((bool)stream.ReceiveNext());
             }
             // 오징어 폼일때 수신
             else if (isSquidNetworked && !IsDeadState)
@@ -621,6 +653,13 @@ public class PlayerController : BaseController
         }
     }
 
+    private void FireStatus(bool isFire)
+    {
+        if (IsFiring == isFire) return;
+        IsFiring = isFire;
+        humanAnimator.SetBool(Fire,isFire);
+    }
+
     public void ChangeHighState(HighState state)
     {
         if (highStateDic.ContainsKey(state))
@@ -628,6 +667,8 @@ public class PlayerController : BaseController
             stateMachine.ChangeState(highStateDic[state]);
         }
     }
+
+
 
 
 }

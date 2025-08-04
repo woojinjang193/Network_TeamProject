@@ -5,13 +5,17 @@ using UnityEngine;
 
 public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관리하는 클래스
 {
-    private PhotonView photonV;
-    private TeamColorInfo teamColorInfo;  //팀컬러 정보
+    //private PhotonView photonV;
+    //private TeamColorInfo teamColorInfo;  //팀컬러 정보
     private Team myTeam; //팀 정보
     private ParticleSystem particleSys; // 충돌이벤트를 위한 파티클시스템 변수
     List<ParticleCollisionEvent> events = new();  //파티클 충돌 이벤트, 파티클 충돌 이벤트는 리스트로 넣어야함
     List<ParticleSystem.Particle> enter = new(); //파티클 트리거 충돌 이벤트 리스트 
 
+    [Header("Set References")] 
+    [SerializeField] private ParticleSystem splash;
+    
+    [Header("Set Values")]
     [SerializeField] private float radius;  //반지름
     [SerializeField] private float hardness; // 원 선명도
     [SerializeField] private float strength; // 강도
@@ -28,10 +32,10 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
 
     private void Awake()
     {
-        photonV = GetComponent<PhotonView>();
+        //photonV = GetComponent<PhotonView>();
         //포톤뷰
 
-        teamColorInfo = FindObjectOfType<TeamColorInfo>();
+        //teamColorInfo = FindObjectOfType<TeamColorInfo>();
         //팀컬러 정보를 가져옴
         particleSys = GetComponent<ParticleSystem>();
         //파티클 시스템을 가져옴
@@ -84,30 +88,33 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
 
     private void OnParticleCollision(GameObject other)
     {
-        events.Clear(); //이벤트 실행전 초기화
-        int count = particleSys.GetCollisionEvents(other, events);
-        //충돌한 파티클 수
-
-        for (int i = 0; i < count; i++)
+        if (photonView.IsMine)
         {
-            Vector3 hitPos = events[i].intersection; //충돌 위치정보
-            var hitComponent = events[i].colliderComponent; // 충돌한 컴포넌트
-            Collider collider = hitComponent as Collider;
-            //hitComponent 타입을 Collider 으로 변경 시도
+            events.Clear(); //이벤트 실행전 초기화
+            int count = particleSys.GetCollisionEvents(other, events);
+            //충돌한 파티클 수
 
-            if (collider == null)
+            for (int i = 0; i < count; i++)
             {
-                continue;
-            }
-            else
-            {
+                Vector3 hitPos = events[i].intersection; //충돌 위치정보
+                var hitComponent = events[i].colliderComponent; // 충돌한 컴포넌트
+                Collider collider = hitComponent as Collider;
+                //hitComponent 타입을 Collider 으로 변경 시도
+
+                Vector3 hitNor = events[i].normal; // 충돌 지점 포워드
+
+                if (collider == null)
+                {
+                    continue;
+                }
+                
                 if (dicColliderToPaintable.TryGetValue(collider, out PaintableObj paintableObj))
-                //타입 변환에 성공 && 딕셔너리에 키를 넣어 값을 받음
+                    //타입 변환에 성공 && 딕셔너리에 키를 넣어 값을 받음
                 {
                     if (dicPaintableToViewID.TryGetValue(paintableObj, out int viewID))
-                    //위에서 받은 값으로 칠해질 오브젝트 viewID 가져옴
+                        //위에서 받은 값으로 칠해질 오브젝트 viewID 가져옴
                     {
-                        photonView.RPC("ReportPaint", RpcTarget.MasterClient, hitPos, radius, hardness, strength, (int)myTeam, viewID);
+                        photonView.RPC("ReportPaint", RpcTarget.MasterClient, hitPos, radius, hardness, strength, (int)myTeam, viewID, hitNor);
                         //뷰아이디를 포함해서 마스터 클라이언트한테 보고
                     }
 
@@ -124,7 +131,7 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
                     }
 
                 }
-            }
+            } 
         }
     }
 
@@ -165,14 +172,14 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
     }
 
     [PunRPC]
-    private void ReportPaint(Vector3 hitPos, float radius, float hardness, float strength, int teamIndex, int viewID)
+    private void ReportPaint(Vector3 hitPos, float radius, float hardness, float strength, int teamIndex, int viewID, Vector3 hitNor)
     {
-        photonView.RPC("SyncDrawInk", RpcTarget.All, hitPos, radius, hardness, strength, teamIndex, viewID);
+        photonView.RPC("SyncDrawInk", RpcTarget.All, hitPos, radius, hardness, strength, teamIndex, viewID, hitNor);
         //마스터가 넘겨받은 정보로 모든 플레이어가 같은곳에 칠하게 해줌
     }
 
     [PunRPC]
-    private void SyncDrawInk(Vector3 hitPos, float radius, float hardness, float strength, int teamIndex, int viewID)
+    private void SyncDrawInk(Vector3 hitPos, float radius, float hardness, float strength, int teamIndex, int viewID, Vector3 hitNor)
     {
         Team team = (Team)teamIndex;
         //인덱스로 enum 변환
@@ -183,6 +190,9 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
             paintableObj.DrawInk(hitPos, radius, hardness, strength, team);
             //그림
         }
+
+        Instantiate(splash, hitPos, Quaternion.LookRotation(hitNor));
+        // 충돌 지점에 스플래쉬 파티클 생성
     }
 
 

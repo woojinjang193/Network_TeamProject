@@ -8,7 +8,6 @@ public class FireModule
 {
     private AIController _controller;
     private float nextFireTime;
-    private bool isFiring = false;
 
     private PhotonView weaponView;
 
@@ -42,18 +41,18 @@ public class FireModule
 
     private void FireStart()
     {
-        if (!isFiring)
+        if (!_controller.isFiring)
         {
-            isFiring = true;
+            _controller.isFiring = true;
             weaponView.RPC("FireParticle", RpcTarget.All, _controller.MyTeam, true);
         }
     }
 
     public void StopFire()
     {
-        if (isFiring)
+        if (_controller.isFiring)
         {
-            isFiring = false;
+            _controller.isFiring = false;
             weaponView.RPC("FireParticle", RpcTarget.All, _controller.MyTeam, false);
         }
     }
