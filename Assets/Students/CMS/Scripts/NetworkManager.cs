@@ -23,6 +23,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private string _desiredRoomNameOnFail; // 빠른 입장 실패 시 사용할 방 이름을 임시 저장하는 변수
 
     private bool isReturningToLastRoom = false;
+    private bool isLeavingFromGameEnd = false;
 
     private void Awake()
     {
@@ -177,9 +178,44 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnLeftRoom()
     {
-        Debug.Log("방 나감, LoginScene으로 이동");
+        Debug.Log("OnLeftRoom 호출됨");
 
-        SceneManager.LoadScene("LoginScene");
+        if (UIManager.Instance?.CurrentUI != null)
+        {
+            Debug.Log($"현재 UI 타입: {UIManager.Instance.CurrentUI.GetType().Name}");
+        }
+        else
+        {
+            Debug.Log("CurrentUI가 null임");
+        }
+
+        if (isLeavingFromGameEnd)
+        {
+            SceneManager.LoadScene("LoginScene");
+            isLeavingFromGameEnd = false;
+        }
+        else
+        {
+            Debug.Log("로비 UI 복귀");
+
+            MatchData.LastRoomName = null;
+
+            //RoomUI 강제 비활성화
+            var allUIs = GameObject.FindObjectsOfType<RoomUI>(true);
+            foreach (var roomUI in allUIs)
+            {
+                Debug.Log("RoomUI 강제 닫기 실행");
+                roomUI.Close(); // 또는 roomUI.gameObject.SetActive(false);
+            }
+
+            UIManager.Instance?.ReplaceUI(typeof(LobbyUI));
+        }
+    }
+    public void LeaveRoomFromGameEnd()
+    {
+        isLeavingFromGameEnd = true;
+        MatchData.LastRoomName = PhotonNetwork.CurrentRoom.Name;
+        PhotonNetwork.LeaveRoom();
     }
     public override void OnJoinedLobby()
     {
@@ -233,7 +269,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Debug.Log($"[ReturnToLastRoomFlow] JoinRoom 시도: {MatchData.LastRoomName}");
         PhotonNetwork.JoinRoom(MatchData.LastRoomName);
     }
-    public void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
         roomManager?.OnPlayerPropertiesUpdated(targetPlayer, changedProps);
         roomManager?.CheckAllReady();
