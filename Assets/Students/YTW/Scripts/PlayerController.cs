@@ -17,7 +17,8 @@ public class PlayerController : BaseController
 
     private float recenterCooldownTimer;
     //private const float RECENTER_COOLDOWN = 1.0f;
-    
+    public Transform modelRoot;
+
     [Header("카메라 설정")]
     public GameObject playerCameraObject;
     public ThirdPersonCamera tpsCamera;

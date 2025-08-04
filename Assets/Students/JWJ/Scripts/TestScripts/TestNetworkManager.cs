@@ -31,7 +31,7 @@ public class TestNetworkManager : MonoBehaviourPunCallbacks
     private void PlayerSpawn()
     {
         Vector3 spawnPos = new Vector3(Random.Range(0, 5), 1, Random.Range(0, 5));
-        PhotonNetwork.Instantiate("Player_CharacterTest", spawnPos, Quaternion.identity);
+        PhotonNetwork.Instantiate("Player_CharacterTest2", spawnPos, Quaternion.identity);
         if(PhotonNetwork.IsMasterClient)
         {
             Manager.Game.GameStart();
