@@ -15,8 +15,8 @@ public class TestGameManager : Singleton<GameManager>
     //플레이어의 콜라이더와 컨트롤러를 넣을 딕셔너리 
 
     [Header("팀별 스폰 위치")]
-    [SerializeField] private Transform[] team1SpawnPoints;   // Team1 스폰 
-    [SerializeField] private Transform[] team2SpawnPoints;   // Team2 스폰 
+    [SerializeField] public Transform[] team1SpawnPoints;   // Team1 스폰 
+    [SerializeField] public Transform[] team2SpawnPoints;   // Team2 스폰 
     [SerializeField] private string playerPrefabName = "Player_CharacterTest";
 
     //게임결과 UI

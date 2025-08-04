@@ -13,7 +13,7 @@ public class GameResultUI : MonoBehaviour
     [SerializeField] private Camera resultCam; //맵을 보여줄 카메라
     [SerializeField] private TMP_Text team1RateText; // 팀1 점유율 텍스트
     [SerializeField] private TMP_Text team2RateText; // 팀2 점유율 텍스트
-    [SerializeField] private TMP_Text winnerText; // 승리팀 텍스트
+    //[SerializeField] private TMP_Text winnerText; // 승리팀 텍스트
 
     [SerializeField] private Slider team1Slider;
     [SerializeField] private Slider team2Slider;
@@ -21,7 +21,26 @@ public class GameResultUI : MonoBehaviour
     [SerializeField] private float openUIDelayTime = 3f; //유아이 표시 타이밍
     [SerializeField] private float betweenSlideMoveTime = 2f; // 슬라이드 사이 간격
     [SerializeField] private float firstValueShowTime = 2f; //첫번째 점유율 표시 시간 (속도)
-    [SerializeField] private float finalValueShowTime = 2f; //마지막 점유율 표시 시간 (속도)
+    [SerializeField] private float finalValueShowTime = 1.5f; //마지막 점유율 표시 시간 (속도)
+
+    [SerializeField] private GameObject team1Char;
+    [SerializeField] private GameObject team2Char;
+
+    [SerializeField] private Animator team1animator;
+    [SerializeField] private Animator team2animator;
+
+    [SerializeField] private GameObject team1Face;
+    [SerializeField] private GameObject team1SadFace;
+
+    [SerializeField] private GameObject team2Face;
+    [SerializeField] private GameObject team2SadFace;
+
+    [SerializeField] private GameObject particle;
+    [SerializeField] private Image team1ResultImage;
+    [SerializeField] private Image team2ResultImage;
+    [SerializeField] private Sprite win;
+    [SerializeField] private Sprite lose;
+    
 
     private string winnerTeam;
     private float firstShowRateValue;
@@ -31,19 +50,27 @@ public class GameResultUI : MonoBehaviour
     private void Start()
     {
         //UI 비활성화
-        resultCam.gameObject.SetActive(false);
+        //resultCam.gameObject.SetActive(false);
         team1RateText.gameObject.SetActive(false);
         team2RateText.gameObject.SetActive(false);
-        winnerText.gameObject.SetActive(false);
+        //winnerText.gameObject.SetActive(false);
         team1Slider.gameObject.SetActive(false);
         team2Slider.gameObject.SetActive(false);
+        team1Char.gameObject.SetActive(false);
+        team2Char.gameObject.SetActive(false);
+        particle.gameObject.SetActive(false);
+        team1ResultImage.gameObject.SetActive(false);
+        team2ResultImage.gameObject.SetActive(false);
+
+        team1animator = team1animator.GetComponent<Animator>();
+        team2animator = team2animator.GetComponent<Animator>();
     }
 
 
     public void UIOpen(string winTeam)
     {
         winnerTeam = winTeam;
-        resultCam.gameObject.SetActive(true);  //카메라 플레이어에서 분리할 예정??
+        resultCam.gameObject.SetActive(true); 
 
         //그리드매니저에서 팀 점유율 가져옴
         team1RateValue = Manager.Grid.Team1Rate / 100;
@@ -67,6 +94,8 @@ public class GameResultUI : MonoBehaviour
         team2RateText.gameObject.SetActive(true);
         team1Slider.gameObject.SetActive(true);
         team2Slider.gameObject.SetActive(true);
+        team1Char.gameObject.SetActive(true);
+        team2Char.gameObject.SetActive(true);
 
 
         float elapsed = 0f;
@@ -120,8 +149,36 @@ public class GameResultUI : MonoBehaviour
         team1RateText.text = (team1RateValue * 100f).ToString("F2") + "%";
         team2RateText.text = (team2RateValue * 100f).ToString("F2") + "%";
 
-        winnerText.gameObject.SetActive(true);
-        winnerText.text = winnerTeam;
+        //winnerText.gameObject.SetActive(true);
+        //winnerText.text = winnerTeam;
+
+        if(winnerTeam == "Purple")
+        {
+            team1animator.SetTrigger("Win");
+            team2animator.SetTrigger("Lose");
+            team2Face.SetActive(false);
+            team2SadFace.SetActive(true);
+
+            team1ResultImage.sprite = win;
+            team2ResultImage.sprite = lose;
+            
+        }
+        else if (winnerTeam == "Yellow")
+        {
+            team1animator.SetTrigger("Lose");
+            team2animator.SetTrigger("Win");
+            team1Face.SetActive(false);
+            team1SadFace.SetActive(true);
+
+            team1ResultImage.sprite = lose;
+            team2ResultImage.sprite = win;
+
+        }
+        team1ResultImage.gameObject.SetActive(true);
+        team2ResultImage.gameObject.SetActive(true);
+        particle.gameObject.SetActive(true);
+
+        
     }
 
     public void UIClose()

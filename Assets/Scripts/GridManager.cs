@@ -124,7 +124,8 @@ public class GridManager : MonoBehaviour, IInRoomCallbacks
         int total = gridDic.Count;
         Team1Rate = countTeam1 / (float)total * 100f;
         Team2Rate = countTeam2 / (float)total * 100f;
-        teamRateText.text = $"Team1 : {Team1Rate.ToString("F2")}%    Team2 : {Team2Rate.ToString("F2")}%";
+        //teamRateText.text = $"Team1 : {Team1Rate.ToString("F2")}%    Team2 : {Team2Rate.ToString("F2")}%";
+        teamRateText.text = "";
 
         photonView.RPC("SyncCoverageUI", RpcTarget.Others, Team1Rate, Team2Rate);
     }
@@ -132,13 +133,14 @@ public class GridManager : MonoBehaviour, IInRoomCallbacks
     [PunRPC]
     public void SyncCoverageUI(float team1Rate, float team2Rate) // 추가됨!!!
     {
-        teamRateText.text = $"Team1 : {team1Rate:F2}%    Team2 : {team2Rate:F2}%";
+        //teamRateText.text = $"Team1 : {team1Rate:F2}%    Team2 : {team2Rate:F2}%";
+        teamRateText.text = "";
     }
 
     public string GetWinningTeam()
     {
-        if (countTeam1 > countTeam2) return "Team1";
-        else if (countTeam2 > countTeam1) return "Team2";
+        if (countTeam1 > countTeam2) return "Purple";
+        else if (countTeam2 > countTeam1) return "Yellow";
         else return "Draw";
     }
 
