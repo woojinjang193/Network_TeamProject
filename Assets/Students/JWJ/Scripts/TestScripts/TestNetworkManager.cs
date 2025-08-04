@@ -14,7 +14,7 @@ public class TestNetworkManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         //PhotonNetwork.JoinRandomOrCreateRoom();
-        PhotonNetwork.JoinOrCreateRoom("TestRoom1515", new RoomOptions() { MaxPlayers = 8 }, TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom("TestRoom151ads5", new RoomOptions() { MaxPlayers = 8 }, TypedLobby.Default);
     }
 
     public override void OnCreatedRoom()
