@@ -185,11 +185,11 @@ public class PlayerController : BaseController
 
         }
 
-        if (IsFiring&&!fireSound.isPlaying)
+        if (inkParticleGun.isFiring && !fireSound.isPlaying)
         {
             fireSound.Play();
         }
-        else if (!IsFiring && fireSound.isPlaying)
+        else if (!inkParticleGun.isFiring && fireSound.isPlaying)
         {
             fireSound.Stop();
         }

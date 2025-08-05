@@ -20,7 +20,7 @@ public class InkParticleGun : MonoBehaviourPun
     public float inkConsumptionRate = 15f; // 초당 잉크 소모량
     public float inkRecoveryRate = 30f; // 초당 잉크 회복량
 
-    private bool isFiring = false;
+    public bool isFiring { get; set; }
 
     // 게임시작시 파티클을 off 시켜놓기위해 EmissionModule을 담을 변수들
     private ParticleSystem.EmissionModule mainEmission;

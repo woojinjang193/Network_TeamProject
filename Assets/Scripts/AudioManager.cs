@@ -404,6 +404,7 @@ public class AudioManager : SingletonPun<AudioManager>
         }
 
         GameObject go = new GameObject("FireSound");
+        go.transform.position = player.transform.position;
         AudioSource audio = go.AddComponent<AudioSource>();
         
         audio.clip = outFire.clipSource;
