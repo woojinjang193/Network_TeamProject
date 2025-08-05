@@ -91,6 +91,8 @@ public class GameResultUI : MonoBehaviour
         team1Slider.value = 0;
         team2Slider.value = 0;
 
+        team1Char.gameObject.SetActive(true);
+        team2Char.gameObject.SetActive(true);
         yield return new WaitForSeconds(openUIDelayTime);
 
         //Debug.Log($"첫 밸류: {firstShowRateValue}, 팀1 벨류: {team1RateValue}, 팀2 벨류: {team2RateValue}");
@@ -100,8 +102,7 @@ public class GameResultUI : MonoBehaviour
         team2RateText.gameObject.SetActive(true);
         team1Slider.gameObject.SetActive(true);
         team2Slider.gameObject.SetActive(true);
-        team1Char.gameObject.SetActive(true);
-        team2Char.gameObject.SetActive(true);
+        
 
 
         float elapsed = 0f;
