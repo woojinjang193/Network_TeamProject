@@ -439,7 +439,6 @@ MonoBehaviour:
   - {fileID: 1799661345}
   - {fileID: 1454833048}
   playerPrefabName: Player_CharacterTest
-  gameResultUI: {fileID: 1038019551816188527}
   matchDuration: 60
   timerText: {fileID: 345321101}
 --- !u!4 &611587127
