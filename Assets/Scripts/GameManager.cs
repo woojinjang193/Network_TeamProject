@@ -21,16 +21,20 @@ public class GameManager : MonoBehaviour
 
     //게임결과 UI
     [SerializeField] private GameResultUI gameResultUI;
+    [SerializeField] private GameObject inkGauge;
 
     private double startTime;
     [SerializeField] private float matchDuration = 180f;
     [SerializeField] private TMP_Text timerText;
     private PhotonView photonView;
 
+    private Animator timerAnimation;
+
     private void Awake()
     {
         Manager.Game = this;
         photonView = GetComponent<PhotonView>();
+        timerAnimation = GetComponentInChildren<Animator>();
     }
 
     private void Start()
@@ -88,6 +92,12 @@ public class GameManager : MonoBehaviour
         int minutes = Mathf.FloorToInt(time / 60);
         int seconds = Mathf.FloorToInt(time % 60);
         timerText.text = $"{minutes:00}:{seconds:00}";
+
+        if(time < 11)
+        {
+            timerText.color = Color.red;
+            timerAnimation.SetTrigger("signal");
+        }
     }
 
     private IEnumerator SpawnPlayerWithDelay()
@@ -167,6 +177,7 @@ public class GameManager : MonoBehaviour
         float team1Rate = Manager.Grid.Team1Rate;
         float team2Rate = Manager.Grid.Team2Rate;
         PlayerOff(); //플레이어 비활성화
+        inkGauge.SetActive(false);
         if (PhotonNetwork.IsMasterClient)
         {
             photonView.RPC("ShowResultUI", RpcTarget.All, winningTeam, team1Rate, team2Rate);

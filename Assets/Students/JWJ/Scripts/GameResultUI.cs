@@ -43,6 +43,8 @@ public class GameResultUI : MonoBehaviour
     [SerializeField] private GameObject drawImage;
     [SerializeField] private Sprite win;
     [SerializeField] private Sprite lose;
+
+
     
 
     private string winnerTeam;
