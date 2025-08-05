@@ -1,4 +1,5 @@
 using Photon.Pun;
+using Photon.Realtime;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -8,8 +9,8 @@ public class RoomUI : BaseUI
 {
     [Header("방 내부 패널")]
     [SerializeField] private TMP_Text roomNameText;
-    [SerializeField] private Transform playerListContent; // 플레이어 목록이 들어갈 부모 Transform
-    [SerializeField] private GameObject playerListItemPrefab; // 각 플레이어 정보를 표시할 UI 프리팹
+    [SerializeField] public Transform playerListContent; // 플레이어 목록이 들어갈 부모 Transform
+    [SerializeField] public GameObject playerListItemPrefab; // 각 플레이어 정보를 표시할 UI 프리팹
     [SerializeField] private Button readyButton;
     [SerializeField] private Button startGameButton; // 방장만 활성화
     [SerializeField] private Button leaveRoomButton;
@@ -20,11 +21,8 @@ public class RoomUI : BaseUI
     [SerializeField] private Button team1Button;
     [SerializeField] private Button team2Button;
 
-    [Header("게임모드")]
-    [SerializeField] private Button mode1vs1Button;
-    [SerializeField] private Button mode2vs2Button;
-    [SerializeField] private Button mode3vs3Button;
-    [SerializeField] private Button mode4vs4Button;
+    [SerializeField] private Button addTeam1BotButton;
+    [SerializeField] private Button addTeam2BotButton;
 
     private void Awake()
     {
@@ -45,12 +43,10 @@ public class RoomUI : BaseUI
 
         team1Button.onClick.AddListener(() => OnClickChooseTeam("Team1"));
         team2Button.onClick.AddListener(() => OnClickChooseTeam("Team2"));
-
-       // mode1vs1Button.onClick.AddListener(() => OnSelectGameMode(1));
-       // mode2vs2Button.onClick.AddListener(() => OnSelectGameMode(2));
-        //mode3vs3Button.onClick.AddListener(() => OnSelectGameMode(3));
-       // mode4vs4Button.onClick.AddListener(() => OnSelectGameMode(4));
+        addTeam1BotButton.onClick.AddListener(() => roomManager.AddBot("Team1"));
+        addTeam2BotButton.onClick.AddListener(() => roomManager.AddBot("Team2"));
     }
+
 
     public override void Open()
     {
@@ -118,11 +114,11 @@ public class RoomUI : BaseUI
         Manager.Net.LeaveRoom();
     }
 
-    public void UpdatePlayerList(List<Photon.Realtime.Player> players)
+    public void UpdatePlayerList(List<Player> players)
     {
         Debug.Log($"UpdatePlayerList 호출됨. 플레이어 수: {players.Count}");
 
-        // 기존 플레이어 삭제
+        // 기존 플레이어 및 봇 패널 모두 삭제
         foreach (Transform child in playerListContent)
         {
             Debug.Log($"기존 아이템 삭제: {child.name}");
@@ -154,6 +150,10 @@ public class RoomUI : BaseUI
             item.ApplyTeamColor(player);
             Debug.Log($"플레이어 {player.NickName} ({player.ActorNumber}) 정보 초기화 완료.");
         }
+
+        //봇 패널 재생성
+        Debug.Log("봇 패널 재생성 시도");
+        FindObjectOfType<RoomManager>()?.RefreshBotPanels();
     }
 
     public void SetStartButtonActive(bool isActive)
@@ -176,11 +176,4 @@ public class RoomUI : BaseUI
             Debug.LogError("RoomUI: RoomManager가 연결되지 않았습니다.");
         }
     }
-    //private void OnSelectGameMode(int mode)
-  //  {
-       // if (!PhotonNetwork.IsMasterClient) return;
-
-        //Debug.Log($"RoomUI: {mode}vs{mode} 모드 선택");
-        //roomManager?.SetGameMode(mode);
-    //}
 }

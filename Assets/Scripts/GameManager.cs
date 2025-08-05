@@ -16,8 +16,6 @@ public class GameManager : MonoBehaviour
     [Header("팀별 스폰 위치")]
     [SerializeField] public Transform[] team1SpawnPoints;   // Team1 스폰 
     [SerializeField] public Transform[] team2SpawnPoints;   // Team2 스폰 
-    
-    [SerializeField] private string playerPrefabName = "Player_Purple";
 
     //게임결과 UI
     [SerializeField] private GameResultUI gameResultUI;
@@ -62,6 +60,11 @@ public class GameManager : MonoBehaviour
         }
 
         yield return StartCoroutine(SpawnPlayerWithDelay());
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            StartCoroutine(WaitForRoomManagerAndSpawnBots());
+        }
 
         if (PhotonNetwork.IsMasterClient)
         {
@@ -119,9 +122,86 @@ public class GameManager : MonoBehaviour
 
         // 겹치지 않도록 mod 연산 사용
         Transform spawnPoint = spawnArray[actorIndex % spawnArray.Length];
-        PhotonNetwork.Instantiate(playerPrefabName, spawnPoint.position, spawnPoint.rotation);
+
+        // 팀별 프리팹 이름 분기
+        string prefabName = team switch
+        {
+            "Team1" => "Player_Purple",
+            "Team2" => "Player_Yellow",
+            _ => null
+        };
+
+        if (string.IsNullOrEmpty(prefabName))
+        {
+            Debug.LogError($"[SpawnPlayerWithDelay] 알 수 없는 팀: {team}");
+            yield break;
+        }
+
+        PhotonNetwork.Instantiate(prefabName, spawnPoint.position, spawnPoint.rotation);
+        Debug.Log($"플레이어 생성 완료: {prefabName}, 위치: {spawnPoint.position}");
     }
 
+    private void SpawnBots()
+    {
+        var roomManager = Manager.Net.roomManager;
+        if (roomManager == null)
+        {
+            Debug.LogError("SpawnBots: RoomManager 찾을 수 없음");
+            return;
+        }
+
+        var bots = roomManager.GetBots();
+        Debug.Log($"[SpawnBots] 봇 수: {bots.Count}");
+
+        for (int i = 0; i < bots.Count; i++)
+        {
+            var bot = bots[i];
+
+            Transform[] spawnArray = bot.Team == "Team1" ? team1SpawnPoints : team2SpawnPoints;
+            if (spawnArray.Length == 0)
+            {
+                Debug.LogError("SpawnBots: 스폰 포인트 없음");
+                continue;
+            }
+
+            Transform spawnPoint = spawnArray[i % spawnArray.Length];
+
+            //팀별 봇 프리팹 이름 결정
+            string prefabName = bot.Team switch
+            {
+                "Team1" => "AI_Purple",
+                "Team2" => "AI_Yellow",
+                _ => null
+            };
+
+            if (string.IsNullOrEmpty(prefabName))
+            {
+                Debug.LogError($"SpawnBots: 알 수 없는 팀 {bot.Team}");
+                continue;
+            }
+
+            GameObject botGO = PhotonNetwork.Instantiate(prefabName, spawnPoint.position, spawnPoint.rotation);
+
+            var ai = botGO.GetComponent<AIController>();
+            if (ai != null)
+            {
+                ai.MyTeam = bot.Team == "Team1" ? Team.Team1 : Team.Team2;
+                Debug.Log($"봇 생성 완료: {bot.Name}, 프리팹: {prefabName}, 팀: {ai.MyTeam}");
+            }
+        }
+    }
+
+    private IEnumerator WaitForRoomManagerAndSpawnBots()
+    {
+        while (Manager.Net.roomManager == null)
+        {
+            Debug.Log("[WaitForRoomManagerAndSpawnBots] RoomManager를 기다리는 중...");
+            yield return null;
+        }
+
+        Debug.Log("[WaitForRoomManagerAndSpawnBots] RoomManager 찾음 → SpawnBots 실행");
+        SpawnBots();
+    }
     public void RegisterPlayer(Collider col, BaseController playerController)
     {
         playerDic[col] = playerController;
