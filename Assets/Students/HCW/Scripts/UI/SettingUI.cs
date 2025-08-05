@@ -64,14 +64,14 @@ public class SettingUI : BaseUI
         closeButton.onClick.AddListener(OnCloseButtonClicked);
 
         // --- InputField 및 Slider 리스너 추가 ---
-        upKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(UP_KEY_PREF, value));
-        downKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(DOWN_KEY_PREF, value));
-        leftKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(LEFT_KEY_PREF, value));
-        rightKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(RIGHT_KEY_PREF, value));
-        squidKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(SQUID_KEY_PREF, value));
-        jumpKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(JUMP_KEY_PREF, value));
+        // upKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(UP_KEY_PREF, value));
+        // downKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(DOWN_KEY_PREF, value));
+        // leftKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(LEFT_KEY_PREF, value));
+        // rightKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(RIGHT_KEY_PREF, value));
+        // squidKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(SQUID_KEY_PREF, value));
+        // jumpKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(JUMP_KEY_PREF, value));
 
-        mouseSensitivitySlider.onValueChanged.AddListener(OnMouseSensitivityChanged);
+        //mouseSensitivitySlider.onValueChanged.AddListener(OnMouseSensitivityChanged);
 
         // --- 해상도 드롭다운 초기화 ---
         resolutions = Screen.resolutions;
@@ -151,7 +151,7 @@ public class SettingUI : BaseUI
         // 기본 해상도 설정 (현재 해상도)
         if (!PlayerPrefs.HasKey(RESOLUTION_WIDTH_PREF)) PlayerPrefs.SetInt(RESOLUTION_WIDTH_PREF, Screen.currentResolution.width);
         if (!PlayerPrefs.HasKey(RESOLUTION_HEIGHT_PREF)) PlayerPrefs.SetInt(RESOLUTION_HEIGHT_PREF, Screen.currentResolution.height);
-        if (!PlayerPrefs.HasKey(RESOLUTION_REFRESH_RATE_PREF)) PlayerPrefs.SetFloat(RESOLUTION_REFRESH_RATE_PREF, Screen.currentResolution.refreshRateRatio.value);
+        if (!PlayerPrefs.HasKey(RESOLUTION_REFRESH_RATE_PREF)) PlayerPrefs.SetFloat(RESOLUTION_REFRESH_RATE_PREF, (float)Screen.currentResolution.refreshRateRatio.value);
         
         PlayerPrefs.Save();
     }
@@ -180,7 +180,7 @@ public class SettingUI : BaseUI
         // 해상도 저장
         PlayerPrefs.SetInt(RESOLUTION_WIDTH_PREF, Screen.currentResolution.width);
         PlayerPrefs.SetInt(RESOLUTION_HEIGHT_PREF, Screen.currentResolution.height);
-        PlayerPrefs.SetFloat(RESOLUTION_REFRESH_RATE_PREF, Screen.currentResolution.refreshRateRatio.value);
+        PlayerPrefs.SetFloat(RESOLUTION_REFRESH_RATE_PREF, (float)Screen.currentResolution.refreshRateRatio.value);
         
         PlayerPrefs.Save();
     }
@@ -225,13 +225,13 @@ public class SettingUI : BaseUI
     private void OnApplyGraphicsButtonClicked()
     {
         Resolution selectedResolution = resolutions[resolutionDropdown.value];
-        Screen.SetResolution(selectedResolution.width, selectedResolution.height, Screen.fullScreen, selectedResolution.refreshRateRatio);
+        //Screen.SetResolution(selectedResolution.width, selectedResolution.height, Screen.fullScreen, selectedResolution.refreshRateRatio);
         Debug.Log($"해상도 적용: {selectedResolution.width}x{selectedResolution.height} @ {selectedResolution.refreshRateRatio.value}Hz");
 
         // 적용 후 PlayerPrefs에 저장
         PlayerPrefs.SetInt(RESOLUTION_WIDTH_PREF, selectedResolution.width);
         PlayerPrefs.SetInt(RESOLUTION_HEIGHT_PREF, selectedResolution.height);
-        PlayerPrefs.SetFloat(RESOLUTION_REFRESH_RATE_PREF, selectedResolution.refreshRateRatio.value);
+        PlayerPrefs.SetFloat(RESOLUTION_REFRESH_RATE_PREF, (float)selectedResolution.refreshRateRatio.value);
         PlayerPrefs.Save();
     }
 }
