@@ -79,7 +79,16 @@ public class UIManager : Singleton<UIManager>
         if (uiStack.Count > 0)
         {
             BaseUI currentUI = uiStack.Pop();
-            currentUI.Close();
+
+            //파괴된 오브젝트인지 체크
+            if (currentUI != null && currentUI.gameObject != null)
+            {
+                currentUI.Close();
+            }
+            else
+            {
+                Debug.LogWarning("UIManager: 이전 UI가 이미 파괴되어 Close() 생략");
+            }
         }
 
         // 새 UI를 열고 스택에 추가
@@ -134,5 +143,23 @@ public class UIManager : Singleton<UIManager>
         {
             Debug.LogWarning("스택에 UI가 없습니다.");
         }
+    }
+    public void Reinitialize()
+    {
+        uiStack.Clear();
+        uiDictionary.Clear();
+
+        BaseUI[] allUIs = FindObjectsOfType<BaseUI>(true);
+        foreach (var ui in allUIs)
+        {
+            ui.gameObject.SetActive(false);
+            if (!uiDictionary.ContainsKey(ui.GetType()))
+            {
+                uiDictionary.Add(ui.GetType(), ui);
+                Debug.Log($"UIManager: {ui.GetType().Name} UI를 재등록했습니다.");
+            }
+        }
+
+        Debug.Log("UIManager: 씬 전환 후 UI 재등록 완료");
     }
 }
