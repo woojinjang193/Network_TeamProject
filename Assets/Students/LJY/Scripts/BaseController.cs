@@ -159,6 +159,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     protected IEnumerator HitRoutine()
     {
         FaceOff(FaceType.Hit);
+        Manager.Audio.PlayEffect("TakeDamage");
         photonView.RPC("TriggerHitAnimation",RpcTarget.AllViaServer);
         yield return new WaitForSeconds(hitRecoveryTimer);
         StopCoroutine(hitRoutine);

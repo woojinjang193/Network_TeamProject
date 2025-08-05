@@ -23,7 +23,7 @@ public class GameResultUI : MonoBehaviour
     [SerializeField] private float betweenSlideMoveTime = 2f; // 슬라이드 사이 간격
     [SerializeField] private float firstValueShowTime = 2f; //첫번째 점유율 표시 시간 (속도)
     [SerializeField] private float finalValueShowTime = 1.5f; //마지막 점유율 표시 시간 (속도)
-    [SerializeField] private float moveToLoginSceneDelay = 5f; //씬 전환까지 시간
+    [SerializeField] private float moveToLoginSceneDelay = 10f; //씬 전환까지 시간
 
     [SerializeField] private GameObject team1Char;
     [SerializeField] private GameObject team2Char;
@@ -43,7 +43,6 @@ public class GameResultUI : MonoBehaviour
     [SerializeField] private GameObject drawImage;
     [SerializeField] private Sprite win;
     [SerializeField] private Sprite lose;
-    
 
     private string winnerTeam;
     private float firstShowRateValue;
@@ -101,6 +100,8 @@ public class GameResultUI : MonoBehaviour
         team1Char.gameObject.SetActive(true);
         team2Char.gameObject.SetActive(true);
 
+        // 사운드 재생 시작
+        Manager.Audio.PlayEffect("PourInk");
 
         float elapsed = 0f;
         while (elapsed < firstValueShowTime)
@@ -155,6 +156,10 @@ public class GameResultUI : MonoBehaviour
 
         //winnerText.gameObject.SetActive(true);
         //winnerText.text = winnerTeam;
+        
+        // 최종 사운드 재생
+        Manager.Audio.PlayEffect("Impact");
+        Manager.Audio.SwitchBGM("Victory",0.1f);
 
         if(winnerTeam == "Purple")
         {

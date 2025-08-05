@@ -9,7 +9,7 @@ using UnityEngine.Audio;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 
-public class AudioManager : SingletonPun<AudioManager>
+public class AudioManager : Singleton<AudioManager>
 {
     // 오디오 데이터를 모아놓은 데이터베이스
     private AudioDataBase audioDB;
@@ -37,7 +37,7 @@ public class AudioManager : SingletonPun<AudioManager>
     private Coroutine startAmbRoutine;
     
     private Dictionary<string, AudioData> audioDict = new();
-    
+
     // 테스트 볼륨
     [Header("Set UI Ref")] 
     [SerializeField] private Slider masterSlider;
@@ -47,6 +47,7 @@ public class AudioManager : SingletonPun<AudioManager>
     protected override void Awake()
     {
         base.Awake();
+        
         // 오디오 데이터베이스 연결
         audioDB = Resources.Load<AudioDataBase>($"Audio/AudioDB");
         
@@ -107,13 +108,12 @@ public class AudioManager : SingletonPun<AudioManager>
         }
     }
     
-    [PunRPC]
-    public void PlayClip(string clipName, Vector3 pos) // 인게임 오디오 클립 재생
+    public AudioSource PlayClip(string clipName, Vector3 pos) // 인게임 오디오 클립 재생
     {
         if (!audioDict.TryGetValue(clipName, out AudioData outClip))
         {
             Debug.LogError($"사운드가 딕셔너리에없음 : {clipName}");
-            return;
+            return null;
         }
         
         GameObject go = new GameObject($"AudioClip_{clipName}");
@@ -136,6 +136,8 @@ public class AudioManager : SingletonPun<AudioManager>
         {
             Destroy(go, outClip.clipSource.length); // 루프 재생이 아닐 경우, 길이가 끝나면 파괴
         }
+
+        return audioClip;
     }
     
     public void SwitchBGM(string bgmName, float fadeTime = 1f) // 배경 음악 변경 시 사용

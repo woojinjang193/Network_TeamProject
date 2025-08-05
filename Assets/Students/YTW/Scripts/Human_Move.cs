@@ -68,6 +68,5 @@ public class Human_Move : PlayerState
             player.humanAnimator.SetFloat(X, 0f);
             player.humanAnimator.SetFloat(Y, 0f);
         }
-        
     }
 }

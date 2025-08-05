@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clipName: HitPlayer
   clipSource: {fileID: 8300000, guid: c4d6ea87223a38940a48925eb6280969, type: 3}
-  volume: 0.6
+  volume: 0.3
   loop: 0
   mixerGroup: {fileID: 0}

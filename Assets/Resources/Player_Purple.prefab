@@ -6570,6 +6570,8 @@ MonoBehaviour:
   damagePerSecondOnEnemyInk: 10
   healthPerSecondOnOurInk: 5
   IsVaulting: 0
+  squidSwim: {fileID: 0}
+  squidSwimBubble: {fileID: 0}
 --- !u!114 &579056536622001376
 MonoBehaviour:
   m_ObjectHideFlags: 0

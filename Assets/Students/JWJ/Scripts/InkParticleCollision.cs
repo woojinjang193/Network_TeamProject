@@ -231,7 +231,7 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
         if (player.MyTeam != myTeam)
         {
             Debug.Log("적 입니다.");
-            player.photonView.RPC("TakeDamage", player.photonView.Owner, 1f);
+            player.photonView.RPC("TakeDamage", player.photonView.Owner, 15f);
             Manager.Audio.PlayClip("InkHit",player.transform.position);
             Manager.Audio.PlayEffect("HitPlayer");
             return;

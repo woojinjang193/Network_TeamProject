@@ -502,7 +502,7 @@ MonoBehaviour:
   - {fileID: 778382024}
   playerPrefabName: Player_Purple
   gameResultUI: {fileID: 1038019551816188527}
-  matchDuration: 60
+  matchDuration: 30
   timerText: {fileID: 345321101}
 --- !u!4 &611587127
 Transform:
@@ -9332,7 +9332,7 @@ MonoBehaviour:
   betweenSlideMoveTime: 2
   firstValueShowTime: 2
   finalValueShowTime: 0.3
-  moveToLoginSceneDelay: 5
+  moveToLoginSceneDelay: 10
   team1Char: {fileID: 6659564360864212173}
   team2Char: {fileID: 472925294093727672}
   team1animator: {fileID: 6193643862448788259}
