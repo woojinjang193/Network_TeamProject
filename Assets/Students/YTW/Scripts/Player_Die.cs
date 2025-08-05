@@ -55,6 +55,8 @@ public class Player_Die : PlayerState
         player.rig.isKinematic = false;
         player.col.enabled = true;
 
+        player.humanModel.SetActive(true);
+
         // 로컬 플레이어일 경우 카메라 원상복구
         if (player.photonView.IsMine)
         {

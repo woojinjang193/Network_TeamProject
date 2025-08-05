@@ -3264,6 +3264,7 @@ MonoBehaviour:
   squidSpeed: 15
   gravityScale: 4
   fallingGravityScale: 7
+  weaponFireEffect: {fileID: 0}
   weaponTransform: {fileID: 7578200829712500236}
   muzzleTransform: {fileID: 2887296725088420237}
   inkableLayer:
