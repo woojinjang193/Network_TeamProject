@@ -66368,8 +66368,8 @@ MonoBehaviour:
   team1Slider: {fileID: 1802360317}
   team2Slider: {fileID: 2096203776}
   openUIDelayTime: 3
-  betweenSlideMoveTime: 2
-  firstValueShowTime: 2
+  betweenSlideMoveTime: 1
+  firstValueShowTime: 3
   finalValueShowTime: 0.3
   moveToLoginSceneDelay: 5
   team1Char: {fileID: 287057359}
