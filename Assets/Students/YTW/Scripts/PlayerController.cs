@@ -41,6 +41,7 @@ public class PlayerController : BaseController
 
     [field:Header("무기 설정")]
     public bool IsFiring { get; set; }
+    public ParticleSystem weaponFireEffect;
     [Header("무기 Transform")]
     public Transform weaponTransform;
     public Transform muzzleTransform;
@@ -54,7 +55,11 @@ public class PlayerController : BaseController
     // 잉크 얼마나 잘 감지할지
     [SerializeField, Range(0.1f, 2.0f)]
     private float inkColorThreshold = 1.0f;
-    
+    [Tooltip("적 팀 잉크 위에 있을 때 초당 받는 데미지")]
+    public float damagePerSecondOnEnemyInk = 10f;
+    [Tooltip("아군 팀 잉크 위에 있을 때 초당 회복하는 체력")]
+    public float healthPerSecondOnOurInk = 5f;
+
     // 잉크 감지 시스템 파라매터
     //private float groundCheckTimer = 0f;
     //private const float GROUND_CHECK_INTERVAL = 0.1f; // 1초에 10번 검사
@@ -143,6 +148,7 @@ public class PlayerController : BaseController
             }
 
             GroundAndInkCheck();
+            HandleInkAndHealth();
 
             if (stateMachine != null)
             {
@@ -716,5 +722,66 @@ public class PlayerController : BaseController
 
 
 
+    public void SetModelVisibility(GameObject model, bool isVisible)
+    {
+        if (model == null) return;
 
+        Renderer[] renderers = model.GetComponentsInChildren<Renderer>(true);
+
+        foreach (Renderer renderer in renderers)
+        {
+            if (weaponFireEffect != null && renderer.gameObject == weaponFireEffect.gameObject)
+            {
+                continue;
+            }
+
+            renderer.enabled = isVisible;
+        }
+
+        Animator animator = model.GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.enabled = isVisible;
+        }
+    }
+
+    private void HandleInkAndHealth()
+    {
+        // 땅에 있지 않다면 아무것도 하지 않음
+        if (!IsGrounded) return;
+
+        switch (CurrentGroundInkStatus)
+        {
+            case InkStatus.OUR_TEAM:
+                // 체력 회복
+                if (CurHp < MaxHp)
+                {
+                    // 이전 체력 기록
+                    float oldHp = CurHp;
+
+                    CurHp += healthPerSecondOnOurInk * Time.deltaTime;
+                    CurHp = Mathf.Min(CurHp, MaxHp); // 최대 체력을 넘지 않도록 보정
+
+                    // 체력이 실제로 회복되었을 때만 로그를 출력
+                    if (CurHp > oldHp)
+                    {
+                        Debug.Log($"아군 잉크 위에서 체력 회복 HP: {CurHp:F1}");
+                    }
+                }
+                break;
+
+            case InkStatus.ENEMY_TEAM:
+                // 데미지
+                if (stateMachine.CurrentState == highStateDic[HighState.HumanForm] && CurHp > 0)
+                {
+                    Debug.Log($"적군 잉크 위에서 데미지를 입습니다");
+                    TakeDamage(damagePerSecondOnEnemyInk * Time.deltaTime);
+                }
+                break;
+
+            case InkStatus.NONE:
+                // 잉크가 없는 곳에서는 아무 효과 없음
+                break;
+        }
+    }
 }

@@ -6553,11 +6553,13 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  maxSlopeAngle: 45
   humanJumpForce: 15
   squidJumpForce: 15
   squidSpeed: 10
   gravityScale: 4
   fallingGravityScale: 7
+  weaponFireEffect: {fileID: 5285278211094875657}
   weaponTransform: {fileID: 549107798967075524}
   muzzleTransform: {fileID: 3157403935491591442}
   inkableLayer:
@@ -6565,6 +6567,8 @@ MonoBehaviour:
     m_Bits: 64
   enemyInkSpeedModifier: 0.5
   inkColorThreshold: 1
+  damagePerSecondOnEnemyInk: 10
+  healthPerSecondOnOurInk: 5
   IsVaulting: 0
 --- !u!114 &579056536622001376
 MonoBehaviour:
