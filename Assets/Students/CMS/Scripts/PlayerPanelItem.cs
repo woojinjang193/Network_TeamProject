@@ -52,4 +52,15 @@ public class PlayerPanelItem : MonoBehaviour
             backgroundImage.color = Color.white;
         }
     }
+    public void InitBot(string botName, string team)
+    {
+        nameText.text = botName;
+        readyText.text = "Ready";
+        readyImage.color = Color.green; 
+        hostImage.enabled = false;
+
+        backgroundImage.color = team == "Team1"
+            ? new Color(1f, 0.5f, 0.5f)
+            : new Color(0.5f, 0.5f, 1f);
+    }
 }
