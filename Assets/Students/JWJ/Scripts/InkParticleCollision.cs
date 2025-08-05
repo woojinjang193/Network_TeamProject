@@ -211,8 +211,13 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
             //그림
         }
 
+        // 충돌 지점 스플래쉬 이펙트
         Instantiate(splash, hitPos, Quaternion.LookRotation(hitNor));
-        // 충돌 지점에 스플래쉬 파티클 생성
+        
+        // 충돌 지점에 소리 재생
+        Manager.Audio.PlayClip("InkHit",hitPos);
+        Manager.Audio.PlayClip("Splash",hitPos);
+        Manager.Audio.PlayClip("Spread",hitPos);
     }
 
 
@@ -223,14 +228,14 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
             Debug.Log("아군입니다.");
             return;
         }
-        else if (player.MyTeam != myTeam)
+        if (player.MyTeam != myTeam)
         {
             Debug.Log("적 입니다.");
             player.photonView.RPC("TakeDamage", player.photonView.Owner, 1f);
+            Manager.Audio.PlayClip("InkHit",player.transform.position);
+            Manager.Audio.PlayEffect("HitPlayer");
+            return;
         }
-        else
-        {
-            Debug.Log("팀 이없습니다");
-        }
+        Debug.Log("팀 이없습니다");
     }
 }
