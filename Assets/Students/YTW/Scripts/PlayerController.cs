@@ -204,7 +204,7 @@ public class PlayerController : BaseController
 
         // 게임 매니저에 팀 할당
         // TODO : 테스트 끝나면 해제
-        // StartCoroutine(WaitForTeamAssignment());
+        StartCoroutine(WaitForTeamAssignment());
 
         // 카메라 동기화
         if (playerCameraObject == null)
@@ -564,8 +564,8 @@ public class PlayerController : BaseController
             string team = teamValue.ToString();
             // GameManager 인스턴스에서 팀별 스폰 포인트 배열을 가져옴
             Transform[] spawnPoints = (team == "Team1")
-                ? GameManager.Instance.team1SpawnPoints
-                : GameManager.Instance.team2SpawnPoints;
+                ? Manager.Game.team1SpawnPoints
+                : Manager.Game.team2SpawnPoints;
 
             if (spawnPoints != null && spawnPoints.Length > 0)
             {

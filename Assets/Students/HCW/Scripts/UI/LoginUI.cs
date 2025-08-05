@@ -61,13 +61,13 @@ public class LoginUI : BaseUI
                 Debug.Log("Photon 서버에 연결되지 않음. 연결 시도 중...");
                 Photon.Pun.PhotonNetwork.ConnectUsingSettings();
             }
-            NetworkManager.Instance.ShowLobby(); // 로그인 성공 후 로비로 이동
+            Manager.Net.ShowLobby(); // 로그인 성공 후 로비로 이동
         });
     }
 
     private void ShowSignUpUI()
     {
-        UIManager.Instance.ReplaceUI(typeof(SignUpUI));
+        Manager.UI.ReplaceUI(typeof(SignUpUI));
     }
 
     // 호출할 메시지 업데이트 함수

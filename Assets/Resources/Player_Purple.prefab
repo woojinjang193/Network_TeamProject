@@ -6497,7 +6497,7 @@ GameObject:
   - component: {fileID: 8610666168281609814}
   m_Layer: 8
   m_Name: Player_Purple
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6540,6 +6540,7 @@ MonoBehaviour:
   moveSpeed: 7
   inkParticleGun: {fileID: 5702437234916080121}
   weaponView: {fileID: 0}
+  fireSound: {fileID: 0}
   faceType: 0
   rig: {fileID: 0}
   col: {fileID: 0}
@@ -6553,6 +6554,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  maxSlopeAngle: 45
   humanJumpForce: 15
   squidJumpForce: 15
   squidSpeed: 10

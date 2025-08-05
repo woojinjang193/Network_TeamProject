@@ -81,7 +81,7 @@ public class SignUpUI : BaseUI
 
     private void ShowLoginUI()
     {
-        UIManager.Instance.ReplaceUI(typeof(LoginUI));
+        Manager.UI.ReplaceUI(typeof(LoginUI));
     }
 
     // 호출할 메시지 업데이트 함수

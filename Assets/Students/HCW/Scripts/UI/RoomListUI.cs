@@ -12,9 +12,6 @@ public class RoomListUI : BaseUI
     [SerializeField] private GameObject roomListItemPrefab; // 각 방 정보를 표시할 UI 프리팹
     [SerializeField] private Button backButton;
     
-    [Header("참조")]
-    [SerializeField] private NetworkManager networkManager;
-    
     private Dictionary<string, RoomListItemUI> roomListItems = new Dictionary<string, RoomListItemUI>();
 
     private UIManager uiManager;
@@ -30,7 +27,7 @@ public class RoomListUI : BaseUI
     {
         gameObject.SetActive(true);
         // TODO: 방 목록을 Photon에서 받아와서 업데이트하는 로직 추가
-        UpdateRoomList(networkManager.cachedRoomList);
+        UpdateRoomList(Manager.Net.cachedRoomList);
     }
 
     public override void Close()
@@ -42,7 +39,7 @@ public class RoomListUI : BaseUI
     {
         if (uiManager != null)
         {
-            UIManager.Instance.PopUI(); // 이전 UI (LobbyUI)로 돌아감
+            Manager.UI.PopUI(); // 이전 UI (LobbyUI)로 돌아감
         }
     }
 

@@ -73,14 +73,14 @@ public class LobbyPanel : MonoBehaviour
     private void CreateRoom()
     {
         createRoomButton.interactable = false; // 중복 클릭 방지
-        NetworkManager.Instance.CreateRoom(roomNameField.text); // 입력된 방 이름으로 방 생성 요청
+        Manager.Net.CreateRoom(roomNameField.text); // 입력된 방 이름으로 방 생성 요청
     }
 
     // 빠른 입장 버튼 클릭 시 호출
     private void QuickJoin()
     {
         string desiredName = roomNameField.text; // 입력된 방 이름 값 읽기
-        NetworkManager.Instance.QuickJoinRoom(desiredName); // 네트워크 매니저에 빠른 입장 요청
+        Manager.Net.QuickJoinRoom(desiredName); // 네트워크 매니저에 빠른 입장 요청
     }
 
     // 로비에서 수신한 방 목록을 UI에 업데이트

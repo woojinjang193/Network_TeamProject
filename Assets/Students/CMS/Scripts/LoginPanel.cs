@@ -85,7 +85,7 @@ public class LoginPanel : MonoBehaviour
                 else
                 {
                     Debug.Log("Photon 서버에 이미 연결됨 로비로 바로 이동");
-                    NetworkManager.Instance.ShowLobby();
+                    Manager.Net.ShowLobby();
                 }
 
                 gameObject.SetActive(false);

@@ -58,6 +58,7 @@ public class AudioManager : SingletonPun<AudioManager>
         bgmGroup = mixer.FindMatchingGroups("Master/BGM")[0];
         sfxGroup = mixer.FindMatchingGroups("Master/SFX")[0];
         
+        
         // 오디오 소스 세팅
         bgmSource = gameObject.GetOrAddComponent<AudioSource>();
         ambientSource = gameObject.AddComponent<AudioSource>();
@@ -73,8 +74,10 @@ public class AudioManager : SingletonPun<AudioManager>
         defaultBGM = audioDict.TryGetValue("defaultBGM", out defaultBGM) ? defaultBGM : audioDB.audioList[0];
         defaultAmbient = audioDict.TryGetValue("defaultAmbient", out defaultAmbient) ? defaultAmbient : audioDB.audioList[0];
     }
+    
     private void Start()
     {
+        // 사용자 설정 가져오기
         VolumeLoad();
         // 기본 백색소음 재생
         SwitchAmbient("defaultAmbient",1f);
@@ -82,7 +85,7 @@ public class AudioManager : SingletonPun<AudioManager>
         SwitchBGM("defaultBGM",1f);
     }
 
-    private void VolumeLoad()
+    private void VolumeLoad() // 사용자 설정을 불러오기
     {
         float value;
         if (PlayerPrefs.HasKey("MasterVolume"))
@@ -135,7 +138,7 @@ public class AudioManager : SingletonPun<AudioManager>
         }
     }
     
-    public void SwitchBGM(string bgmName, float fadeTime = 0.3f) // 배경 음악 변경 시 사용
+    public void SwitchBGM(string bgmName, float fadeTime = 1f) // 배경 음악 변경 시 사용
     {
         // 딕셔너리에서 이름을 기준으로 찾는다.
         if (!audioDict.TryGetValue(bgmName, out AudioData newBgm))

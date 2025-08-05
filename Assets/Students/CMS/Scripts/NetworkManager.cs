@@ -9,22 +9,20 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 
-public class NetworkManager : MonoBehaviourPunCallbacks
+public class NetworkManager : SingletonPunCallbacks<NetworkManager>
 {
-    public static NetworkManager Instance { get; private set; }
-
-    [SerializeField] TMP_Text stateText;
-    [SerializeField] RoomManager roomManager;
+    public RoomManager roomManager;
 
     public List<RoomInfo> cachedRoomList = new();
 
     private string _desiredRoomNameOnFail; // 빠른 입장 실패 시 사용할 방 이름을 임시 저장하는 변수
 
-    private void Awake()
+    protected override void Awake()
     {
-        DontDestroyOnLoad(gameObject);
-        Instance = this;
+        base.Awake();
+        roomManager = FindObjectOfType<RoomManager>();
         Debug.Log("NetworkManager 초기화 완료");
+        
     }
 
 
@@ -94,7 +92,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Debug.Log("방 입장 성공!");
 
         roomManager?.OnRoomJoined();
-        UIManager.Instance?.ReplaceUI(typeof(LobbyUI));
+        Manager.UI.ReplaceUI(typeof(LobbyUI));
     }
 
 
@@ -109,10 +107,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public void ShowLobby()
     {
-        if (UIManager.Instance != null)
-        {
-            UIManager.Instance.ReplaceUI(typeof(LobbyUI));
-        }
+        Manager.UI.ReplaceUI(typeof(LobbyUI));
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
@@ -121,7 +116,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         Debug.Log($"[NetworkManager] RoomList 업데이트 수신됨, 방 수: {roomList.Count}");
 
-        if (UIManager.Instance?.CurrentUI is RoomListUI roomListUI)
+        if (Manager.UI.CurrentUI is RoomListUI roomListUI)
         {
             roomListUI.UpdateRoomList(roomList);
             Debug.Log("룸리스트 UI 업데이트 실행");
@@ -166,9 +161,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("OnLeftRoom 호출됨");
 
-        if (UIManager.Instance?.CurrentUI != null)
+        if (Manager.UI.CurrentUI != null)
         {
-            Debug.Log($"현재 UI 타입: {UIManager.Instance.CurrentUI.GetType().Name}");
+            Debug.Log($"현재 UI 타입: {Manager.UI.CurrentUI.GetType().Name}");
         }
         else
         {
@@ -181,7 +176,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             roomUI.Close();
         }
 
-        UIManager.Instance?.ReplaceUI(typeof(LobbyUI));
+        Manager.UI.ReplaceUI(typeof(LobbyUI));
     }
 
     public override void OnJoinedLobby()
