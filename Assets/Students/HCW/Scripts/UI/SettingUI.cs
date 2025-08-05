@@ -18,7 +18,7 @@ public class SettingUI : BaseUI
     [SerializeField] private GameObject controlsContent;
 
     [Header("그래픽 UI 요소")]
-    [SerializeField] private TMPro.TMP_Dropdown resolutionDropdown;
+    [SerializeField] private TMP_Dropdown resolutionDropdown;
     [SerializeField] private Button applyGraphicsButton;
 
     private Resolution[] resolutions;
@@ -26,27 +26,7 @@ public class SettingUI : BaseUI
     private const string RESOLUTION_HEIGHT_PREF = "ResolutionHeight";
     private const string RESOLUTION_REFRESH_RATE_PREF = "ResolutionRefreshRate";
 
-    [Header("컨트롤 UI 요소")]
-    [SerializeField] private Slider mouseSensitivitySlider;
-    [SerializeField] private TextMeshProUGUI mouseSensitivityValueText; // 슬라이더 값 표시용
-    [SerializeField] private TMP_InputField upKeyInputField;
-    [SerializeField] private TMP_InputField downKeyInputField;
-    [SerializeField] private TMP_InputField leftKeyInputField;
-    [SerializeField] private TMP_InputField rightKeyInputField;
-    [SerializeField] private TMP_InputField squidKeyInputField;
-    [SerializeField] private TMP_InputField jumpKeyInputField;
 
-
-    private Dictionary<string, KeyCode> keyBindings = new Dictionary<string, KeyCode>();
-    private float mouseSensitivity;
-
-    private const string UP_KEY_PREF = "UpKey";
-    private const string DOWN_KEY_PREF = "DownKey";
-    private const string LEFT_KEY_PREF = "LeftKey";
-    private const string RIGHT_KEY_PREF = "RightKey";
-    private const string SQUID_KEY_PREF = "SquidKey";
-    private const string JUMP_KEY_PREF = "JumpKey";
-    private const string MOUSE_SENSITIVITY_PREF = "MouseSensitivity";
 
     private UIManager uiManager;
 
@@ -63,15 +43,7 @@ public class SettingUI : BaseUI
         // 닫기 버튼에 리스너 추가
         closeButton.onClick.AddListener(OnCloseButtonClicked);
 
-        // --- InputField 및 Slider 리스너 추가 ---
-        // upKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(UP_KEY_PREF, value));
-        // downKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(DOWN_KEY_PREF, value));
-        // leftKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(LEFT_KEY_PREF, value));
-        // rightKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(RIGHT_KEY_PREF, value));
-        // squidKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(SQUID_KEY_PREF, value));
-        // jumpKeyInputField.onEndEdit.AddListener((value) => OnKeyInputEndEdit(JUMP_KEY_PREF, value));
 
-        //mouseSensitivitySlider.onValueChanged.AddListener(OnMouseSensitivityChanged);
 
         // --- 해상도 드롭다운 초기화 ---
         resolutions = Screen.resolutions;
@@ -80,7 +52,7 @@ public class SettingUI : BaseUI
         int currentResolutionIndex = 0;
         for (int i = 0; i < resolutions.Length; i++)
         {
-            string option = resolutions[i].width + " x " + resolutions[i].height + " @ " + resolutions[i].refreshRateRatio.value + "Hz";
+            string option = resolutions[i].width + " x " + resolutions[i].height;
             options.Add(option);
 
             if (resolutions[i].width == Screen.currentResolution.width &&
@@ -98,7 +70,7 @@ public class SettingUI : BaseUI
         applyGraphicsButton.onClick.AddListener(OnApplyGraphicsButtonClicked);
 
         // 초기 키 설정
-        SetDefaultKeyBindings();
+        SetDefaultSettings();
     }
 
     public override void Open()
@@ -108,16 +80,12 @@ public class SettingUI : BaseUI
         ChangeTab(soundContent);
 
         // UI 열릴 때 설정 로드 및 UI 업데이트
-        LoadSettings();
-        UpdateControlsUI();
         UpdateGraphicsUI(); // 그래픽 UI 업데이트 추가
     }
 
     public override void Close()
     {
         gameObject.SetActive(false);
-        // UI 닫힐 때 설정 저장
-        SaveSettings();
     }
 
     private void ChangeTab(GameObject activeContent)
@@ -138,65 +106,19 @@ public class SettingUI : BaseUI
     }
 
     // 설정 로드/저장 및 UI 업데이트
-    private void SetDefaultKeyBindings()
+    private void SetDefaultSettings()
     {
-        if (!PlayerPrefs.HasKey(UP_KEY_PREF)) PlayerPrefs.SetString(UP_KEY_PREF, KeyCode.W.ToString());
-        if (!PlayerPrefs.HasKey(DOWN_KEY_PREF)) PlayerPrefs.SetString(DOWN_KEY_PREF, KeyCode.S.ToString());
-        if (!PlayerPrefs.HasKey(LEFT_KEY_PREF)) PlayerPrefs.SetString(LEFT_KEY_PREF, KeyCode.A.ToString());
-        if (!PlayerPrefs.HasKey(RIGHT_KEY_PREF)) PlayerPrefs.SetString(RIGHT_KEY_PREF, KeyCode.D.ToString());
-        if (!PlayerPrefs.HasKey(SQUID_KEY_PREF)) PlayerPrefs.SetString(SQUID_KEY_PREF, KeyCode.LeftShift.ToString());
-        if (!PlayerPrefs.HasKey(JUMP_KEY_PREF)) PlayerPrefs.SetString(JUMP_KEY_PREF, KeyCode.Space.ToString());
-        if (!PlayerPrefs.HasKey(MOUSE_SENSITIVITY_PREF)) PlayerPrefs.SetFloat(MOUSE_SENSITIVITY_PREF, 1.0f); // 기본 감도
+
 
         // 기본 해상도 설정 (현재 해상도)
         if (!PlayerPrefs.HasKey(RESOLUTION_WIDTH_PREF)) PlayerPrefs.SetInt(RESOLUTION_WIDTH_PREF, Screen.currentResolution.width);
         if (!PlayerPrefs.HasKey(RESOLUTION_HEIGHT_PREF)) PlayerPrefs.SetInt(RESOLUTION_HEIGHT_PREF, Screen.currentResolution.height);
         if (!PlayerPrefs.HasKey(RESOLUTION_REFRESH_RATE_PREF)) PlayerPrefs.SetFloat(RESOLUTION_REFRESH_RATE_PREF, (float)Screen.currentResolution.refreshRateRatio.value);
-        
+
         PlayerPrefs.Save();
     }
 
-    private void LoadSettings()
-    {
-        keyBindings[UP_KEY_PREF] = (KeyCode)Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString(UP_KEY_PREF));
-        keyBindings[DOWN_KEY_PREF] = (KeyCode)Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString(DOWN_KEY_PREF));
-        keyBindings[LEFT_KEY_PREF] = (KeyCode)Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString(LEFT_KEY_PREF));
-        keyBindings[RIGHT_KEY_PREF] = (KeyCode)Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString(RIGHT_KEY_PREF));
-        keyBindings[SQUID_KEY_PREF] = (KeyCode)Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString(SQUID_KEY_PREF));
-        keyBindings[JUMP_KEY_PREF] = (KeyCode)Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString(JUMP_KEY_PREF));
-        mouseSensitivity = PlayerPrefs.GetFloat(MOUSE_SENSITIVITY_PREF);
-    }
 
-    private void SaveSettings()
-    {
-        PlayerPrefs.SetString(UP_KEY_PREF, keyBindings[UP_KEY_PREF].ToString());
-        PlayerPrefs.SetString(DOWN_KEY_PREF, keyBindings[DOWN_KEY_PREF].ToString());
-        PlayerPrefs.SetString(LEFT_KEY_PREF, keyBindings[LEFT_KEY_PREF].ToString());
-        PlayerPrefs.SetString(RIGHT_KEY_PREF, keyBindings[RIGHT_KEY_PREF].ToString());
-        PlayerPrefs.SetString(SQUID_KEY_PREF, keyBindings[SQUID_KEY_PREF].ToString());
-        PlayerPrefs.SetString(JUMP_KEY_PREF, keyBindings[JUMP_KEY_PREF].ToString());
-        PlayerPrefs.SetFloat(MOUSE_SENSITIVITY_PREF, mouseSensitivity);
-
-        // 해상도 저장
-        PlayerPrefs.SetInt(RESOLUTION_WIDTH_PREF, Screen.currentResolution.width);
-        PlayerPrefs.SetInt(RESOLUTION_HEIGHT_PREF, Screen.currentResolution.height);
-        PlayerPrefs.SetFloat(RESOLUTION_REFRESH_RATE_PREF, (float)Screen.currentResolution.refreshRateRatio.value);
-        
-        PlayerPrefs.Save();
-    }
-
-    private void UpdateControlsUI()
-    {
-        upKeyInputField.text = keyBindings[UP_KEY_PREF].ToString();
-        downKeyInputField.text = keyBindings[DOWN_KEY_PREF].ToString();
-        leftKeyInputField.text = keyBindings[LEFT_KEY_PREF].ToString();
-        rightKeyInputField.text = keyBindings[RIGHT_KEY_PREF].ToString();
-        squidKeyInputField.text = keyBindings[SQUID_KEY_PREF].ToString();
-        jumpKeyInputField.text = keyBindings[JUMP_KEY_PREF].ToString();
-
-        mouseSensitivitySlider.value = mouseSensitivity;
-        mouseSensitivityValueText.text = mouseSensitivity.ToString("F2");
-    }
 
     private void UpdateGraphicsUI()
     {
@@ -225,8 +147,8 @@ public class SettingUI : BaseUI
     private void OnApplyGraphicsButtonClicked()
     {
         Resolution selectedResolution = resolutions[resolutionDropdown.value];
-        //Screen.SetResolution(selectedResolution.width, selectedResolution.height, Screen.fullScreen, selectedResolution.refreshRateRatio);
-        Debug.Log($"해상도 적용: {selectedResolution.width}x{selectedResolution.height} @ {selectedResolution.refreshRateRatio.value}Hz");
+        Screen.SetResolution(selectedResolution.width, selectedResolution.height, Screen.fullScreenMode, selectedResolution.refreshRateRatio);
+        Debug.Log($"해상도 적용: {selectedResolution.width}x{selectedResolution.height}");
 
         // 적용 후 PlayerPrefs에 저장
         PlayerPrefs.SetInt(RESOLUTION_WIDTH_PREF, selectedResolution.width);
@@ -235,3 +157,5 @@ public class SettingUI : BaseUI
         PlayerPrefs.Save();
     }
 }
+
+    
