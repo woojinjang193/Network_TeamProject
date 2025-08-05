@@ -182,7 +182,20 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     public override void OnJoinedLobby()
     {
         Debug.Log("로비 입장 완료");
-            ShowLobby(); 
+        ShowLobby(); 
+    }
+
+    public void RequestRoomListUpdate()
+    {
+        if (PhotonNetwork.IsConnectedAndReady)
+        {
+            PhotonNetwork.JoinLobby(); // 로비에 다시 조인하여 방 목록 업데이트 요청
+            Debug.Log("방 목록 업데이트 요청");
+        }
+        else
+        {
+            Debug.LogWarning("Photon 연결되지 않음");
+        }
     }
     // 이전 방으로 돌아가기
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
