@@ -39,9 +39,11 @@ public class PlayerController : BaseController
     public float gravityScale = 4f;
     public float fallingGravityScale = 7f;
 
+
     [field:Header("무기 설정")]
     public bool IsFiring { get; set; }
     public ParticleSystem weaponFireEffect;
+
     [Header("무기 Transform")]
     public Transform weaponTransform;
     public Transform muzzleTransform;
@@ -183,6 +185,15 @@ public class PlayerController : BaseController
             tpsCamera.CameraUpdate(input.MouseInput.x, input.MouseInput.y);
 
         }
+
+        if (IsFiring&&!fireSound.isPlaying)
+        {
+            fireSound.Play();
+        }
+        else if (!IsFiring && fireSound.isPlaying)
+        {
+            fireSound.Stop();
+        }
     }
 
     public void MineInit()
@@ -203,7 +214,7 @@ public class PlayerController : BaseController
 
         // 게임 매니저에 팀 할당
         // TODO : 테스트 끝나면 해제
-        // StartCoroutine(WaitForTeamAssignment());
+        StartCoroutine(WaitForTeamAssignment());
 
         // 카메라 동기화
         if (playerCameraObject == null)
@@ -563,8 +574,8 @@ public class PlayerController : BaseController
             string team = teamValue.ToString();
             // GameManager 인스턴스에서 팀별 스폰 포인트 배열을 가져옴
             Transform[] spawnPoints = (team == "Team1")
-                ? GameManager.Instance.team1SpawnPoints
-                : GameManager.Instance.team2SpawnPoints;
+                ? Manager.Game.team1SpawnPoints
+                : Manager.Game.team2SpawnPoints;
 
             if (spawnPoints != null && spawnPoints.Length > 0)
             {

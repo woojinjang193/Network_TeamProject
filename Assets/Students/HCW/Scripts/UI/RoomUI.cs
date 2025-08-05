@@ -115,7 +115,7 @@ public class RoomUI : BaseUI
     private void OnLeaveRoomButtonClicked()
     {
         Debug.Log("방 나가기 버튼 클릭됨");
-        NetworkManager.Instance.LeaveRoom();
+        Manager.Net.LeaveRoom();
     }
 
     public void UpdatePlayerList(List<Photon.Realtime.Player> players)

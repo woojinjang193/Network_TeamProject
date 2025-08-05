@@ -53,6 +53,9 @@ MonoBehaviour:
   - TriggerHitAnimation
   - ShowResultUI
   - PlayClip
+  - RequestGridPaint
+  - SyncGridPaint
+  - RpcSetGridTeam
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

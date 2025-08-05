@@ -3244,6 +3244,7 @@ MonoBehaviour:
   moveSpeed: 10
   inkParticleGun: {fileID: 923992536721296673}
   weaponView: {fileID: 0}
+  fireSound: {fileID: 0}
   faceType: 0
   rig: {fileID: 0}
   col: {fileID: 0}
