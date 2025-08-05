@@ -9,6 +9,7 @@ using UnityEngine;
 public class GridManager : MonoBehaviour, IInRoomCallbacks
 {
     [SerializeField] private TMP_Text teamRateText;
+    [SerializeField] private GameObject MapWithGrid;
     private PhotonView photonView;///
 
     private int countTeam1  = 0;
@@ -18,7 +19,8 @@ public class GridManager : MonoBehaviour, IInRoomCallbacks
     public float Team1Rate { get; private set; }
     public float Team2Rate { get; private set; }
 
-    private Dictionary<int, MapGrid> gridDic = new(5000);
+    public Dictionary<int, MapGrid> gridDic = new(5000);
+    private Dictionary<Collider, MapGrid> colliderToGrid = new(5000);
     //그리드들을 넣어놓을 딕셔너리
 
     private void Awake()
@@ -26,22 +28,11 @@ public class GridManager : MonoBehaviour, IInRoomCallbacks
         photonView = GetComponent<PhotonView>();//
         Manager.Grid = this;
 
-        if (teamRateText == null)
+        MapGrid[] mapGrids = MapWithGrid.GetComponentsInChildren<MapGrid>(false);
+        for (int i = 0; i < mapGrids.Length; i++)
         {
-            GameObject teamRateTextPrefab = Resources.Load<GameObject>("UI/CoverageRateCanvas");
-            if (teamRateTextPrefab != null)
-            {
-                GameObject canvas = Instantiate(teamRateTextPrefab);
-                canvas.transform.SetParent(transform, false);
-                teamRateText = canvas.GetComponentInChildren<TMP_Text>();
-            }
-            else
-            {
-                Debug.LogError("UI/CoverageRateCanvas 프리팹을 찾을 수 없습니다.");
-            }
-        }
-
-        
+            mapGrids[i].id = i;
+        }   
 
     }
     private void Start()
@@ -61,7 +52,7 @@ public class GridManager : MonoBehaviour, IInRoomCallbacks
 
     public void RegisterGrid(MapGrid grid)
     {
-        int id = grid.gameObject.GetInstanceID();
+        int id = grid.id;
         if(!gridDic.ContainsKey(id))
             // 딕셔너리에 없다면
         {
@@ -69,19 +60,38 @@ public class GridManager : MonoBehaviour, IInRoomCallbacks
             //딕셔너리에 등록
             countNone++;
             //그리드를 등록할때는 팀을none 으로 넣음
+
+            Collider col = grid.GetComponent<Collider>();
+            if (col != null)
+            {
+                colliderToGrid[col] = grid;
+            }
         }
     }
-    public MapGrid GetGrid(GameObject obj)
+    public MapGrid GetGrid(Collider col) //콜라이더로 그리드 정보 받아옴
     {
-        int id = obj.GetInstanceID();
-        return gridDic[id];
-        
-    }    
+        colliderToGrid.TryGetValue(col, out MapGrid grid);
+        return grid;
+    }
+
+    //public MapGrid GetGrid(GameObject obj) //
+    //{
+    //    Collider col = obj.GetComponent<Collider>();
+    //    if (col != null)
+    //        return GetGrid(col);
+    //    else
+    //        return null;
+    //}
+
+    public MapGrid GetGridByID(int id)
+    {
+        gridDic.TryGetValue(id, out MapGrid grid);
+        return grid;
+    }
+
 
     public List<MapGrid> GetAllGrids() //InkParticleCollision 에서 한번 호출
     {
-        //Debug.Log($"등록된 그리드 총개수: {gridDic.Count}");
-        //Debug.Log($"None :{countNone}");
         return gridDic.Values.ToList();
         //딕셔너리를 리스트로 바꿔서 반환
     }
@@ -125,20 +135,24 @@ public class GridManager : MonoBehaviour, IInRoomCallbacks
         Team1Rate = countTeam1 / (float)total * 100f;
         Team2Rate = countTeam2 / (float)total * 100f;
         teamRateText.text = $"Team1 : {Team1Rate.ToString("F2")}%    Team2 : {Team2Rate.ToString("F2")}%";
+        //teamRateText.text = "";
 
-        photonView.RPC("SyncCoverageUI", RpcTarget.Others, Team1Rate, Team2Rate);
+        //photonView.RPC("SyncCoverageUI", RpcTarget.Others, Team1Rate, Team2Rate);//
+   
     }
 
-    [PunRPC]
-    public void SyncCoverageUI(float team1Rate, float team2Rate) // 추가됨!!!
-    {
-        teamRateText.text = $"Team1 : {team1Rate:F2}%    Team2 : {team2Rate:F2}%";
-    }
+
+    //[PunRPC]
+    //public void SyncCoverageUI(float team1Rate, float team2Rate) 
+    //{
+    //    teamRateText.text = $"Team1 : {team1Rate:F2}%    Team2 : {team2Rate:F2}%";
+    //    //teamRateText.text = ""; 
+    //}
 
     public string GetWinningTeam()
     {
-        if (countTeam1 > countTeam2) return "Team1";
-        else if (countTeam2 > countTeam1) return "Team2";
+        if (countTeam1 > countTeam2) return "Purple";
+        else if (countTeam2 > countTeam1) return "Yellow";
         else return "Draw";
     }
 
@@ -148,6 +162,7 @@ public class GridManager : MonoBehaviour, IInRoomCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             CountGridsByNewMaster();
+            Debug.Log("마스터 바뀜");
         }
     }
 
