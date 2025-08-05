@@ -15,8 +15,8 @@ public class TestGameManager : Singleton<GameManager>
     //플레이어의 콜라이더와 컨트롤러를 넣을 딕셔너리 
 
     [Header("팀별 스폰 위치")]
-    [SerializeField] private Transform[] team1SpawnPoints;   // Team1 스폰 
-    [SerializeField] private Transform[] team2SpawnPoints;   // Team2 스폰 
+    [SerializeField] public Transform[] team1SpawnPoints;   // Team1 스폰 
+    [SerializeField] public Transform[] team2SpawnPoints;   // Team2 스폰 
     [SerializeField] private string playerPrefabName = "Player_CharacterTest";
 
     //게임결과 UI
@@ -117,17 +117,20 @@ public class TestGameManager : Singleton<GameManager>
         //SceneManager.LoadScene("LoginScene"); //씬 이름 변경 예정
 
         //gameResultUI.UIOpen(winningTeam);
+
+        float team1Rate = Manager.Grid.Team1Rate;
+        float team2Rate = Manager.Grid.Team2Rate;
         if (PhotonNetwork.IsMasterClient)
         {
-            photonView.RPC("ShowResultUI", RpcTarget.All, winningTeam);
+            photonView.RPC("ShowResultUI", RpcTarget.All, winningTeam, team1Rate, team2Rate);
         }
 
     }
 
     [PunRPC]
-    void ShowResultUI(string winner)
+    void ShowResultUI(string winner, float team1Rate, float team2Rate)
     {
-        gameResultUI.UIOpen(winner);
+        gameResultUI.UIOpen(winner, team1Rate / 100f, team2Rate / 100f);
     }
 
     private void PlayerOff()

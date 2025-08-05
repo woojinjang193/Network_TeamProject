@@ -13,10 +13,6 @@ public class InkTank : MonoBehaviour
     public float WobbleSpeed = 5.0f;
     public float RecoveryRate = 1f;
 
-    [Header("잉크 잔량")]
-    public float MinFillAmount = -0.8f; // 잉크가 완전히 비었을 때
-    public float MaxFillAmount = 0.8f; // 잉크가 가득 찼을 때
-
     private PlayerController myPlayer; // 내 플레이어 참조
 
     private Vector3 prevPos;
@@ -81,8 +77,6 @@ public class InkTank : MonoBehaviour
 
     private void FindMyPlayer()
     {
-        // InkTank는 PlayerController의 자식으로 붙어있을 가능성이 높으므로,
-        // 부모에서 먼저 찾아보는 것이 효율적입니다.
         myPlayer = GetComponentInParent<PlayerController>();
         if (myPlayer != null && myPlayer.photonView.IsMine) return;
 
@@ -103,8 +97,9 @@ public class InkTank : MonoBehaviour
     {
         if (inkRenderer == null) return;
 
+        // 셰이더 _FillAmount 값이 0일 때 최대치 1일 때 비어 보이도록 되어있음
         float inkRatio = Mathf.Clamp01(currentInk / maxInk);
-        float targetFillAmount = Mathf.Lerp(MinFillAmount, MaxFillAmount, inkRatio);
+        float targetFillAmount = Mathf.Lerp(1f, 0f, inkRatio);
         inkRenderer.material.SetFloat(fill_ID, targetFillAmount);
     }
 }

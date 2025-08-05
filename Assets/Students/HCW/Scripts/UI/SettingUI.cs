@@ -32,15 +32,6 @@ public class SettingUI : BaseUI
         closeButton.onClick.AddListener(OnCloseButtonClicked);
     }
 
-    private void Update()
-    {
-        // ESC 키로 UI 닫기
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            OnCloseButtonClicked();
-        }
-    }
-
     public override void Open()
     {
         gameObject.SetActive(true);
@@ -67,7 +58,7 @@ public class SettingUI : BaseUI
     {
         if (uiManager != null)
         {
-            UIManager.Instance.PopUI();
+            Manager.UI.PopUI();
         }
     }
 }

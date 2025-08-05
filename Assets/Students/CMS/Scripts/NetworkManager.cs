@@ -9,27 +9,20 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 
-public class NetworkManager : MonoBehaviourPunCallbacks
+public class NetworkManager : SingletonPunCallbacks<NetworkManager>
 {
-    public static NetworkManager Instance { get; private set; }
-
-    [SerializeField] TMP_Text stateText;
-    [SerializeField] RoomManager roomManager;
-    [SerializeField] private GameObject lobbyPanel;
-    [SerializeField] private GameObject roomPanel;
+    public RoomManager roomManager;
 
     public List<RoomInfo> cachedRoomList = new();
 
     private string _desiredRoomNameOnFail; // 빠른 입장 실패 시 사용할 방 이름을 임시 저장하는 변수
 
-    private bool isReturningToLastRoom = false;
-    private bool isLeavingFromGameEnd = false;
-
-    private void Awake()
+    protected override void Awake()
     {
-        DontDestroyOnLoad(gameObject);
-        Instance = this;
+        base.Awake();
+        roomManager = FindObjectOfType<RoomManager>();
         Debug.Log("NetworkManager 초기화 완료");
+        
     }
 
 
@@ -41,10 +34,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("Photon 연결 완료");
 
-        if (!string.IsNullOrEmpty(MatchData.LastRoomName))
+        if (PhotonNetwork.InRoom)
         {
-            Debug.Log($"[DEBUG] 이전 방 이름 있음: {MatchData.LastRoomName}");
-            StartCoroutine(ReturnToLastRoomFlow());
+            Debug.Log("[NetworkManager] 이미 방에 있음,LobbyUI 띄우기");
+            ShowLobby();
         }
         else
         {
@@ -98,17 +91,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("방 입장 성공!");
 
-        MatchData.LastRoomName = null;
-
-        if (roomManager == null)
-        {
-            Debug.LogError("roomManager가 null입니다. 연결 확인 필요!");
-        }
-        else
-        {
-            Debug.Log("roomManager.OnRoomJoined() 호출");
-            roomManager.OnRoomJoined();
-        }
+        roomManager?.OnRoomJoined();
+        Manager.UI.ReplaceUI(typeof(LobbyUI));
     }
 
 
@@ -123,10 +107,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public void ShowLobby()
     {
-        if (UIManager.Instance != null)
-        {
-            UIManager.Instance.ReplaceUI(typeof(LobbyUI));
-        }
+        Manager.UI.ReplaceUI(typeof(LobbyUI));
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
@@ -135,7 +116,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         Debug.Log($"[NetworkManager] RoomList 업데이트 수신됨, 방 수: {roomList.Count}");
 
-        if (UIManager.Instance?.CurrentUI is RoomListUI roomListUI)
+        if (Manager.UI.CurrentUI is RoomListUI roomListUI)
         {
             roomListUI.UpdateRoomList(roomList);
             Debug.Log("룸리스트 UI 업데이트 실행");
@@ -180,95 +161,30 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("OnLeftRoom 호출됨");
 
-        if (UIManager.Instance?.CurrentUI != null)
+        if (Manager.UI.CurrentUI != null)
         {
-            Debug.Log($"현재 UI 타입: {UIManager.Instance.CurrentUI.GetType().Name}");
+            Debug.Log($"현재 UI 타입: {Manager.UI.CurrentUI.GetType().Name}");
         }
         else
         {
             Debug.Log("CurrentUI가 null임");
         }
 
-        if (isLeavingFromGameEnd)
+        var allUIs = GameObject.FindObjectsOfType<RoomUI>(true);
+        foreach (var roomUI in allUIs)
         {
-            SceneManager.LoadScene("LoginScene");
-            isLeavingFromGameEnd = false;
+            roomUI.Close();
         }
-        else
-        {
-            Debug.Log("로비 UI 복귀");
 
-            MatchData.LastRoomName = null;
-
-            //RoomUI 강제 비활성화
-            var allUIs = GameObject.FindObjectsOfType<RoomUI>(true);
-            foreach (var roomUI in allUIs)
-            {
-                Debug.Log("RoomUI 강제 닫기 실행");
-                roomUI.Close(); // 또는 roomUI.gameObject.SetActive(false);
-            }
-
-            UIManager.Instance?.ReplaceUI(typeof(LobbyUI));
-        }
+        Manager.UI.ReplaceUI(typeof(LobbyUI));
     }
-    public void LeaveRoomFromGameEnd()
-    {
-        isLeavingFromGameEnd = true;
-        MatchData.LastRoomName = PhotonNetwork.CurrentRoom.Name;
-        PhotonNetwork.LeaveRoom();
-    }
+
     public override void OnJoinedLobby()
     {
         Debug.Log("로비 입장 완료");
-
-        if (isReturningToLastRoom && !string.IsNullOrEmpty(MatchData.LastRoomName))
-        {
-            Debug.Log($"이전 방 재입장 시도: {MatchData.LastRoomName}");
-            isReturningToLastRoom = false;
-            PhotonNetwork.JoinRoom(MatchData.LastRoomName);
-        }
-        else
-        {
             ShowLobby(); 
-        }
-    }
-    // 이전 방 복귀 상태 설정
-    public void SetReturnToLastRoomFlag(bool flag)
-    {
-        isReturningToLastRoom = flag;
     }
     // 이전 방으로 돌아가기
-    private IEnumerator ReturnToLastRoomFlow()
-    {
-        Debug.Log("[ReturnToLastRoomFlow] 시작");
-
-        yield return new WaitUntil(() =>
-            PhotonNetwork.IsConnectedAndReady &&
-            PhotonNetwork.NetworkClientState == ClientState.ConnectedToMasterServer);
-
-        if (!PhotonNetwork.InLobby)
-        {
-            PhotonNetwork.JoinLobby();
-            yield return new WaitUntil(() => PhotonNetwork.NetworkClientState == ClientState.JoinedLobby);
-        }
-
-        yield return new WaitUntil(() => PhotonNetwork.InLobby);
-
-        // MatchData.LastRoomName이 실제 roomList에 존재하는지 확인
-        RoomInfo targetRoom = cachedRoomList.FirstOrDefault(r => r.Name == MatchData.LastRoomName);
-
-        if (targetRoom == null)
-        {
-            Debug.LogWarning($"[ReturnToLastRoomFlow] 해당 방 존재하지 않음: {MatchData.LastRoomName} → 새로 생성 시도");
-
-            RoomOptions options = new RoomOptions { MaxPlayers = 8, IsVisible = true, IsOpen = true };
-            PhotonNetwork.CreateRoom(MatchData.LastRoomName, options);
-            yield break;
-        }
-        // 기존 방으로 재입장
-        Debug.Log($"[ReturnToLastRoomFlow] JoinRoom 시도: {MatchData.LastRoomName}");
-        PhotonNetwork.JoinRoom(MatchData.LastRoomName);
-    }
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
         roomManager?.OnPlayerPropertiesUpdated(targetPlayer, changedProps);
@@ -277,9 +193,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     // JoinRoom 실패 시 콜백
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
-        Debug.LogWarning($"JoinRoom 실패: {message} → 방 생성 시도");
-
-        RoomOptions options = new RoomOptions { MaxPlayers = 8 };
-        PhotonNetwork.CreateRoom(MatchData.LastRoomName, options);
+        Debug.LogWarning($"JoinRoom 실패: {message}");
     }
 }

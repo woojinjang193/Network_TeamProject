@@ -2,6 +2,7 @@ using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Realtime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -27,8 +28,6 @@ public class GameManager : Singleton<GameManager>
     {
         base.Awake();
         photonView = GetComponent<PhotonView>();
-        DontDestroyOnLoad(gameObject);
-        Manager.Game = this;
     }
 
     private void Start()
@@ -130,9 +129,22 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
-    public void GameEnd()
+    private void GameEnd()
     {
         Debug.Log("게임 엔드");
+
+        //플레이어 오브젝트 수동 제거
+        //DestroyPlayers();
+        
+        // foreach (var playerObj in GameObject.FindGameObjectsWithTag("Player"))
+        // {
+        //     var pv = playerObj.GetComponent<PhotonView>();
+        //     if (pv != null && pv.IsMine)
+        //     {
+        //         PhotonNetwork.Destroy(playerObj);
+        //         Debug.Log($"플레이어 오브젝트 제거됨: {playerObj.name}");
+        //     }
+        // }
 
         // 현재 유저가 속한 팀 가져오기
         string myTeam = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
@@ -145,9 +157,27 @@ public class GameManager : Singleton<GameManager>
         bool isWin = (winningTeam != "Draw") && (myTeam == winningTeam);
 
         FirebaseManager.UploadMatchResult(isWin);
+        
+        ChangeToLoginScene();
+    }
 
-        MatchData.LastRoomName = PhotonNetwork.CurrentRoom.Name;
-
-        PhotonNetwork.LeaveRoom();
+    private void ChangeToLoginScene()
+    {
+        AsyncOperation async = SceneManager.LoadSceneAsync("LoginScene");
+        if (async != null)
+            async.completed += (AsyncOperation op) =>
+            {
+                Debug.Log("로그인 씬 불러오기 완료");
+                Manager.Net.roomManager = FindObjectOfType<RoomManager>();
+                Manager.Net.roomManager.RoomReInit();
+                
+            };
+    }
+    private void DestroyPlayers()
+    {
+        foreach (var playerObj in playerDic.Values)
+        {
+            PhotonNetwork.Destroy(playerObj.gameObject);
+        }
     }
 }

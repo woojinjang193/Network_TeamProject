@@ -6,11 +6,8 @@ using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
 
-public class FirebaseManager : MonoBehaviour
+public class FirebaseManager : Singleton<FirebaseManager>
 {
-    private static FirebaseManager instance;
-    public static FirebaseManager Instance => instance;
-
     private static FirebaseApp app;
     public static FirebaseApp App => app;
 
@@ -19,17 +16,9 @@ public class FirebaseManager : MonoBehaviour
 
     private static DatabaseReference dbRef;
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        base.Awake();
     }
 
     public void Start()

@@ -35,6 +35,10 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     [Header("잉크 파티클 총")]
     public InkParticleGun inkParticleGun;
     public PhotonView weaponView;
+
+    [Header("사운드 관련")] 
+    public AudioSource fireSound;
+
     
     // 팀 설정
     private Team myTeam = Team.None;
@@ -71,7 +75,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     protected bool isSquidNetworked;
     protected bool isAir;
     
-    
+    // 논리 파라매터
     public bool IsMoving
     {
         get{return isMove;}
@@ -79,6 +83,8 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     }
     protected bool isJump;
     protected float networkMoveSpeed;
+    public bool IsFiring { get; set; }
+    
     
     //플레이어 체력 및 사망 파라매터
     private float curHp;
@@ -122,6 +128,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
             weaponView = inkParticleGun.GetComponent<PhotonView>();
         }
         Manager.Game.RegisterPlayer(col, this);
+        Manager.Audio.SetFireSound(this);
     }
     
     public abstract void TakeDamage(float amount);
