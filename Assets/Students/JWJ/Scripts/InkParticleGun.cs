@@ -20,6 +20,8 @@ public class InkParticleGun : MonoBehaviourPun
     public float inkConsumptionRate = 15f; // 초당 잉크 소모량
     public float inkRecoveryRate = 30f; // 초당 잉크 회복량
 
+    private bool isFiring = false;
+
     // 게임시작시 파티클을 off 시켜놓기위해 EmissionModule을 담을 변수들
     private ParticleSystem.EmissionModule mainEmission;
     private ParticleSystem.EmissionModule fireEmission;
@@ -63,23 +65,40 @@ public class InkParticleGun : MonoBehaviourPun
         mainParticleMain.startSpeed = startSpeedCurve; ///
     }
 
+    private void Update()
+    {
+        if (isFiring && photonView.IsMine)
+        {
+            if (currentInk > 0)
+            {
+                currentInk -= inkConsumptionRate * Time.deltaTime;
+            }
+            else
+            {
+                currentInk = 0;
+                isFiring = false;
+                mainEmission.enabled = false;
+                fireEmission.enabled = false;
+            }
+        }
+    }
+
     [PunRPC]
     public void FireParticle(Team team, bool mouseButtonDown) //활성화 
     {
-        // 잉크가 없으면 발사 중지
+        this.isFiring = mouseButtonDown;
+
         if (currentInk <= 0)
         {
-            mainEmission.enabled = false;
-            fireEmission.enabled = false;
-            return;
+            this.isFiring = false;
         }
 
         UpdateStartSpeed();
 
         //mainParticleMain.startSpeed = particleSpeed;
-        //파티클 on off 설정. 마우스가 클릭상태일땐 활성화
-        mainEmission.enabled = mouseButtonDown;
-        fireEmission.enabled = mouseButtonDown;
+        //파티클 on off 설정. isFiring 상태에 따라 결정
+        mainEmission.enabled = this.isFiring;
+        fireEmission.enabled = this.isFiring;
 
         if (team != currentTeam)
             //플레이어컨트롤러에서 넘겨받은 팀이 현재팀이 아닐경우 (처음과 팀이 변경됐을 경우)
@@ -89,12 +108,6 @@ public class InkParticleGun : MonoBehaviourPun
         
         particleCollision.SetTeam(currentTeam);
         //파티클 충돌 스크립트로 넘겨줌
-
-        if (mouseButtonDown)
-        {
-            currentInk -= inkConsumptionRate * Time.deltaTime;
-            Debug.Log("잉크 소모중");
-        }
     }
 
     // 잉크 회복 (PlayerController에서 호출)

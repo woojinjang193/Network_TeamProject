@@ -51,6 +51,13 @@ public class InGameUI : BaseUI
             if (myPlayer == null) return; // 아직도 못찾았으면 Update 종료
         }
 
+        // 플레이어 상태에 따라 잉크 게이지 활성화 여부 결정
+        if (myPlayer.stateMachine != null && myPlayer.highStateDic.ContainsKey(HighState.SquidForm))
+        {
+            bool isSquidForm = myPlayer.stateMachine.CurrentState == myPlayer.highStateDic[HighState.SquidForm];
+            SetInkGaugeActive(isSquidForm);
+        }
+
         // 플레이어를 찾았다면, 잉크 게이지 업데이트
         if (myPlayer.inkParticleGun != null)
         {

@@ -3248,12 +3248,12 @@ MonoBehaviour:
   rig: {fileID: 0}
   col: {fileID: 0}
   input: {fileID: 0}
-  modelRoot: {fileID: 3415162285399603300}
   playerCameraObject: {fileID: 8410999822390816552}
   tpsCamera: {fileID: 0}
   mainCamera: {fileID: 9103138114427329405}
   cameraPivot: {fileID: 7641482301345163525}
   spectatorCamera: {fileID: 0}
+  ModelTransform: {fileID: 0}
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -4382,6 +4382,7 @@ Transform:
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1207952695500905957}
   - {fileID: 1257028241199647922}
   - {fileID: 6365047461271269670}
   - {fileID: 5830212659247679331}
@@ -29725,3 +29726,77 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1453416222109871692}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &582633458812675110
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 306522169560681248}
+    m_Modifications:
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.392
+      objectReference: {fileID: 0}
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.96551555
+      objectReference: {fileID: 0}
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.16495979
+      objectReference: {fileID: 0}
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.03096517
+      objectReference: {fileID: 0}
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.19902037
+      objectReference: {fileID: 0}
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 19.321
+      objectReference: {fileID: 0}
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -0.356
+      objectReference: {fileID: 0}
+    - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -23.355
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286366742647364446, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: m_Name
+      value: InkTank
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+--- !u!4 &1207952695500905957 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+  m_PrefabInstance: {fileID: 582633458812675110}
+  m_PrefabAsset: {fileID: 0}

@@ -51,6 +51,12 @@ public class Player_Squid : PlayerState
     {
         subStateMachine.Update();
 
+        // 잉크 회복 로직 추가
+        if (player.inkParticleGun != null)
+        {
+            player.inkParticleGun.RecoverInk();
+        }
+
         if (!player.input.IsSquidHeld && !player.IsOnWalkableWall)
         {
             this.stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);

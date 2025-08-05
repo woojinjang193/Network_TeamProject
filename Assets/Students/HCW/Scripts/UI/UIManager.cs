@@ -42,6 +42,30 @@ public class UIManager : Singleton<UIManager>
         }
     }
 
+    private void Update()
+    {
+        // ESC 키로 설정 UI 토글
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // SettingUI가 등록되어 있는지 확인
+            if (!uiDictionary.ContainsKey(typeof(SettingUI)))
+            {
+                Debug.LogWarning("UIManager에 SettingUI가 등록되지 않았습니다.");
+                return;
+            }
+
+            // 현재 UI가 SettingUI라면 닫고, 아니라면 연다.
+            if (CurrentUI != null && CurrentUI.GetType() == typeof(SettingUI))
+            {
+                PopUI();
+            }
+            else
+            {
+                PushUI(typeof(SettingUI));
+            }
+        }
+    }
+
     // 현재 UI를 완전히 교체 (이전 UI는 스택에서 제거)
     public void ReplaceUI(Type uiType)
     {
@@ -55,7 +79,16 @@ public class UIManager : Singleton<UIManager>
         if (uiStack.Count > 0)
         {
             BaseUI currentUI = uiStack.Pop();
-            currentUI.Close();
+
+            //파괴된 오브젝트인지 체크
+            if (currentUI != null && currentUI.gameObject != null)
+            {
+                currentUI.Close();
+            }
+            else
+            {
+                Debug.LogWarning("UIManager: 이전 UI가 이미 파괴되어 Close() 생략");
+            }
         }
 
         // 새 UI를 열고 스택에 추가
@@ -110,5 +143,23 @@ public class UIManager : Singleton<UIManager>
         {
             Debug.LogWarning("스택에 UI가 없습니다.");
         }
+    }
+    public void Reinitialize()
+    {
+        uiStack.Clear();
+        uiDictionary.Clear();
+
+        BaseUI[] allUIs = FindObjectsOfType<BaseUI>(true);
+        foreach (var ui in allUIs)
+        {
+            ui.gameObject.SetActive(false);
+            if (!uiDictionary.ContainsKey(ui.GetType()))
+            {
+                uiDictionary.Add(ui.GetType(), ui);
+                Debug.Log($"UIManager: {ui.GetType().Name} UI를 재등록했습니다.");
+            }
+        }
+
+        Debug.Log("UIManager: 씬 전환 후 UI 재등록 완료");
     }
 }
