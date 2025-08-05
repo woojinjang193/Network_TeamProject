@@ -22,7 +22,7 @@ public class ChaseState : AIBaseState
         }
 
         float distance = Vector3.Distance(_controller.transform.position, target.position);
-        if(distance > 10f)
+        if(distance > _controller.detectRadius)
         {
             _controller.StateMachine.SetState(new IdleState(_controller));
             _controller.FireModule.StopFire();

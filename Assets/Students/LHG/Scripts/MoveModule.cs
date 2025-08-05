@@ -36,10 +36,10 @@ public class MoveModule
                 {
                     MoveTo(_randomPos);
                     elapsed += Time.deltaTime;
-                
+
                     float distance = Vector3.Distance(_controller.transform.position, _randomPos);
                     _controller.IsMoving = distance > 0.1f;
-                
+
                     yield return null;
                 }
             }
@@ -63,12 +63,12 @@ public class MoveModule
             currentSpeed *= _controller.enemyInkSpeedModifier;
         }
 
-        if(!_controller.agent.hasPath || _controller.agent.destination != targetPos)
+        if (!_controller.agent.hasPath || _controller.agent.destination != targetPos)
         {
             _controller.agent.SetDestination(targetPos);
         }
 
-        if(_controller.agent.pathPending == false && _controller.agent.remainingDistance > _controller.agent.stoppingDistance)
+        if (_controller.agent.pathPending == false && _controller.agent.remainingDistance > _controller.agent.stoppingDistance)
         {
             Vector3 direction = (_controller.agent.steeringTarget - _controller.transform.position).normalized;
             direction.y = 0;
@@ -100,6 +100,18 @@ public class MoveModule
     // 벽에 부딪히면 이동 중단하고 방향 재설정
     public void OnCollisionEnter(Collision collision)
     {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+        {
+            Debug.Log("플레이어와 충돌: 무시됨");
+            return;
+        }
+
+        //int ignoreLayerMask = LayerMask.GetMask("Player", "AI");
+        //if ((ignoreLayerMask & (1<<collision.gameObject.layer)) != 0)
+        //{
+        //    return;
+        //}
+
         ContactPoint contact = collision.contacts[0];
         float angle = Vector3.Dot(contact.normal, -_controller.transform.forward);
 
@@ -120,12 +132,12 @@ public class MoveModule
 
     public void RotateToTarget(Vector3 direction)
     {
-        if (Vector3.Dot(direction, _controller.transform.forward)>0.98f)
-            // 거의 각도가 맞으니 return;
+        if (Vector3.Dot(direction, _controller.transform.forward) > 0.98f)
+        // 거의 각도가 맞으니 return;
         {
             return;
         }
-        
+
         if (direction != Vector3.zero)
         {
             _controller.transform.rotation = Quaternion.Slerp(
