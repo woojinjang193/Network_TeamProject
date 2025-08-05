@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviour
     private double startTime;
     [SerializeField] private float matchDuration = 180f;
     [SerializeField] private TMP_Text timerText;
+    [SerializeField] private GameObject timerPanel;
+
     private PhotonView photonView;
 
     private Animator timerAnimation;
@@ -176,7 +178,11 @@ public class GameManager : MonoBehaviour
 
         float team1Rate = Manager.Grid.Team1Rate;
         float team2Rate = Manager.Grid.Team2Rate;
+
         PlayerOff(); //플레이어 비활성화
+
+        timerPanel.gameObject.SetActive(false);
+
         inkGauge.SetActive(false);
         if (PhotonNetwork.IsMasterClient)
         {

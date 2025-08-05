@@ -17543,6 +17543,7 @@ MonoBehaviour:
   inkGauge: {fileID: 1730783463}
   matchDuration: 60
   timerText: {fileID: 345321101}
+  timerPanel: {fileID: 2126148755}
 --- !u!4 &611587127
 Transform:
   m_ObjectHideFlags: 0
