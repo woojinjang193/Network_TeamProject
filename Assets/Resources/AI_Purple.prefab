@@ -2197,6 +2197,7 @@ GameObject:
   - component: {fileID: 4156248522989792812}
   - component: {fileID: 5467757474418972372}
   - component: {fileID: 5400148726782383323}
+  - component: {fileID: 1233821734482484076}
   m_Layer: 0
   m_Name: AI_Purple
   m_TagString: Untagged
@@ -2273,6 +2274,14 @@ MonoBehaviour:
   detectRadius: 10
   spawnPoint: {fileID: 1384964969777689815}
   isFiring: 0
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  inkableLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  inkColorThreshold: 1
+  enemyInkSpeedModifier: 0.5
 --- !u!54 &5467757474418972372
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2323,6 +2332,28 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!195 &1233821734482484076
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2359971001717548127}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &2463770829065899914
 GameObject:
   m_ObjectHideFlags: 0

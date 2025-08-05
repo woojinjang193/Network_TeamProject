@@ -12,7 +12,7 @@ public class Manager : Singleton<Manager>
     protected override void Awake()
     {
         base.Awake();
-        Game = GameManager.Instance;
+        Game = FindObjectOfType<GameManager>();
         Audio = AudioManager.Instance;
         Grid = FindObjectOfType<GridManager>();
 

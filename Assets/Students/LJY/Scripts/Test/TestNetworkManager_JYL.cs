@@ -25,7 +25,7 @@ public class TestNetworkManager_JYL : MonoBehaviourPunCallbacks
     private void PlayerSpawn()
     {
         PhotonNetwork.Instantiate("Player_Yellow", new Vector3(0, 5, 0), Quaternion.identity);
-        PhotonNetwork.Instantiate("AI_Purple", new Vector3(1, 5, 1), Quaternion.identity);
+       // PhotonNetwork.Instantiate("AI_Purple", new Vector3(1, 5, 1), Quaternion.identity);
        // PhotonNetwork.Instantiate("AI_Yellow", new Vector3(3, 5, 3), Quaternion.identity);
     }
     public override void OnPlayerEnteredRoom(Player player)

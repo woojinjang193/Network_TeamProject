@@ -21,29 +21,33 @@ public class RoomManager : MonoBehaviour
 
     }
 
+    /// 방 시작 버튼 클릭 시 호출
     public void OnClickGameStart()
     {
-        PhotonNetwork.LoadLevel("JWJ_SampleScene"); //시작시 GameScene 로드
+        PhotonNetwork.AutomaticallySyncScene = true; // 마스터가 씬 전환 시 자동 동기화
+        PhotonNetwork.LoadLevel("JWJ_SampleScene"); // 시작 시 GameScene 로드
     }
 
-    public void PlayerPanelSpawn(Player player) // 새로운 플레이어가 들어왔을 때 패널 추가
+    /// 새로운 플레이어가 들어왔을 때 패널 추가
+    public void PlayerPanelSpawn(Player player)
     {
         playerPanels[player.ActorNumber] = null; // RoomUI가 UI를 관리하므로 null로 설정
         roomUI?.UpdatePlayerList(PhotonNetwork.PlayerList.ToList()); // RoomUI 업데이트
     }
 
-    public void PlayerPanelSpawnAll()  // 현재 방의 모든 플레이어 패널 일괄 생성
+    /// 현재 방의 모든 플레이어 패널 일괄 생성
+    public void PlayerPanelSpawnAll()
     {
-        PhotonNetwork.AutomaticallySyncScene = true;
         playerPanels.Clear();
-        foreach(Player player in PhotonNetwork.PlayerList)
+        foreach (Player player in PhotonNetwork.PlayerList)
         {
             playerPanels[player.ActorNumber] = null; // RoomUI가 UI를 관리하므로 null로 설정
         }
         roomUI?.UpdatePlayerList(PhotonNetwork.PlayerList.ToList()); // RoomUI 업데이트
     }
 
-    public void PlayerPanelRemove(Player player) // 플레이어가 나갔을 때 패널 제거
+    /// 플레이어가 나갔을 때 패널 제거
+    public void PlayerPanelRemove(Player player)
     {
         if (playerPanels.ContainsKey(player.ActorNumber))
         {
@@ -51,6 +55,8 @@ public class RoomManager : MonoBehaviour
         }
         roomUI?.UpdatePlayerList(PhotonNetwork.PlayerList.ToList()); // RoomUI 업데이트
     }
+
+    /// 모든 플레이어가 준비 상태인지, 팀 배분이 올바른지 확인
     public void CheckAllReady()
     {
         int team1Count = 0, team2Count = 0;
@@ -84,7 +90,7 @@ public class RoomManager : MonoBehaviour
         roomUI?.SetStartButtonActive(canStart && PhotonNetwork.IsMasterClient);
     }
 
-    
+    /// 팀 선택 버튼 클릭 시 호출
     public void OnClickChooseTeam(string team)
     {
         Debug.Log($"RoomManager: 플레이어 {PhotonNetwork.LocalPlayer.NickName} 팀을 {team}으로 설정 시도");
@@ -94,17 +100,21 @@ public class RoomManager : MonoBehaviour
             { "Ready", false }
         });
     }
+    public void OnRoomJoined()
+    {
+        Debug.Log("RoomManager: 방 입장 처리 시작");
+
+        if (roomUI == null)
+            Debug.LogError("roomUI가 null입니다!");
+        else
+            Debug.Log("roomUI.Open() 호출");
+
+        roomUI?.Open();
+        PlayerPanelSpawnAll();
+    }
 
     public void OnPlayerPropertiesUpdated(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
-        // 플레이어 속성 변경 시 RoomUI의 플레이어 목록을 업데이트
         roomUI?.UpdatePlayerList(PhotonNetwork.PlayerList.ToList());
-    }
-
-    public void SetGameMode(int mode)
-    {
-        if (mode < 1 || mode > 4) return;
-        selectedMode = mode;
-        Debug.Log($"RoomManager: 선택된 게임 모드 {selectedMode}vs{selectedMode}");
     }
 }

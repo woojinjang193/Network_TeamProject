@@ -17145,6 +17145,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  maxSlopeAngle: 45
   humanJumpForce: 15
   squidJumpForce: 15
   squidSpeed: 10

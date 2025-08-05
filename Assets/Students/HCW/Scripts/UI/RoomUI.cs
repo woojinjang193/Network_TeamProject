@@ -29,6 +29,12 @@ public class RoomUI : BaseUI
     private void Awake()
     {
         Debug.Log("RoomUI: Awake 메서드 호출됨."); // 이 로그가 뜨는지 확인
+        if (roomManager == null)
+        {
+            roomManager = FindObjectOfType<RoomManager>();
+            if (roomManager == null)
+                Debug.LogError("RoomUI: RoomManager를 찾을 수 없습니다.");
+        }
         // 버튼 이벤트 연결
         readyButton.onClick.AddListener(OnReadyButtonClicked);
         startGameButton.onClick.AddListener(OnStartGameButtonClicked);
@@ -37,10 +43,10 @@ public class RoomUI : BaseUI
         team1Button.onClick.AddListener(() => OnClickChooseTeam("Team1"));
         team2Button.onClick.AddListener(() => OnClickChooseTeam("Team2"));
 
-        mode1vs1Button.onClick.AddListener(() => OnSelectGameMode(1));
-        mode2vs2Button.onClick.AddListener(() => OnSelectGameMode(2));
-        mode3vs3Button.onClick.AddListener(() => OnSelectGameMode(3));
-        mode4vs4Button.onClick.AddListener(() => OnSelectGameMode(4));
+       // mode1vs1Button.onClick.AddListener(() => OnSelectGameMode(1));
+       // mode2vs2Button.onClick.AddListener(() => OnSelectGameMode(2));
+        //mode3vs3Button.onClick.AddListener(() => OnSelectGameMode(3));
+       // mode4vs4Button.onClick.AddListener(() => OnSelectGameMode(4));
     }
 
     public override void Open()
@@ -161,11 +167,11 @@ public class RoomUI : BaseUI
             Debug.LogError("RoomUI: RoomManager가 연결되지 않았습니다.");
         }
     }
-    private void OnSelectGameMode(int mode)
-    {
-        if (!PhotonNetwork.IsMasterClient) return;
+    //private void OnSelectGameMode(int mode)
+  //  {
+       // if (!PhotonNetwork.IsMasterClient) return;
 
-        Debug.Log($"RoomUI: {mode}vs{mode} 모드 선택");
-        roomManager?.SetGameMode(mode);
-    }
+        //Debug.Log($"RoomUI: {mode}vs{mode} 모드 선택");
+        //roomManager?.SetGameMode(mode);
+    //}
 }
