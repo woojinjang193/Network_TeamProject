@@ -26,13 +26,10 @@ public class Player_Human : PlayerState
     {
         Debug.Log("인간 폼");
         player.gameObject.layer = LayerMask.NameToLayer("Player");
-        player.humanModel.SetActive(true);
+        // player.humanModel.SetActive(true); 
+        player.SetModelVisibility(player.humanModel, true);
         player.squidModel.SetActive(false);
-        if (player.inkParticleGun != null)
-        {
-            MeshRenderer gunRenderer = player.inkParticleGun.GetComponentInChildren<MeshRenderer>();
-            if (gunRenderer != null) gunRenderer.enabled = true;
-        }
+
         player.col.direction = 1;
         player.col.center = colCenter;
         player.col.height = 2.0f;

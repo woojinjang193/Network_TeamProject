@@ -27,13 +27,10 @@ public class Player_Squid : PlayerState
         Debug.Log("오징어 폼");
         player.IsFiring = false;
         player.gameObject.layer = LayerMask.NameToLayer("Invincible");
-        player.humanModel.SetActive(false);
+        // player.humanModel.SetActive(false); 
+        player.SetModelVisibility(player.humanModel, false);
         player.squidModel.SetActive(true);
-        if (player.inkParticleGun != null)
-        {
-            MeshRenderer gunRenderer = player.inkParticleGun.GetComponentInChildren<MeshRenderer>();
-            if (gunRenderer != null) gunRenderer.enabled = false;
-        }
+
 
         player.col.direction = 2;
         player.col.height = 0.5f;

@@ -17152,6 +17152,7 @@ MonoBehaviour:
   squidSpeed: 10
   gravityScale: 4
   fallingGravityScale: 7
+  weaponFireEffect: {fileID: 6140524484781776323}
   weaponTransform: {fileID: 1289286861466892408}
   muzzleTransform: {fileID: 4127634135089093344}
   inkableLayer:
@@ -17159,6 +17160,8 @@ MonoBehaviour:
     m_Bits: 64
   enemyInkSpeedModifier: 0.5
   inkColorThreshold: 1
+  damagePerSecondOnEnemyInk: 10
+  healthPerSecondOnOurInk: 5
   IsVaulting: 0
 --- !u!114 &1400002144534113326
 MonoBehaviour:
