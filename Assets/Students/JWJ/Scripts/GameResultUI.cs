@@ -23,6 +23,7 @@ public class GameResultUI : MonoBehaviour
     [SerializeField] private float betweenSlideMoveTime = 2f; // 슬라이드 사이 간격
     [SerializeField] private float firstValueShowTime = 2f; //첫번째 점유율 표시 시간 (속도)
     [SerializeField] private float finalValueShowTime = 1.5f; //마지막 점유율 표시 시간 (속도)
+    [SerializeField] private float moveToLoginSceneDelay = 5f; //씬 전환까지 시간
 
     [SerializeField] private GameObject team1Char;
     [SerializeField] private GameObject team2Char;
@@ -198,9 +199,10 @@ public class GameResultUI : MonoBehaviour
             //team1ResultImage.sprite = lose;
             //team2ResultImage.sprite = win;
         }
-        
 
-        
+        yield return new WaitForSeconds(moveToLoginSceneDelay);
+
+        Manager.Game.ChangeToLoginScene(); //로그인씬으로 이동
     }
 
     public void UIClose()
