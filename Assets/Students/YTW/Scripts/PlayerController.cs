@@ -41,7 +41,6 @@ public class PlayerController : BaseController
 
 
     [field:Header("무기 설정")]
-    public bool IsFiring { get; set; }
     public ParticleSystem weaponFireEffect;
 
     [Header("무기 Transform")]
