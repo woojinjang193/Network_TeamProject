@@ -52,7 +52,8 @@ public class DetectModule
     private void DetectEnemyPlayer()
     {
         
-        Collider[] hits = Physics.OverlapSphere(_controller.transform.position, _controller.detectRadius);
+        //해당레이어 컬라이더만 감지
+        Collider[] hits = Physics.OverlapSphere(_controller.transform.position, _controller.detectRadius, LayerMask.GetMask("Player"));
         foreach (var hit in hits)
         {
             BaseController player = Manager.Game.GetPlayer(hit);
