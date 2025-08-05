@@ -28,12 +28,15 @@ public class RoomUI : BaseUI
 
     private void Awake()
     {
-        Debug.Log("RoomUI: Awake 메서드 호출됨."); // 이 로그가 뜨는지 확인
+        Debug.Log("RoomUI: Awake 메서드 호출됨.");
+
         if (roomManager == null)
         {
             roomManager = FindObjectOfType<RoomManager>();
             if (roomManager == null)
-                Debug.LogError("RoomUI: RoomManager를 찾을 수 없습니다.");
+            {
+                Debug.LogError("RoomUI: RoomManager가 연결되지 않았습니다.");
+            }
         }
         // 버튼 이벤트 연결
         readyButton.onClick.AddListener(OnReadyButtonClicked);
@@ -51,13 +54,19 @@ public class RoomUI : BaseUI
 
     public override void Open()
     {
-        gameObject.SetActive(true);
-        // 방 이름 설정 (NetworkManager에서 호출 시 전달받거나 PhotonNetwork.CurrentRoom.Name 사용)
-        if (Photon.Pun.PhotonNetwork.CurrentRoom != null)
+        if (!PhotonNetwork.InRoom)
         {
-            roomNameText.text = Photon.Pun.PhotonNetwork.CurrentRoom.Name;
+            Debug.LogWarning("RoomUI.Open(): 현재 방에 입장한 상태가 아님, UI 비활성화");
+            return;
         }
-        // TODO: 플레이어 목록 업데이트 로직 추가 (RoomManager와 연동)
+
+        gameObject.SetActive(true);
+
+        if (PhotonNetwork.CurrentRoom != null)
+        {
+            roomNameText.text = PhotonNetwork.CurrentRoom.Name;
+        }
+        roomManager?.PlayerPanelSpawnAll();
     }
 
     public override void Close()

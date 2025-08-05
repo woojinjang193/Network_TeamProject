@@ -25,9 +25,14 @@ public class GameManager : Singleton<GameManager>
 
     protected override void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject); // ❗ 중복이면 즉시 파괴
+            return;
+        }
+
         base.Awake();
         photonView = GetComponent<PhotonView>();
-        DontDestroyOnLoad(gameObject);
         Manager.Game = this;
     }
 
@@ -134,6 +139,17 @@ public class GameManager : Singleton<GameManager>
     {
         Debug.Log("게임 엔드");
 
+        //플레이어 오브젝트 수동 제거
+        foreach (var playerObj in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            var pv = playerObj.GetComponent<PhotonView>();
+            if (pv != null && pv.IsMine)
+            {
+                PhotonNetwork.Destroy(playerObj);
+                Debug.Log($"플레이어 오브젝트 제거됨: {playerObj.name}");
+            }
+        }
+
         // 현재 유저가 속한 팀 가져오기
         string myTeam = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
 
@@ -146,8 +162,6 @@ public class GameManager : Singleton<GameManager>
 
         FirebaseManager.UploadMatchResult(isWin);
 
-        MatchData.LastRoomName = PhotonNetwork.CurrentRoom.Name;
-
-        PhotonNetwork.LeaveRoom();
+        SceneManager.LoadScene("LoginScene");
     }
 }
