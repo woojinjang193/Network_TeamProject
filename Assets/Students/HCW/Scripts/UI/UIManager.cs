@@ -42,6 +42,30 @@ public class UIManager : Singleton<UIManager>
         }
     }
 
+    private void Update()
+    {
+        // ESC 키로 설정 UI 토글
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // SettingUI가 등록되어 있는지 확인
+            if (!uiDictionary.ContainsKey(typeof(SettingUI)))
+            {
+                Debug.LogWarning("UIManager에 SettingUI가 등록되지 않았습니다.");
+                return;
+            }
+
+            // 현재 UI가 SettingUI라면 닫고, 아니라면 연다.
+            if (CurrentUI != null && CurrentUI.GetType() == typeof(SettingUI))
+            {
+                PopUI();
+            }
+            else
+            {
+                PushUI(typeof(SettingUI));
+            }
+        }
+    }
+
     // 현재 UI를 완전히 교체 (이전 UI는 스택에서 제거)
     public void ReplaceUI(Type uiType)
     {

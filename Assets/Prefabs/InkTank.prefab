@@ -52,8 +52,8 @@ MonoBehaviour:
   MaxWobble: 0.03
   WobbleSpeed: 5
   RecoveryRate: 1
-  MinFillAmount: -0.8
-  MaxFillAmount: 0.8
+  FillAmount_Full: 0
+  FillAmount_Empty: 1
 --- !u!33 &4315454063018225093
 MeshFilter:
   m_ObjectHideFlags: 0
