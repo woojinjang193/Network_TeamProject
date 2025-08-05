@@ -39,6 +39,7 @@ public class GameResultUI : MonoBehaviour
     [SerializeField] private GameObject particle;
     [SerializeField] private Image team1ResultImage;
     [SerializeField] private Image team2ResultImage;
+    [SerializeField] private GameObject drawImage;
     [SerializeField] private Sprite win;
     [SerializeField] private Sprite lose;
     
@@ -62,6 +63,7 @@ public class GameResultUI : MonoBehaviour
         particle.gameObject.SetActive(false);
         team1ResultImage.gameObject.SetActive(false);
         team2ResultImage.gameObject.SetActive(false);
+        drawImage.gameObject.SetActive(false);
 
         team1animator = team1animator.GetComponent<Animator>();
         team2animator = team2animator.GetComponent<Animator>();
@@ -162,7 +164,11 @@ public class GameResultUI : MonoBehaviour
 
             team1ResultImage.sprite = win;
             team2ResultImage.sprite = lose;
-            
+
+            team1ResultImage.gameObject.SetActive(true);
+            team2ResultImage.gameObject.SetActive(true);
+            particle.gameObject.SetActive(true);
+
         }
         else if (winnerTeam == "Yellow")
         {
@@ -174,10 +180,25 @@ public class GameResultUI : MonoBehaviour
             team1ResultImage.sprite = lose;
             team2ResultImage.sprite = win;
 
+            team1ResultImage.gameObject.SetActive(true);
+            team2ResultImage.gameObject.SetActive(true);
+            particle.gameObject.SetActive(true);
+
         }
-        team1ResultImage.gameObject.SetActive(true);
-        team2ResultImage.gameObject.SetActive(true);
-        particle.gameObject.SetActive(true);
+        else if (winnerTeam == "Draw")
+        {
+            team1animator.SetTrigger("Lose");
+            team2animator.SetTrigger("Lose");
+            team1Face.SetActive(false);
+            team1SadFace.SetActive(true);
+            team2Face.SetActive(false);
+            team2SadFace.SetActive(true);
+
+            drawImage.gameObject.SetActive(true);
+            //team1ResultImage.sprite = lose;
+            //team2ResultImage.sprite = win;
+        }
+        
 
         
     }
