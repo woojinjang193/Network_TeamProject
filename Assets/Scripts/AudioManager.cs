@@ -18,6 +18,7 @@ public class AudioManager : Singleton<AudioManager>
     // 기본음 세팅
     private AudioData defaultBGM; // 별도의 명령이 없을 경우 재생하는 배경음악
     private AudioData defaultAmbient; // '' 백색소음
+    private AudioData clickClip;
 
     // 믹서 세팅
     private AudioMixer mixer;  // 볼륨을 관리하는 오디오 믹서
@@ -28,6 +29,7 @@ public class AudioManager : Singleton<AudioManager>
     private AudioSource bgmSource; // 배경음악 오디오 소스
     private AudioSource ambientSource; // 게임에서 백색소음에 해당하는 오디오 소스
     private AudioSource effectSource; // 효과음 오디오 소스
+    private AudioSource clickSource;
     
     
     private Coroutine bgmFadeRoutine;
@@ -64,16 +66,19 @@ public class AudioManager : Singleton<AudioManager>
         bgmSource = gameObject.GetOrAddComponent<AudioSource>();
         ambientSource = gameObject.AddComponent<AudioSource>();
         effectSource = gameObject.AddComponent<AudioSource>();
+        clickSource = gameObject.AddComponent<AudioSource>();
+        clickSource.playOnAwake = false;
         
         // 오디오 소스와 믹서 연결
         bgmSource.outputAudioMixerGroup = bgmGroup;
         ambientSource.outputAudioMixerGroup = bgmGroup;
         effectSource.outputAudioMixerGroup = sfxGroup;
-        
+        clickSource.outputAudioMixerGroup = sfxGroup;
         
         // 기본 브금 세팅
         defaultBGM = audioDict.TryGetValue("defaultBGM", out defaultBGM) ? defaultBGM : audioDB.audioList[0];
         defaultAmbient = audioDict.TryGetValue("defaultAmbient", out defaultAmbient) ? defaultAmbient : audioDB.audioList[0];
+        clickClip = audioDict.TryGetValue("Click",out clickClip)? clickClip: audioDB.audioList[0];
     }
     
     private void Start()
@@ -423,5 +428,15 @@ public class AudioManager : Singleton<AudioManager>
         player.fireSound = audio;
     }
 
-    public enum MixerType{Master,BGM,SFX}
+    public void Click()
+    {
+        clickSource.Play();
+    }
+
+    public enum MixerType
+    {
+        Master,
+        BGM,
+        SFX
+    }
 }
