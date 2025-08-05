@@ -142,7 +142,7 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
             //Debug.Log("마스터 클라이언트가 아닙니다.");
             return;
         }
-        //Debug.Log("트리거 충돌.");
+        Debug.Log("트리거 충돌.");
 
         int numEnter = particleSys.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter);
         //트리거Enter 한 파티클 수
@@ -164,10 +164,30 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
                 if (collider.CompareTag("Grid"))
                 //태그가 Grid라면
                 {
-                    Manager.Grid.GetGrid(collider.gameObject).SetGrid(myTeam);
-                    //그리드 정보를 가져와서 팀을 세팅해줌
+                    MapGrid grid = Manager.Grid.GetGrid(collider);
+                    //콜라이더로 그리드 정보 받아옴
+                    if (grid == null)
+                    {
+                        continue;
+                    }
+                        
+                    int gridID = grid.id; //그디드 아이디
+                    int teamIndex = (int)myTeam; //팀정보 RPC를 위해 int로 변경
+                    photonView.RPC("RpcSetGridTeam", RpcTarget.All, gridID, teamIndex);
                 }
             }
+        }
+    }
+
+    [PunRPC]
+    private void RpcSetGridTeam(int gridID, int teamIndex) // 모든클라이언트가 그리드 팀정보 업데이트
+    {
+        var grid = Manager.Grid.GetGridByID(gridID);
+        Debug.Log(grid);
+
+        if (grid != null)
+        {
+            grid.SetGrid((Team)teamIndex);
         }
     }
 

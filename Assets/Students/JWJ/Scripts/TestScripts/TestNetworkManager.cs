@@ -8,13 +8,14 @@ public class TestNetworkManager : MonoBehaviourPunCallbacks
 {
     void Start()
     {
+        PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.ConnectUsingSettings();
     }
 
     public override void OnConnectedToMaster()
     {
         //PhotonNetwork.JoinRandomOrCreateRoom();
-        PhotonNetwork.JoinOrCreateRoom("TestRoom151ads5", new RoomOptions() { MaxPlayers = 8 }, TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom("TestRoom151adsdfsf5", new RoomOptions() { MaxPlayers = 8 }, TypedLobby.Default);
     }
 
     public override void OnCreatedRoom()
