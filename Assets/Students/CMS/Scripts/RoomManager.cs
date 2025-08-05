@@ -11,7 +11,6 @@ using System.Linq; // Linq 네임스페이스 추가
 public class RoomManager : MonoBehaviour
 {
     [SerializeField] private RoomUI roomUI; // RoomUI 참조 추가
-
     [SerializeField] private int selectedMode = 2; // 1vs1 ~ 4vs4
 
     public Dictionary<int, PlayerPanelItem> playerPanels = new Dictionary<int, PlayerPanelItem>();
@@ -26,7 +25,7 @@ public class RoomManager : MonoBehaviour
         {
             isLoading = true;
             PhotonNetwork.AutomaticallySyncScene = true; // 마스터가 씬 전환 시 자동 동기화
-            PhotonNetwork.LoadLevel("JWJ_SampleScene"); // 시작 시 GameScene 로드
+            PhotonNetwork.LoadLevel("Map2"); // 시작 시 GameScene 로드
         }
     }
 

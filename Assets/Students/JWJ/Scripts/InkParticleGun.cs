@@ -50,16 +50,18 @@ public class InkParticleGun : MonoBehaviourPun
         fireEffectMain = fireEffect.main;
         //floorInkEffectMain = floorInkEffect.main;///
 
+        mainEmission.enabled = false;
+        //비활성화
+        fireEmission.enabled = false;
+        //비활성화 
+
         startSpeedCurve = new ParticleSystem.MinMaxCurve(particleSpeed, particleSpeed + 5);///
     }
 
     private void Start()
     {
         currentInk = maxInk; // 잉크 초기화
-        mainEmission.enabled = false;
-        //비활성화
-        fireEmission.enabled = false;
-        //비활성화 
+        
         SetTeamColor(currentTeam);
 
         mainParticleMain.startSpeed = startSpeedCurve; ///

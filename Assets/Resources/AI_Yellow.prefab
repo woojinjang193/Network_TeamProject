@@ -7779,7 +7779,7 @@ MonoBehaviour:
   particleCollision: {fileID: 3145142366722821433}
   maxInk: 100
   currentInk: 0
-  inkConsumptionRate: 15
+  inkConsumptionRate: 0
   inkRecoveryRate: 30
 --- !u!114 &6306726902486594379
 MonoBehaviour:
@@ -28722,6 +28722,7 @@ MonoBehaviour:
   moveSpeed: 4
   inkParticleGun: {fileID: 3949212785003392163}
   weaponView: {fileID: 0}
+  fireSound: {fileID: 0}
   faceType: 0
   rig: {fileID: 0}
   col: {fileID: 0}
@@ -28729,7 +28730,6 @@ MonoBehaviour:
   detectInterval: 3
   detectRadius: 10
   spawnPoint: {fileID: 7547512936608378369}
-  isFiring: 0
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
