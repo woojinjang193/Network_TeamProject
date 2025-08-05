@@ -21,7 +21,7 @@ public class RoomListItem : MonoBehaviourPun
 
         GetComponent<Button>().onClick.AddListener(() =>  // 항목 클릭 시 방 입장 처리
         {
-            NetworkManager.Instance.JoinRoom(roomName);  // 네트워크 매니저 통해 입장 요청
+            Manager.Net.JoinRoom(roomName);  // 네트워크 매니저 통해 입장 요청
         });
     }
 

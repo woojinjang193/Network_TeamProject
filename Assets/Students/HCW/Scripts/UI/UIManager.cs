@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ExitGames.Client.Photon;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class UIManager : Singleton<UIManager>
 {
@@ -10,12 +12,17 @@ public class UIManager : Singleton<UIManager>
     private Dictionary<Type, BaseUI> uiDictionary = new Dictionary<Type, BaseUI>();
     private Stack<BaseUI> uiStack = new Stack<BaseUI>();
 
-    [SerializeField] private BaseUI startPanel; // 시작 UI만 인스펙터에서 설정
+    //[SerializeField] private BaseUI startPanel; // 시작 UI만 인스펙터에서 설정
+    private BaseUI startPanel; // 시작 UI만 인스펙터에서 설정
 
+    // 게임 중인지 판별
+    public bool IsGaming;
+    
     protected override void Awake()
     {
         base.Awake();
 
+        startPanel = FindObjectOfType<LoginUI>(true);
         // 씬에 있는 모든 BaseUI 상속 객체를 찾아 비활성화하고 딕셔너리에 등록
         BaseUI[] allUIs = FindObjectsOfType<BaseUI>(true);
         foreach (var ui in allUIs)
@@ -34,11 +41,13 @@ public class UIManager : Singleton<UIManager>
         if (startPanel != null)
         {
             ReplaceUI(startPanel.GetType());
+            Debug.Log($"로그인 UI 띄움{startPanel.gameObject.name}");
         }
         else if (uiDictionary.Count > 0)
         {
             // 시작 패널이 지정되지 않았다면 찾은 UI 중 첫 번째 UI를 시작 패널로 사용
             ReplaceUI(uiDictionary.Keys.First());
+            Debug.Log("스타트패널 null임");
         }
     }
 
@@ -47,6 +56,8 @@ public class UIManager : Singleton<UIManager>
         // ESC 키로 설정 UI 토글
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            if (SceneManager.GetActiveScene().name != "LoginScene") return;
+            
             // SettingUI가 등록되어 있는지 확인
             if (!uiDictionary.ContainsKey(typeof(SettingUI)))
             {
@@ -148,7 +159,8 @@ public class UIManager : Singleton<UIManager>
     {
         uiStack.Clear();
         uiDictionary.Clear();
-
+        
+        startPanel = FindObjectOfType<LoginUI>(true);
         BaseUI[] allUIs = FindObjectsOfType<BaseUI>(true);
         foreach (var ui in allUIs)
         {

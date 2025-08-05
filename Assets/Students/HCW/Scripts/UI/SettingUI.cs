@@ -58,7 +58,7 @@ public class SettingUI : BaseUI
     {
         if (uiManager != null)
         {
-            UIManager.Instance.PopUI();
+            Manager.UI.PopUI();
         }
     }
 }

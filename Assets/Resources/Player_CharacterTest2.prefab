@@ -3002,7 +3002,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 21
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &2560178878259534965
@@ -3244,6 +3244,7 @@ MonoBehaviour:
   moveSpeed: 10
   inkParticleGun: {fileID: 923992536721296673}
   weaponView: {fileID: 0}
+  fireSound: {fileID: 0}
   faceType: 0
   rig: {fileID: 0}
   col: {fileID: 0}
@@ -3257,6 +3258,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  maxSlopeAngle: 45
   humanJumpForce: 15
   squidJumpForce: 15
   squidSpeed: 15
@@ -3290,7 +3292,7 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 1995463346312928341}
-  sceneViewId: 22
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &3410483075890032642
@@ -10154,7 +10156,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 20
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &4856041403337528177

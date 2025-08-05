@@ -15,17 +15,19 @@ public class RoomManager : MonoBehaviour
     [SerializeField] private int selectedMode = 2; // 1vs1 ~ 4vs4
 
     public Dictionary<int, PlayerPanelItem> playerPanels = new Dictionary<int, PlayerPanelItem>();
+    private bool isLoading;
 
-    private void Awake()
-    {
-
-    }
+    private void Awake(){}
 
     /// 방 시작 버튼 클릭 시 호출
     public void OnClickGameStart()
     {
-        PhotonNetwork.AutomaticallySyncScene = true; // 마스터가 씬 전환 시 자동 동기화
-        PhotonNetwork.LoadLevel("JWJ_SampleScene"); // 시작 시 GameScene 로드
+        if (!isLoading)
+        {
+            isLoading = true;
+            PhotonNetwork.AutomaticallySyncScene = true; // 마스터가 씬 전환 시 자동 동기화
+            PhotonNetwork.LoadLevel("JWJ_SampleScene"); // 시작 시 GameScene 로드
+        }
     }
 
     /// 새로운 플레이어가 들어왔을 때 패널 추가
@@ -116,5 +118,28 @@ public class RoomManager : MonoBehaviour
     public void OnPlayerPropertiesUpdated(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
         roomUI?.UpdatePlayerList(PhotonNetwork.PlayerList.ToList());
+    }
+    
+    public void RoomReInit()
+    {
+        Debug.Log("[RoomUIInitializer] LoginScene 진입 → UIManager 재초기화 시도");
+
+        Manager.UI.Reinitialize();
+
+        if (PhotonNetwork.InRoom)
+        {
+            Debug.Log("[RoomUIInitializer] PhotonNetwork.InRoom = true → RoomUI 활성화");
+
+            Manager.UI.ReplaceUI(typeof(RoomUI));
+
+            OnRoomJoined();
+        }
+        else
+        {
+            Debug.Log("[RoomUIInitializer] 현재 방에 없음 → LobbyUI 표시");
+            Manager.UI.ReplaceUI(typeof(LobbyUI));
+        }
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

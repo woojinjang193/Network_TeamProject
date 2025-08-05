@@ -21,6 +21,6 @@ public class RoomListItemUI : MonoBehaviour
     private void OnJoinButtonClick()
     {
         Debug.Log($"방 참가 시도: {roomName}");
-        NetworkManager.Instance.JoinRoom(roomName);
+        Manager.Net.JoinRoom(roomName);
     }
 }

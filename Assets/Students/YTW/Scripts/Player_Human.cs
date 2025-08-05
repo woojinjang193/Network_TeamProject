@@ -1,13 +1,14 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player_Human : PlayerState
 {
     private StateMachine subStateMachine;
     public Dictionary<LowState, BaseState> lowStateDic { get; private set; }
-    private Vector3 colCenter = new Vector3(0, 1f, 0);
+    private Vector3 colCenter = new(0, 1f, 0);
 
     public Player_Human(PlayerController player, StateMachine stateMachine) : base(player, stateMachine)
     {
