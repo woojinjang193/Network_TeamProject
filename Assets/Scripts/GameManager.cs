@@ -7,7 +7,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameManager : Singleton<GameManager>
+public class GameManager : MonoBehaviour
 {
     public bool IsGameEnd { get; private set; }
 
@@ -17,16 +17,19 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] public Transform[] team1SpawnPoints;   // Team1 스폰 
     [SerializeField] public Transform[] team2SpawnPoints;   // Team2 스폰 
     
-    [SerializeField] private string playerPrefabName = "Player_CharacterTest";
+    [SerializeField] private string playerPrefabName = "Player_Purple";
+
+    //게임결과 UI
+    [SerializeField] private GameResultUI gameResultUI;
 
     private double startTime;
     [SerializeField] private float matchDuration = 180f;
     [SerializeField] private TMP_Text timerText;
     private PhotonView photonView;
 
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
+        Manager.Game = this;
         photonView = GetComponent<PhotonView>();
     }
 
@@ -151,17 +154,33 @@ public class GameManager : Singleton<GameManager>
 
         //승리 팀 판단
         string winningTeam = Manager.Grid.GetWinningTeam();
+
+        
+
         Debug.Log($"내 팀: {myTeam}, 승리 팀: {winningTeam}");
 
         //팀이 이긴 경우
         bool isWin = (winningTeam != "Draw") && (myTeam == winningTeam);
 
         FirebaseManager.UploadMatchResult(isWin);
-        
-        ChangeToLoginScene();
+
+        float team1Rate = Manager.Grid.Team1Rate;
+        float team2Rate = Manager.Grid.Team2Rate;
+        PlayerOff(); //플레이어 비활성화
+        if (PhotonNetwork.IsMasterClient)
+        {
+            photonView.RPC("ShowResultUI", RpcTarget.All, winningTeam, team1Rate, team2Rate);
+
+        }
     }
 
-    private void ChangeToLoginScene()
+    [PunRPC]
+    void ShowResultUI(string winner, float team1Rate, float team2Rate)
+    {
+        gameResultUI.UIOpen(winner, team1Rate / 100f, team2Rate / 100f);
+    }
+
+    public void ChangeToLoginScene()
     {
         AsyncOperation async = SceneManager.LoadSceneAsync("LoginScene");
         if (async != null)
@@ -178,6 +197,14 @@ public class GameManager : Singleton<GameManager>
         foreach (var playerObj in playerDic.Values)
         {
             PhotonNetwork.Destroy(playerObj.gameObject);
+        }
+    }
+
+    private void PlayerOff()
+    {
+        foreach (BaseController player in playerDic.Values)
+        {
+            player.gameObject.SetActive(false);
         }
     }
 }
