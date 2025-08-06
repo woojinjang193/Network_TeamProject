@@ -145,21 +145,35 @@ public class GameManager : MonoBehaviour
 
     private void SpawnBots()
     {
-        var roomManager = Manager.Net.roomManager;
-        if (roomManager == null)
+        if (!PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botsRaw))
         {
-            Debug.LogError("SpawnBots: RoomManager 찾을 수 없음");
+            Debug.Log("[SpawnBots] CustomProperties에 봇 정보 없음");
             return;
         }
 
-        var bots = roomManager.GetBots();
-        Debug.Log($"[SpawnBots] 봇 수: {bots.Count}");
-
-        for (int i = 0; i < bots.Count; i++)
+        object[] bots = botsRaw as object[];
+        if (bots == null || bots.Length == 0)
         {
-            var bot = bots[i];
+            Debug.Log("[SpawnBots] 봇 리스트 비어있음");
+            return;
+        }
 
-            Transform[] spawnArray = bot.Team == "Team1" ? team1SpawnPoints : team2SpawnPoints;
+        Debug.Log($"[SpawnBots] 봇 수: {bots.Length}");
+
+        for (int i = 0; i < bots.Length; i++)
+        {
+            var botData = bots[i] as ExitGames.Client.Photon.Hashtable;
+
+            if (botData == null)
+            {
+                Debug.LogWarning($"[SpawnBots] botData null: index {i}");
+                continue;
+            }
+
+            string team = (string)botData["team"];
+            string name = (string)botData["name"];
+
+            Transform[] spawnArray = team == "Team1" ? team1SpawnPoints : team2SpawnPoints;
             if (spawnArray.Length == 0)
             {
                 Debug.LogError("SpawnBots: 스폰 포인트 없음");
@@ -168,8 +182,7 @@ public class GameManager : MonoBehaviour
 
             Transform spawnPoint = spawnArray[i % spawnArray.Length];
 
-            //팀별 봇 프리팹 이름 결정
-            string prefabName = bot.Team switch
+            string prefabName = team switch
             {
                 "Team1" => "AI_Purple",
                 "Team2" => "AI_Yellow",
@@ -178,7 +191,7 @@ public class GameManager : MonoBehaviour
 
             if (string.IsNullOrEmpty(prefabName))
             {
-                Debug.LogError($"SpawnBots: 알 수 없는 팀 {bot.Team}");
+                Debug.LogError($"SpawnBots: 알 수 없는 팀 {team}");
                 continue;
             }
 
@@ -187,8 +200,8 @@ public class GameManager : MonoBehaviour
             var ai = botGO.GetComponent<AIController>();
             if (ai != null)
             {
-                ai.MyTeam = bot.Team == "Team1" ? Team.Team1 : Team.Team2;
-                Debug.Log($"봇 생성 완료: {bot.Name}, 프리팹: {prefabName}, 팀: {ai.MyTeam}");
+                ai.MyTeam = team == "Team1" ? Team.Team1 : Team.Team2;
+                Debug.Log($"봇 생성 완료: {name}, 프리팹: {prefabName}, 팀: {ai.MyTeam}");
             }
         }
     }
