@@ -7,7 +7,10 @@ public class PlayerState : BaseState
     private static readonly int MoveX = Animator.StringToHash("MoveX");
     private static readonly int MoveY = Animator.StringToHash("MoveY");
     protected PlayerController player;
-    protected StateMachine stateMachine;
+    
+    protected StateMachine stateMachine { get; set; }
+    protected StateMachine subStateMachine { get; set; }
+    public Dictionary<LowState, BaseState> lowStateDic { get; protected set; }
 
 
     protected PlayerState(PlayerController player, StateMachine stateMachine)
@@ -92,28 +95,11 @@ public class PlayerState : BaseState
         return player.IsGrounded;
     }
 
-    protected void Die()
-    {
-        /* 사망 로직 구현 */
-    }
+    public override void Enter() { }
 
-    public override void Enter()
-    {
+    public override void Update() { }
 
-    }
+    public override void FixedUpdate() { }
 
-    public override void Update()
-    {
-
-    }
-
-    public override void FixedUpdate()
-    {
-
-    }
-
-    public override void Exit()
-    {
-
-    }
+    public override void Exit() { }
 }
