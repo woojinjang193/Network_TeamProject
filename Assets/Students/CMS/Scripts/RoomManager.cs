@@ -122,23 +122,23 @@ public class RoomManager : MonoBehaviourPunCallbacks
                 teamNoneCounter++;
             }
 
-            //봇 상태 확인
-            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botRaw))
+        }
+        //봇 상태 확인
+        if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botRaw))
+        {
+            var botList = botRaw as object[];
+            foreach (var bot in botList)
             {
-                var botList = botRaw as object[];
-                foreach (var bot in botList)
+                var b = bot as Hashtable;
+                if ((string)b["team"] == "Team1")
                 {
-                    var b = bot as Hashtable;
-                    if ((string)b["team"] == "Team1")
-                    {
-                        team1Counter++;
-                        bot1Counter++;
-                    }
-                    else if ((string)b["team"] == "Team2")
-                    {
-                        team2Counter++;
-                        bot2Counter++;
-                    }
+                    team1Counter++;
+                    bot1Counter++;
+                }
+                else if ((string)b["team"] == "Team2")
+                {
+                    team2Counter++;
+                    bot2Counter++;
                 }
             }
         }
