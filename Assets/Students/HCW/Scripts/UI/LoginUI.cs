@@ -69,7 +69,7 @@ public class LoginUI : BaseUI
                     loginTimer = 0f;
                 }
             }
-            PhotonNetwork.JoinLobby(); // 로그인 성공 후 로비로 이동
+            //PhotonNetwork.JoinLobby(); // 로그인 성공 후 로비로 이동
         });
     }
 
