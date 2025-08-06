@@ -67,6 +67,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator InitAfterPhotonReady()
     {
+        playerDic.Clear(); //딕셔너리 초기화
         while (!PhotonNetwork.IsConnectedAndReady || PhotonNetwork.LocalPlayer == null || !PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("team"))
         {
             yield return null;
@@ -317,7 +318,8 @@ public class GameManager : MonoBehaviour
     [PunRPC]
     void RpcGameEnd()
     {
-        OnGameEnded?.Invoke(); // 캐릭터들 움직임
+        OnGameEnded?.Invoke(); // 캐릭터들 정지
+        OnGameEnded = null;
     }
 
     private void GameEnd()

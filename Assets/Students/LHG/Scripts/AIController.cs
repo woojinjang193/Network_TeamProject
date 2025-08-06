@@ -74,7 +74,7 @@ public class AIController : BaseController
     {
         base.OnDisable();
         GameManager.OnGameStarted -= EnableControl;
-        GameManager.OnGameEnded += DisableControl;
+        GameManager.OnGameEnded -= DisableControl;
     }
 
     private void EnableControl()///////////////
@@ -87,7 +87,10 @@ public class AIController : BaseController
     {
         canControl = false;
         inkParticleGun.FireParticle(MyTeam, false);
-        StopAllActions();
+        if (photonView.IsMine)
+        {
+            StopAllActions();
+        }
     }
 
     private void Update()
