@@ -42,7 +42,7 @@ public class LobbyPanel : MonoBehaviour
         logoutButton.onClick.AddListener(Logout);
         editProfileButton.onClick.AddListener(EditProfile);
         createRoomButton.onClick.AddListener(CreateRoom);
-        quickJoinButton.onClick.AddListener(QuickJoin);
+        // quickJoinButton.onClick.AddListener(QuickJoin);
     }
 
     private void OnEnable()
@@ -77,11 +77,11 @@ public class LobbyPanel : MonoBehaviour
     }
 
     // 빠른 입장 버튼 클릭 시 호출
-    private void QuickJoin()
-    {
-        string desiredName = roomNameField.text; // 입력된 방 이름 값 읽기
-        Manager.Net.QuickJoinRoom(desiredName); // 네트워크 매니저에 빠른 입장 요청
-    }
+    // private void QuickJoin()
+    // {
+    //     string desiredName = roomNameField.text; // 입력된 방 이름 값 읽기
+    //     Manager.Net.QuickJoinRoom(desiredName); // 네트워크 매니저에 빠른 입장 요청
+    // }
 
     // 로비에서 수신한 방 목록을 UI에 업데이트
     public void UpdateRoomList(List<RoomInfo> roomList)

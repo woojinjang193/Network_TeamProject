@@ -8252,14 +8252,6 @@ MonoBehaviour:
   controlsContent: {fileID: 6835466151823723794}
   resolutionDropdown: {fileID: 55420428851889329}
   applyGraphicsButton: {fileID: 8682998378811801550}
-  mouseSensitivitySlider: {fileID: 7015528010278746713}
-  mouseSensitivityValueText: {fileID: 1758262646653719379}
-  upKeyInputField: {fileID: 353767455658570142}
-  downKeyInputField: {fileID: 8228851185422295561}
-  leftKeyInputField: {fileID: 5305618680018708508}
-  rightKeyInputField: {fileID: 5341936050465217033}
-  squidKeyInputField: {fileID: 747067343044383637}
-  jumpKeyInputField: {fileID: 8303910829696011266}
 --- !u!222 &3902595512907800775
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -22,9 +22,13 @@ public class RoomListUI : BaseUI
         uiManager = FindObjectOfType<UIManager>();
 
         backButton.onClick.AddListener(OnBackButtonClicked);
-        refreshButton.onClick.AddListener(OnRefreshButtonClicked); // 새로고침 버튼 리스너 추가
+        //refreshButton.onClick.AddListener(OnRefreshButtonClicked); // 새로고침 버튼 리스너 추가
     }
 
+    private void OnEnable()
+    {
+        Open();
+    }
     public override void Open()
     {
         gameObject.SetActive(true);
@@ -45,10 +49,10 @@ public class RoomListUI : BaseUI
         }
     }
 
-    private void OnRefreshButtonClicked()
-    {
-        Manager.Net.RequestRoomListUpdate();
-    }
+    // private void OnRefreshButtonClicked()
+    // {
+    //     Manager.Net.RequestRoomListUpdate();
+    // }
 
     public void UpdateRoomList(List<RoomInfo> roomList)
     {
