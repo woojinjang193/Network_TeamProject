@@ -41,7 +41,7 @@ public class TempNetwork : MonoBehaviourPunCallbacks
 
     private void AISpawn()
     {
-        Vector3 spawnPos = new Vector3(Random.Range(11, 16), 10, Random.Range(11, 16));
+        Vector3 spawnPos = new Vector3(Random.Range(11, 16), 3, Random.Range(11, 16));
         PhotonNetwork.Instantiate("AI_Purple", spawnPos, Quaternion.identity);
     }
 }

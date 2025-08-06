@@ -20,12 +20,6 @@ public class AIController : BaseController
     [SerializeField] public float detectInterval = 1f; //탐지간격(초)
     [SerializeField] public float detectRadius = 10f; //탐지 범위(m)
 
-
-    [Header("Set Spawn")]
-    public Transform spawnPoint;
-    private Vector3 _initialPosition;
-    private Quaternion _initialRotation;
-
     /// <summary>
     /// 봇 바닥탐지 관련. player controller에서 참고함
     /// </summary>
