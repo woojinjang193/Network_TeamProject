@@ -102,7 +102,7 @@ public class RoomUI : BaseUI
     {
         Debug.Log("준비 버튼 클릭됨");
 
-        if (Photon.Pun.PhotonNetwork.LocalPlayer == null)
+        if (PhotonNetwork.LocalPlayer == null)
         {
             Debug.LogError("로컬 플레이어가 Photon 네트워크에 연결되지 않았습니다.");
             return;
@@ -120,8 +120,10 @@ public class RoomUI : BaseUI
         bool newReadyState = !currentReadyState;
 
         // CustomProperties 업데이트
-        ExitGames.Client.Photon.Hashtable playerProps = new ExitGames.Client.Photon.Hashtable();
-        playerProps.Add("Ready", newReadyState);
+        ExitGames.Client.Photon.Hashtable playerProps = new ExitGames.Client.Photon.Hashtable()
+        {
+            ["Ready"] = newReadyState
+        };
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProps);
 
         Debug.Log($"플레이어 {PhotonNetwork.LocalPlayer.NickName}의 준비 상태: {newReadyState}");

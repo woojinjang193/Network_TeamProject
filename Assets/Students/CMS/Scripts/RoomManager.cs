@@ -195,7 +195,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
             }
 
             // 준비완료 && 팀 수 같음 && 최소 1명 이상일 때만 시작 버튼 활성화
-            bool canStart = team1Count == team2Count && team1Count > 0 && teamNone != 0 && isReady;
+            bool canStart = team1Count == team2Count && team1Count > 0 && teamNone == 0 && isReady;
             Debug.Log($"체크올레디 최종 확인 {team1Count} {team2Count} {teamNone}");
             roomUI?.SetStartButtonActive(canStart && PhotonNetwork.IsMasterClient);
         }
@@ -207,7 +207,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         if (!PhotonNetwork.IsMasterClient) return;
 
-        if (!isLoading)
+        if (!isLoading) // 더블클릭 방지
         {
             isLoading = true;
             PhotonNetwork.CurrentRoom.IsOpen = false;
@@ -248,7 +248,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     #endregion
     
     #region 방 참가 및 UI 초기화
-    public void OnRoomJoined()
+    public void OnRoomJoined() //네트워크 매니저에서 호출됨
     {
         roomUI?.Open();
         //PlayerPanelSpawnAll();
