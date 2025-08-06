@@ -37,7 +37,6 @@ public class RoomManager : MonoBehaviour
         if (!isLoading)
         {
             isLoading = true;
-            PhotonNetwork.AutomaticallySyncScene = true; // 마스터가 씬 전환 시 자동 동기화
             PhotonNetwork.LoadLevel("Map2"); // 시작 시 GameScene 로드
         }
     }
