@@ -67,27 +67,38 @@ public class AIController : BaseController
     public override void OnEnable()/////////////////
     {
         base.OnEnable();
-        GameManager.OnGameStarted += EnableControl;
-        GameManager.OnGameEnded += DisableControl;
+        if (photonView.IsMine)
+        {
+            GameManager.OnGameStarted += EnableControl;
+            GameManager.OnGameEnded += DisableControl;
+        }
     }
     public override void OnDisable()///////////////
     {
         base.OnDisable();
-        GameManager.OnGameStarted -= EnableControl;
-        GameManager.OnGameEnded += DisableControl;
+        if (photonView.IsMine)
+        {
+            GameManager.OnGameStarted -= EnableControl;
+            GameManager.OnGameEnded -= DisableControl;
+        }
     }
 
     private void EnableControl()///////////////
     {
         canControl = true;
         inkParticleGun.FireParticle(MyTeam, true);
+        IsMoving = true;
     }
 
     private void DisableControl()///////////////
     {
         canControl = false;
+        IsMoving = false;
         inkParticleGun.FireParticle(MyTeam, false);
-        StopAllActions();
+        if (photonView.IsMine)
+        {
+            StopAllActions();
+        }
     }
 
     private void Update()
@@ -408,6 +419,7 @@ public class AIController : BaseController
     {
         MoveModule.StopWander();
         FireModule.StopFire();
+        rig.isKinematic = true;
         rig.velocity = Vector3.zero;
         rig.angularVelocity = Vector3.zero;
     }

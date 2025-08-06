@@ -117,14 +117,20 @@ public class PlayerController : BaseController
     public override void OnEnable()/////////////////
     {
         base.OnEnable();
-        GameManager.OnGameStarted += EnableControl;
-        GameManager.OnGameEnded += DisableControl;
+        if (photonView.IsMine)
+        {
+            GameManager.OnGameStarted += EnableControl;
+            GameManager.OnGameEnded += DisableControl;
+        }
     }
     public override void OnDisable()///////////////
     {
         base.OnDisable();
-        GameManager.OnGameStarted -= EnableControl;
-        GameManager.OnGameEnded += DisableControl;
+        if (photonView.IsMine)
+        {
+            GameManager.OnGameStarted -= EnableControl;
+            GameManager.OnGameEnded -= DisableControl;
+        }
     }
 
     private void EnableControl()///////////////
@@ -136,6 +142,7 @@ public class PlayerController : BaseController
     {
         canControl = false;
 
+        rig.isKinematic = false;
         rig.velocity = Vector3.zero;
         rig.angularVelocity = Vector3.zero;
 

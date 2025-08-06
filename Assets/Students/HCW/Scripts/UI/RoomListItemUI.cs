@@ -12,7 +12,7 @@ public class RoomListItemUI : MonoBehaviour
 
     private string roomName;
 
-    public void Setup(Photon.Realtime.RoomInfo info)
+    public void Setup(RoomInfo info)
     {
         roomName = info.Name;
         roomNameText.text = info.Name;
@@ -21,7 +21,8 @@ public class RoomListItemUI : MonoBehaviour
         {
             Debug.Log($"룸{info.Name} 커스텀 프로퍼티의 키 값을 가져오는데 실패함 tS");
         }
-        
+
+        Debug.Log($"아이템UI 합:{playerCount}");
         playerCountText.text = $"{playerCount} / {info.MaxPlayers}";
         joinButton.interactable = (int)playerCount < 8;
         joinButton.onClick.AddListener(OnJoinButtonClick);

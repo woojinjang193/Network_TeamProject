@@ -66,13 +66,16 @@ public class RoomManager : MonoBehaviourPunCallbacks
     }
     public void OnClickChooseTeam(string team) // 플레이어 팀 변경 시 호출됨. 버튼에 의해서 호출
     {
-        Debug.Log($"RoomManager: 플레이어 {PhotonNetwork.LocalPlayer.NickName} 팀을 {team}으로 설정 시도");
-        // 현재 플레이어의 정보를 저장함
-        PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable
+        if (PhotonNetwork.LocalPlayer.IsLocal)
         {
-            { "team", team },
-            { "Ready", false }
-        });
+            Debug.Log($"RoomManager: 플레이어 {PhotonNetwork.LocalPlayer.NickName} 팀을 {team}으로 설정 시도");
+            // 현재 플레이어의 정보를 저장함
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable
+            {
+                { "team", team },
+                { "Ready", false }
+            });
+        }
     }
     
     public IEnumerator SetCountProperty()
@@ -98,6 +101,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     #region 커스텀 프로퍼티 체크
     public void CheckPlayerCount() // 현재 방의 플레이어 + 봇 숫자 체크 및 팀 체크
     {
+        if (!PhotonNetwork.IsMasterClient) return;
         team1Counter = 0;
         team2Counter = 0;
         teamNoneCounter = 0;
@@ -118,31 +122,34 @@ public class RoomManager : MonoBehaviourPunCallbacks
                 teamNoneCounter++;
             }
 
-            //봇 상태 확인
-            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botRaw))
+        }
+        //봇 상태 확인
+        if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botRaw))
+        {
+            var botList = botRaw as object[];
+            foreach (var bot in botList)
             {
-                var botList = botRaw as object[];
-                foreach (var bot in botList)
+                var b = bot as Hashtable;
+                if ((string)b["team"] == "Team1")
                 {
-                    var b = bot as Hashtable;
-                    if ((string)b["team"] == "Team1")
-                    {
-                        team1Counter++;
-                        bot1Counter++;
-                    }
-                    else if ((string)b["team"] == "Team2")
-                    {
-                        team2Counter++;
-                        bot2Counter++;
-                    }
-                    Debug.Log($" 봇 상태 확인 팀 1 카운트 : {team1Counter} 팀 2 카운트 :  {team2Counter}");
+                    team1Counter++;
+                    bot1Counter++;
+                }
+                else if ((string)b["team"] == "Team2")
+                {
+                    team2Counter++;
+                    bot2Counter++;
                 }
             }
         }
+        Debug.Log($"쳌플 플레이어 상태 확인 팀 1 :{team1Counter} 팀2 : {team2Counter} ");
+        Debug.Log($"쳌플 봇 상태 확인 팀 1 카운트 : {bot1Counter} 팀 2 카운트 :  {bot2Counter}");
     }
     
     public void CheckAllReady() // 모든 플레이어가 준비 됐는지 확인하고, 마스터클라이언트의 시작 버튼을 활성화함
     {
+        if (!PhotonNetwork.IsMasterClient) return;
+        
         bool isReady = true;
 
         Debug.Log("체크올레디 시작");
@@ -171,34 +178,31 @@ public class RoomManager : MonoBehaviourPunCallbacks
                 roomUI?.SetStartButtonActive(false);
                 isReady = false;
             }
-
-            //봇 상태 확인
-            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botRaw))
-            {
-                var botList = botRaw as object[];
-                foreach (var bot in botList)
-                {
-                    var b = bot as Hashtable;
-                    if ((string)b["team"] == "Team1")
-                    {
-                        team1Count++;
-                        Debug.Log($"팀1 카운트 ++ {team1Count}");
-                    }
-                    else if ((string)b["team"] == "Team2")
-                    {
-                        team2Count++;
-                        Debug.Log($"팀2 카운트 ++ {team2Count}");
-                    }
-                }
-
-                Debug.Log($" 봇 상태 확인 팀 1 카운트 : {team1Count} 팀 2 카운트 :  {team2Count}");
-            }
-
-            // 준비완료 && 팀 수 같음 && 최소 1명 이상일 때만 시작 버튼 활성화
-            bool canStart = team1Count == team2Count && team1Count > 0 && teamNone != 0 && isReady;
-            Debug.Log($"체크올레디 최종 확인 {team1Count} {team2Count} {teamNone}");
-            roomUI?.SetStartButtonActive(canStart && PhotonNetwork.IsMasterClient);
         }
+        //봇 상태 확인
+        if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botRaw))
+        {
+            var botList = botRaw as object[];
+            foreach (var bot in botList)
+            {
+                var b = bot as Hashtable;
+                if ((string)b["team"] == "Team1")
+                {
+                    team1Count++;
+                    Debug.Log($"팀1 카운트 ++ {team1Count}");
+                }
+                else if ((string)b["team"] == "Team2")
+                {
+                    team2Count++;
+                    Debug.Log($"팀2 카운트 ++ {team2Count}");
+                }
+            }
+        }
+        Debug.Log($"레디쳌 봇 상태 확인 팀 1 카운트 : {team1Count} 팀 2 카운트 :  {team2Count}");
+        // 준비완료 && 팀 수 같음 && 최소 1명 이상일 때만 시작 버튼 활성화
+        bool canStart = team1Count == team2Count && team1Count > 0 && teamNone == 0 && isReady;
+        Debug.Log($"체크올레디 최종 확인 {team1Count} {team2Count} {teamNone}");
+        roomUI?.SetStartButtonActive(canStart && PhotonNetwork.IsMasterClient);
     }
     #endregion
     
@@ -207,7 +211,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         if (!PhotonNetwork.IsMasterClient) return;
 
-        if (!isLoading)
+        if (!isLoading) // 더블클릭 방지
         {
             isLoading = true;
             PhotonNetwork.CurrentRoom.IsOpen = false;
@@ -248,7 +252,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     #endregion
     
     #region 방 참가 및 UI 초기화
-    public void OnRoomJoined()
+    public void OnRoomJoined() //네트워크 매니저에서 호출됨
     {
         roomUI?.Open();
         //PlayerPanelSpawnAll();

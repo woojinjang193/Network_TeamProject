@@ -215,6 +215,12 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
         {
             roomUI.Close();
         }
+        PhotonNetwork.LocalPlayer.SetCustomProperties(
+        new ExitGames.Client.Photon.Hashtable
+        {
+            ["team"] = null,
+            ["Ready"] = false
+        });
         PhotonNetwork.JoinLobby(); //방을 떠날 때, 로비에 재참가
     }
 

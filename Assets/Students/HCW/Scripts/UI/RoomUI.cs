@@ -46,7 +46,7 @@ public class RoomUI : BaseUI
         readyButton.onClick.AddListener(OnReadyButtonClicked);
         startGameButton.onClick.AddListener(OnStartGameButtonClicked);
         leaveRoomButton.onClick.AddListener(OnLeaveRoomButtonClicked);
-        //clearBotsButton.onClick.AddListener(OnClickClearBots);
+//        clearBotsButton.onClick.AddListener(OnClickClearBots);
 
         team1Button.onClick.AddListener(() => OnClickChooseTeam("Team1"));
         team2Button.onClick.AddListener(() => OnClickChooseTeam("Team2"));
@@ -87,12 +87,20 @@ public class RoomUI : BaseUI
                 UpdateMapSelectionUI((string)mapName);
             }
         }
-        addTeam1BotButton.interactable = PhotonNetwork.IsMasterClient;
-        addTeam2BotButton.interactable = PhotonNetwork.IsMasterClient;
-        mapDropdown.interactable = PhotonNetwork.IsMasterClient;
+
+        SetMaster();
+
         roomManager?.PlayerPanelSpawnAll();
     }
 
+    public void SetMaster()
+    {
+        startGameButton.interactable = PhotonNetwork.IsMasterClient;
+        addTeam1BotButton.interactable = PhotonNetwork.IsMasterClient;
+        addTeam2BotButton.interactable = PhotonNetwork.IsMasterClient;
+        mapDropdown.interactable = PhotonNetwork.IsMasterClient;
+        //clearBotsButton.interactable = PhotonNetwork.IsMasterClient;
+    }
     public override void Close()
     {
         gameObject.SetActive(false);
@@ -102,7 +110,7 @@ public class RoomUI : BaseUI
     {
         Debug.Log("준비 버튼 클릭됨");
 
-        if (Photon.Pun.PhotonNetwork.LocalPlayer == null)
+        if (PhotonNetwork.LocalPlayer == null)
         {
             Debug.LogError("로컬 플레이어가 Photon 네트워크에 연결되지 않았습니다.");
             return;
@@ -120,8 +128,10 @@ public class RoomUI : BaseUI
         bool newReadyState = !currentReadyState;
 
         // CustomProperties 업데이트
-        ExitGames.Client.Photon.Hashtable playerProps = new ExitGames.Client.Photon.Hashtable();
-        playerProps.Add("Ready", newReadyState);
+        ExitGames.Client.Photon.Hashtable playerProps = new ExitGames.Client.Photon.Hashtable()
+        {
+            ["Ready"] = newReadyState
+        };
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProps);
 
         Debug.Log($"플레이어 {PhotonNetwork.LocalPlayer.NickName}의 준비 상태: {newReadyState}");
