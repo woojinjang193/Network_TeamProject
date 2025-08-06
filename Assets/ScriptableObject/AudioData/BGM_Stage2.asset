@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BGM_Stage2
   m_EditorClassIdentifier: 
   clipName: Stage2
-  clipSource: {fileID: 8300000, guid: 4b83dfa7f32f69f4ca1290f676480318, type: 3}
-  volume: 0.3
+  clipSource: {fileID: 8300000, guid: ca344e7051851154dae822484d69633e, type: 3}
+  volume: 0.5
   loop: 1
   mixerGroup: {fileID: -8976598623936957593, guid: e76f20a7c7b3a534b8bc98098cf2246b, type: 2}
