@@ -25,10 +25,5 @@ public class IdleState : AIBaseState
             _controller.MoveModule.StopWander();
             _controller.StateMachine.SetState(new ChaseState(_controller));
         }
-        
-        //if (_controller.DetectModule.HasEnemy)
-        //{
-        //    _controller.StateMachine.SetState(new ChaseState(_controller));
-        //}
     }
 }
