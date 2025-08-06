@@ -188,7 +188,6 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
         {
             roomUI.Close();
         }
-
         PhotonNetwork.JoinLobby(); //방을 떠날 때, 로비에 재참가
     }
 
@@ -199,6 +198,7 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     {
         Debug.Log("방 입장 성공!");
 
+        Manager.UI.ReplaceUI(typeof(RoomUI));
         roomManager?.OnRoomJoined();
     }
     public void JoinRoom(string roomName) // 방에 참가할 때 사용되는 함수
