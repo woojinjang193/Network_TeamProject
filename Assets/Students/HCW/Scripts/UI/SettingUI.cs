@@ -19,13 +19,14 @@ public class SettingUI : BaseUI
 
     [Header("그래픽 UI 요소")]
     [SerializeField] private TMP_Dropdown resolutionDropdown;
+    [SerializeField] private Toggle fullscreenToggle; // 전체화면 토글 추가
     [SerializeField] private Button applyGraphicsButton;
 
     private Resolution[] resolutions;
     private const string RESOLUTION_WIDTH_PREF = "ResolutionWidth";
     private const string RESOLUTION_HEIGHT_PREF = "ResolutionHeight";
     private const string RESOLUTION_REFRESH_RATE_PREF = "ResolutionRefreshRate";
-
+    private const string FULLSCREEN_PREF = "Fullscreen";
 
 
     private UIManager uiManager;
@@ -69,7 +70,8 @@ public class SettingUI : BaseUI
         resolutionDropdown.onValueChanged.AddListener(OnResolutionChanged);
         applyGraphicsButton.onClick.AddListener(OnApplyGraphicsButtonClicked);
 
-        // 초기 키 설정
+        fullscreenToggle.onValueChanged.AddListener(OnFullscreenToggleChanged);
+
         SetDefaultSettings();
     }
 
@@ -115,6 +117,9 @@ public class SettingUI : BaseUI
         if (!PlayerPrefs.HasKey(RESOLUTION_HEIGHT_PREF)) PlayerPrefs.SetInt(RESOLUTION_HEIGHT_PREF, Screen.currentResolution.height);
         if (!PlayerPrefs.HasKey(RESOLUTION_REFRESH_RATE_PREF)) PlayerPrefs.SetFloat(RESOLUTION_REFRESH_RATE_PREF, (float)Screen.currentResolution.refreshRateRatio.value);
 
+        // 기본 전체화면 설정 (현재 Screen.fullScreen 값)
+        if (!PlayerPrefs.HasKey(FULLSCREEN_PREF)) PlayerPrefs.SetInt(FULLSCREEN_PREF, Screen.fullScreen ? 1 : 0);
+
         PlayerPrefs.Save();
     }
 
@@ -136,6 +141,9 @@ public class SettingUI : BaseUI
         }
         resolutionDropdown.value = currentResolutionIndex;
         resolutionDropdown.RefreshShownValue();
+
+        // 현재 전체화면 설정을 토글에 표시
+        fullscreenToggle.isOn = Screen.fullScreen;
     }
 
     private void OnResolutionChanged(int resolutionIndex)
@@ -154,6 +162,17 @@ public class SettingUI : BaseUI
         PlayerPrefs.SetInt(RESOLUTION_WIDTH_PREF, selectedResolution.width);
         PlayerPrefs.SetInt(RESOLUTION_HEIGHT_PREF, selectedResolution.height);
         PlayerPrefs.SetFloat(RESOLUTION_REFRESH_RATE_PREF, (float)selectedResolution.refreshRateRatio.value);
+        PlayerPrefs.Save();
+    }
+
+    private void OnFullscreenToggleChanged(bool isOn)
+    {
+        // 전체화면 모드 변경
+        Screen.fullScreen = isOn;
+        Debug.Log($"전체화면 모드 변경: {isOn}");
+
+        // 변경 후 PlayerPrefs에 저장
+        PlayerPrefs.SetInt(FULLSCREEN_PREF, isOn ? 1 : 0);
         PlayerPrefs.Save();
     }
 }
