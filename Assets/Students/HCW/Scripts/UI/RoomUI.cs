@@ -87,6 +87,8 @@ public class RoomUI : BaseUI
                 UpdateMapSelectionUI((string)mapName);
             }
         }
+        addTeam1BotButton.interactable = PhotonNetwork.IsMasterClient;
+        addTeam2BotButton.interactable = PhotonNetwork.IsMasterClient;
         mapDropdown.interactable = PhotonNetwork.IsMasterClient;
         roomManager?.PlayerPanelSpawnAll();
     }
@@ -109,7 +111,7 @@ public class RoomUI : BaseUI
         // CustomProperties에서 "Ready" 속성 가져오기. 없으면 false로 초기화.
         object readyValue;
         bool currentReadyState = false;
-        if (Photon.Pun.PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("Ready", out readyValue))
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("Ready", out readyValue))
         {
             currentReadyState = (bool)readyValue;
         }
@@ -120,9 +122,9 @@ public class RoomUI : BaseUI
         // CustomProperties 업데이트
         ExitGames.Client.Photon.Hashtable playerProps = new ExitGames.Client.Photon.Hashtable();
         playerProps.Add("Ready", newReadyState);
-        Photon.Pun.PhotonNetwork.LocalPlayer.SetCustomProperties(playerProps);
+        PhotonNetwork.LocalPlayer.SetCustomProperties(playerProps);
 
-        Debug.Log($"플레이어 {Photon.Pun.PhotonNetwork.LocalPlayer.NickName}의 준비 상태: {newReadyState}");
+        Debug.Log($"플레이어 {PhotonNetwork.LocalPlayer.NickName}의 준비 상태: {newReadyState}");
     }
 
     private void OnStartGameButtonClicked()
@@ -133,29 +135,42 @@ public class RoomUI : BaseUI
             roomManager.OnClickGameStart();
         }
     }
-    private void UpdateStartButton()
-    {
-        startGameButton.gameObject.SetActive(PhotonNetwork.IsMasterClient);
-    }
+    
+    // private void UpdateStartButton()
+    // {
+    //     startGameButton.gameObject.SetActive(PhotonNetwork.IsMasterClient);
+    // }
 
     private void OnLeaveRoomButtonClicked()
     {
         Debug.Log("방 나가기 버튼 클릭됨");
 
+        // ExitGames.Client.Photon.Hashtable resetProps = new()
+        // {
+        //     { "team", null },
+        //     { "Ready", false }
+        // };
+        // PhotonNetwork.LocalPlayer.SetCustomProperties(resetProps);
+        
         Manager.Net.roomManager?.ClearRoomData();
         Manager.Net.LeaveRoom();
     }
 
-    public void UpdatePlayerList(List<Player> players)
+    public void ClearPlayerPanels()
     {
-        Debug.Log($"UpdatePlayerList 호출됨. 플레이어 수: {players.Count}");
-
         // 기존 플레이어 및 봇 패널 모두 삭제
         foreach (Transform child in playerListContent)
         {
             Debug.Log($"기존 아이템 삭제: {child.name}");
             Destroy(child.gameObject);
         }
+    }
+    public void UpdatePlayerList(List<Player> players) // 받은 플레이어 리스트를 기준으로 패널 업데이트. 이후 봇 패널 생성
+    {
+        // 플레이어 및 봇 패널이 재생성 된다.
+        Debug.Log($"UpdatePlayerList 호출됨. 플레이어 수: {players.Count}");
+
+        ClearPlayerPanels();
 
         // 새 플레이어 생성 및 업데이트
         foreach (var player in players)
@@ -218,7 +233,7 @@ public class RoomUI : BaseUI
         }
     }
 
-    public void UpdateMapSelectionUI(string mapName)
+    public void UpdateMapSelectionUI(string mapName) // 맵 변경 시 호출. 업데이트 한다.
     {
         if (mapName == "Map1")
         {
@@ -232,6 +247,6 @@ public class RoomUI : BaseUI
     private void OnClickClearBots()
     {
         Debug.Log("Clear Bots 버튼 클릭됨");
-        roomManager?.ClearBots();
+        StartCoroutine(roomManager?.ClearBots());
     }
 }

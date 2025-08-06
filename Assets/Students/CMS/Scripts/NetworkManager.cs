@@ -120,13 +120,28 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     
     private IEnumerator CreateRoomRoutine(string roomName) // 방 생성 시도 코루틴
     {
+        ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable()
+        {
+            ["t1C"] = 0,
+                ["t2C"] = 0,
+                ["tN"] = 1,
+                ["tS"] = 1
+        };
+        
+        RoomOptions options = new RoomOptions
+        {
+            MaxPlayers = 8, 
+            CustomRoomProperties = hash, 
+            CustomRoomPropertiesForLobby = new string[]{"tS"}, 
+            IsVisible = true, 
+            IsOpen = true,
+        };
+        
         while (true)
         {
+                
             if (PhotonNetwork.NetworkClientState == ClientState.JoinedLobby) // 로비에 접속 해야만 방 생성
             {
-                        
-                RoomOptions options = new RoomOptions { MaxPlayers = 8, IsVisible = true, IsOpen = true };
-        
                 PhotonNetwork.CreateRoom(roomName, options); // 방 생성
                 if (waitRoutine != null)
                 {
@@ -149,19 +164,31 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     // 플레이어 정보가 업데이트 됐을 때
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
-        roomManager?.OnPlayerPropertiesUpdated(targetPlayer, changedProps);
-        roomManager?.CheckAllReady();
+        if (PhotonNetwork.InRoom)
+        {
+            roomManager?.OnPlayerPropertiesUpdated(targetPlayer, changedProps);
+        }
     }
     public override void OnPlayerEnteredRoom(Player newPlayer) // 새 플레이어가 현재 방에 입장했을 때 호출
     {
         if (newPlayer != PhotonNetwork.LocalPlayer)
             Debug.Log($"플레이어 입장: {newPlayer.NickName}");
 
-        roomManager?.PlayerPanelSpawn(newPlayer);
+        roomManager?.PlayerPanelSpawn(newPlayer); // 해당 플레이어 패널을 스폰함
+        if (PhotonNetwork.IsMasterClient)
+        {
+            roomManager?.CheckAllReady();
+            StartCoroutine(roomManager?.SetCountProperty());
+        }
     }
     public override void OnPlayerLeftRoom(Player otherPlayer) // 현재 방에서 다른 플레이어가 떠났을 때 호출
     {
         roomManager?.PlayerPanelRemove(otherPlayer);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            roomManager?.CheckPlayerCount();
+            StartCoroutine(roomManager?.SetCountProperty());
+        }
     }
     #endregion
     

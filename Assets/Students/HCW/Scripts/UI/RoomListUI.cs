@@ -19,8 +19,6 @@ public class RoomListUI : BaseUI
 
     private void Awake()
     {
-        uiManager = FindObjectOfType<UIManager>();
-
         backButton.onClick.AddListener(OnBackButtonClicked);
         //refreshButton.onClick.AddListener(OnRefreshButtonClicked); // 새로고침 버튼 리스너 추가
     }
@@ -32,7 +30,6 @@ public class RoomListUI : BaseUI
     public override void Open()
     {
         gameObject.SetActive(true);
-        // TODO: 방 목록을 Photon에서 받아와서 업데이트하는 로직 추가
         UpdateRoomList(Manager.Net.cachedRoomList);
     }
 
@@ -43,10 +40,7 @@ public class RoomListUI : BaseUI
 
     private void OnBackButtonClicked()
     {
-        if (uiManager != null)
-        {
-            Manager.UI.PopUI(); // 이전 UI (LobbyUI)로 돌아감
-        }
+        Manager.UI.PopUI(); // 이전 UI (LobbyUI)로 돌아감
     }
 
     // private void OnRefreshButtonClicked()
