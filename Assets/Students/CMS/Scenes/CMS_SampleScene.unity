@@ -356,9 +356,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: Sign Up
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_fontSharedMaterials: []
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_fontSharedMaterials:
+  - {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -2226,9 +2227,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u200B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_fontSharedMaterials: []
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_fontSharedMaterials:
+  - {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -2791,9 +2793,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: Enter ID
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_fontSharedMaterials: []
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_fontSharedMaterials:
+  - {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -3647,9 +3650,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u200B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_fontSharedMaterials: []
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_fontSharedMaterials:
+  - {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -4948,12 +4952,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d8c0ce1d7ed1754b9921f989efb39b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startButton: {fileID: 92124383}
-  leaveButton: {fileID: 1524363490}
-  team1Button: {fileID: 0}
-  team2Button: {fileID: 0}
-  playerPanelItemPrefabs: {fileID: 4567751370966977743, guid: f9b1b4e39124f4c4ebe62ba7b1ddb77d, type: 3}
-  playerPanelContent: {fileID: 1019517609}
+  roomUI: {fileID: 0}
 --- !u!224 &627959217
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5045,13 +5044,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 053755e98b41d8045b342b4697eea85d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stateText: {fileID: 1642323514}
-  loadingPanel: {fileID: 945193769}
-  lobbyPanel: {fileID: 1415870437}
-  loginPanel: {fileID: 909981791}
-  roomListItems: {fileID: 5492581033099819259, guid: b58f70bd4dfe2f24e849b9eeeef097b1, type: 3}
-  lobbyPanelScript: {fileID: 1415870439}
-  roomPanel: {fileID: 627959215}
   roomManager: {fileID: 627959216}
 --- !u!4 &633165907
 Transform:
@@ -9061,9 +9053,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: Enter Password
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_fontSharedMaterials: []
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_fontSharedMaterials:
+  - {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -10505,9 +10498,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: Login
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_fontSharedMaterials: []
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_fontSharedMaterials:
+  - {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -11618,9 +11612,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: ID
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_fontSharedMaterials: []
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_fontSharedMaterials:
+  - {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -13535,9 +13530,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: Password Reset
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_fontSharedMaterials: []
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_fontSharedMaterials:
+  - {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -14530,9 +14526,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: Password
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: 1e9caca1ec8992e40be50d4875c07950, type: 2}
-  m_fontSharedMaterials: []
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_fontSharedMaterials:
+  - {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:

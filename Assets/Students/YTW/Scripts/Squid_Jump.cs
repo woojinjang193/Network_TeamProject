@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Squid_Jump : PlayerState
 {
+    private static readonly int JumpTrigger = Animator.StringToHash("JumpTrigger");
+    private static readonly int IsAir = Animator.StringToHash("IsAir");
     private Player_Squid squidState;
 
     public Squid_Jump(PlayerController player, StateMachine stateMachine, Player_Squid squidState) : base(player, stateMachine)
@@ -16,6 +18,10 @@ public class Squid_Jump : PlayerState
         player.IsVaulting = false;
         player.rig.useGravity = true;
 
+        player.squidAnimator.SetTrigger(JumpTrigger);
+        player.squidAnimator.SetBool(IsAir,true);
+        
+        Manager.Audio.PlayEffect("Jump");
     }
 
     public override void FixedUpdate()
@@ -39,5 +45,10 @@ public class Squid_Jump : PlayerState
             SetMove(player.moveSpeed);
             SetPlayerRotation();
         }
+    }
+
+    public override void Exit()
+    {
+        player.squidAnimator.SetBool(IsAir,false);
     }
 }

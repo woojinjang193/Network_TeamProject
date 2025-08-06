@@ -19,7 +19,7 @@ MonoBehaviour:
     AppIdVoice: 
     AppVersion: 
     UseNameServer: 1
-    FixedRegion: 
+    FixedRegion: kr
     Server: 
     Port: 0
     ProxyServer: 
@@ -44,6 +44,24 @@ MonoBehaviour:
   - SetStartTime
   - TakeDamage
   - SyncCoverageUI
+  - PlayerDie
+  - ApplyPaint
+  - ReportPaint
+  - SyncDraw
+  - SyncDrawInk
+  - AiDie
+  - TriggerHitAnimation
+  - ShowResultUI
+  - PlayClip
+  - RequestGridPaint
+  - SyncGridPaint
+  - RpcSetGridTeam
+  - NotifyPlayerSpawned
+  - NotifyCharSpawned
+  - RPC_OpenGameStartUI
+  - OpenGameStartUITogether
+  - RpcGameStart
+  - RpcGameEnd
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

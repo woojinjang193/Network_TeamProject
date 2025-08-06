@@ -14,7 +14,6 @@ public class Human_Hit : PlayerState
 
     public override void Enter()
     {
-
     }
 
     public override void Update()

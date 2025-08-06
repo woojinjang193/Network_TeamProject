@@ -4,11 +4,16 @@ using UnityEngine;
 
 public class PlayerState : BaseState
 {
+    private static readonly int MoveX = Animator.StringToHash("MoveX");
+    private static readonly int MoveY = Animator.StringToHash("MoveY");
     protected PlayerController player;
-    protected StateMachine stateMachine;
     
+    protected StateMachine stateMachine { get; set; }
+    protected StateMachine subStateMachine { get; set; }
+    public Dictionary<LowState, BaseState> lowStateDic { get; protected set; }
 
-    public PlayerState(PlayerController player, StateMachine stateMachine)
+
+    protected PlayerState(PlayerController player, StateMachine stateMachine)
     {
         this.player = player;
         this.stateMachine = stateMachine;
@@ -17,13 +22,21 @@ public class PlayerState : BaseState
 
     protected void SetMove(float moveSpeed)
     {
+        if (player.input.MoveInput == Vector2.zero)
+        {
+            player.rig.velocity = new Vector3(0, player.rig.velocity.y, 0);
+            player.humanAnimator.SetFloat(MoveX,0f);
+            player.humanAnimator.SetFloat(MoveY,0f);
+            return;
+        }
+        
         Vector3 camForward = player.mainCamera.transform.forward;
         Vector3 camRight = player.mainCamera.transform.right;
         camForward.y = 0;
         camRight.y = 0;
 
-        Vector3 moveDirection = (camForward.normalized * player.input.MoveInput.y +
-                                 camRight.normalized * player.input.MoveInput.x);
+        Vector3 moveDirection = (camForward * player.input.MoveInput.y +
+                                 camRight * player.input.MoveInput.x).normalized;
 
         // 경사면 이동일 경우
         if (player.IsGrounded)
@@ -33,21 +46,45 @@ public class PlayerState : BaseState
         }
         else 
         {
-           player.rig.velocity = new Vector3(moveDirection.x * moveSpeed, player.rig.velocity.y, moveDirection.z * moveSpeed);
+            player.rig.velocity = new Vector3(moveDirection.x * moveSpeed, player.rig.velocity.y, moveDirection.z * moveSpeed);
         }
     }
     protected void SetPlayerRotation()
     {
+        if (player.IsFiring || player.ModelTransform == null)
+        {
+            return;
+        }
+
         Vector3 lookDirection = player.rig.velocity;
         lookDirection.y = 0;
 
         if (lookDirection.sqrMagnitude > 0.01f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
-            player.transform.rotation = Quaternion.Slerp(player.transform.rotation, targetRotation, Time.fixedDeltaTime * 15f);
+            Quaternion targetRotation = Quaternion.LookRotation(lookDirection.normalized);
+            player.ModelTransform.rotation = Quaternion.Slerp(player.ModelTransform.rotation, targetRotation, Time.fixedDeltaTime * 15f);
         }
     }
 
+    protected void UpdateAnimationParameters()
+    {
+        if (player.humanAnimator == null) return;
+
+        Vector3 worldMoveDirection = player.rig.velocity;
+        if (player.rig.velocity == Vector3.zero)
+        {
+            player.humanAnimator.SetFloat(MoveX, 0f);
+            player.humanAnimator.SetFloat(MoveY, 0f);
+            return;
+        }
+        worldMoveDirection.y = 0;
+
+        Vector3 localMoveDirection = player.ModelTransform.InverseTransformDirection(worldMoveDirection.normalized);
+
+        player.humanAnimator.SetFloat(MoveX, localMoveDirection.x, 0.1f, Time.fixedDeltaTime);
+        player.humanAnimator.SetFloat(MoveY, localMoveDirection.z, 0.1f, Time.fixedDeltaTime);
+    }
+    
     protected void Jump(float jumpForce)
     {
         player.rig.useGravity = true;
@@ -58,28 +95,11 @@ public class PlayerState : BaseState
         return player.IsGrounded;
     }
 
-    protected void Die()
-    {
-        /* 사망 로직 구현 */
-    }
+    public override void Enter() { }
 
-    public override void Enter()
-    {
+    public override void Update() { }
 
-    }
+    public override void FixedUpdate() { }
 
-    public override void Update()
-    {
-
-    }
-
-    public override void FixedUpdate()
-    {
-
-    }
-
-    public override void Exit()
-    {
-
-    }
+    public override void Exit() { }
 }

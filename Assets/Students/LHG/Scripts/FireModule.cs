@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,20 +7,35 @@ using UnityEngine;
 public class FireModule
 {
     private AIController _controller;
-    private float nextFireTime = 0f;
+    private float nextFireTime;
+    private PhotonView weaponView;
 
-    public FireModule(AIController controller)
+    public FireModule(AIController controller, PhotonView weaponView)
     {
         _controller = controller;
+        this.weaponView = weaponView;
     }
-    public void FireAt(Transform target)
+
+    public void TryFireAt(Transform target) // TODO : 타겟 사용안함
     {
-        if(Time.time >= nextFireTime)
+        FireStart();
+    }
+
+    private void FireStart()
+    {
+        if (!_controller.IsFiring)
         {
-            Vector3 dir = (target.position - _controller.transform.position).normalized;
-            Debug.DrawRay(_controller.transform.position, dir * 5f, Color.red, 0.2f); //TODO 플레이어 기능의 물감발사를 가져오자 + 발사간격
-            //Debug.Log($"발사 방향: + {dir}, 타겟 위치: + { target.position}");
-            nextFireTime = Time.time + _controller.fireInterval;
+            _controller.IsFiring = true;
+            weaponView.RPC("FireParticle", RpcTarget.All, _controller.MyTeam, true);
+        }
+    }
+
+    public void StopFire()
+    {
+        if (_controller.IsFiring)
+        {
+            _controller.IsFiring = false;
+            weaponView.RPC("FireParticle", RpcTarget.All, _controller.MyTeam, false);
         }
     }
 }

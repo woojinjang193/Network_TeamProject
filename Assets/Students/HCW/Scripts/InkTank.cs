@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,14 +8,15 @@ public class InkTank : MonoBehaviour
     [Header("Liquid 셰이더가 적용된 자식 오브젝트")]
     public Renderer inkRenderer;
 
+    [Header("색상 설정")]
+    [SerializeField] private Color inkColor = Color.white; // 인스펙터에서 설정할 색상
+
     [Header("흔들림 세팅")]
     public float MaxWobble = 0.03f;
     public float WobbleSpeed = 5.0f;
     public float RecoveryRate = 1f;
 
-    [Header("잉크 잔량")]
-    public float MinFillAmount = -0.8f; // 잉크가 완전히 비었을 때
-    public float MaxFillAmount = 0.8f; // 잉크가 가득 찼을 때
+    private PlayerController myPlayer; // 내 플레이어 참조
 
     private Vector3 prevPos;
     private Vector3 prevRot;
@@ -24,6 +26,7 @@ public class InkTank : MonoBehaviour
     private int wobbleX_ID;
     private int wobbleZ_ID;
     private int fill_ID;
+    private int color_ID;
 
     void Awake()
     {
@@ -37,12 +40,29 @@ public class InkTank : MonoBehaviour
         wobbleX_ID = Shader.PropertyToID("_WobbleX");
         wobbleZ_ID = Shader.PropertyToID("_WobbleZ");
         fill_ID = Shader.PropertyToID("_FillAmount");
+        color_ID = Shader.PropertyToID("_Colour"); // 셰이더의 색상 프로퍼티 이름 (Liquid 셰이더의 _Colour)
+
+        inkRenderer.material.SetColor(color_ID, inkColor);
     }
 
     private void Update()
     {
         if (inkRenderer == null) return;
 
+        // 내 플레이어를 아직 못 찾았다면 탐색
+        if (myPlayer == null)
+        {
+            FindMyPlayer();
+            if (myPlayer == null) return; // 아직도 못찾았으면 Update 종료
+        }
+
+        // 플레이어를 찾았다면, 잉크 레벨 업데이트
+        if (myPlayer.inkParticleGun != null)
+        {
+            UpdateInkLevel(myPlayer.inkParticleGun.currentInk, myPlayer.inkParticleGun.maxInk);
+        }
+
+        // --- 기존 흔들림 로직 ---
         wobbleAmountToAddX = Mathf.Lerp(wobbleAmountToAddX, 0, Time.deltaTime * RecoveryRate);
         wobbleAmountToAddZ = Mathf.Lerp(wobbleAmountToAddZ, 0, Time.deltaTime * RecoveryRate);
 
@@ -62,13 +82,31 @@ public class InkTank : MonoBehaviour
         prevRot = transform.rotation.eulerAngles;
     }
 
+    private void FindMyPlayer()
+    {
+        myPlayer = GetComponentInParent<PlayerController>();
+        if (myPlayer != null && myPlayer.photonView.IsMine) return;
+
+        // 부모에 없다면 전체 씬에서 탐색
+        var players = FindObjectsOfType<PlayerController>();
+        foreach (var player in players)
+        {
+            if (player.photonView.IsMine)
+            {
+                myPlayer = player;
+                return; // 찾았으면 바로 종료
+            }
+        }
+    }
+
     // 잉크 탱크의 잔량을 설정
     public void UpdateInkLevel(float currentInk, float maxInk)
     {
         if (inkRenderer == null) return;
 
+        // 셰이더 _FillAmount 값이 0일 때 최대치 1일 때 비어 보이도록 되어있음
         float inkRatio = Mathf.Clamp01(currentInk / maxInk);
-        float targetFillAmount = Mathf.Lerp(MinFillAmount, MaxFillAmount, inkRatio);
+        float targetFillAmount = Mathf.Lerp(1f, 0f, inkRatio);
         inkRenderer.material.SetFloat(fill_ID, targetFillAmount);
     }
 }

@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class Player_Squid : PlayerState
 {
-    private StateMachine subStateMachine;
-    public Dictionary<LowState, BaseState> lowStateDic { get; private set; }
+    
 
     private float revertTimer = 0f;
     private const float REVERT_DELAY = 0.1f;
+    private Vector3 colCenter = new Vector3(0, 0.5f, 0);
 
     public Player_Squid(PlayerController player, StateMachine stateMachine) : base(player, stateMachine)
     {
@@ -24,34 +24,50 @@ public class Player_Squid : PlayerState
     public override void Enter()
     {
         Debug.Log("오징어 폼");
+        player.IsFiring = false;
         player.gameObject.layer = LayerMask.NameToLayer("Invincible");
-        player.humanModel.SetActive(false);
+        // player.humanModel.SetActive(false); 
+        player.SetModelVisibility(player.humanModel, false);
         player.squidModel.SetActive(true);
-        player.col.height = 1.0f;
-        player.col.radius = 0.5f;
+
+
+        player.col.direction = 2;
+        player.col.height = 0.5f;
+        player.col.radius = 0.45f;
+        player.col.center = colCenter;
         player.IsVaulting = false;
 
         player.rig.velocity = Vector3.zero;
 
         revertTimer = 0f;
         subStateMachine.Initialize(lowStateDic[LowState.Idle]);
+        
+        Manager.Audio.PlayEffect("ToSquid");
     }
 
     public override void Update()
     {
         subStateMachine.Update();
 
+        // 잉크 회복 로직 추가
+        if (player.inkParticleGun != null)
+        {
+            player.inkParticleGun.RecoverInk();
+        }
+
         if (!player.input.IsSquidHeld && !player.IsOnWalkableWall)
         {
-            this.stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
+            subStateMachine.CurrentState.Exit();
+            stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
             return;
         }
 
         if (player.WallNormal != Vector3.zero && !player.IsGrounded && player.CurrentWallInkStatus != InkStatus.OUR_TEAM)
         {
             player.rig.AddForce(player.WallNormal * 5f, ForceMode.Impulse);
-
-            this.stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
+            
+            subStateMachine.CurrentState.Exit();
+            stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
             return;
         }
 
@@ -61,7 +77,8 @@ public class Player_Squid : PlayerState
             revertTimer += Time.deltaTime;
             if (revertTimer >= REVERT_DELAY)
             {
-                this.stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
+                subStateMachine.CurrentState.Exit();
+                stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
             }
         }
         else

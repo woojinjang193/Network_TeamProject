@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -28,6 +30,10 @@ public class LobbyUI : BaseUI
         logoutButton.onClick.AddListener(OnLogoutButtonClicked);
     }
 
+    private void OnEnable()
+    {
+        createRoomButton.interactable = true;
+    }
     public override void Open()
     {
         gameObject.SetActive(true);
@@ -55,19 +61,20 @@ public class LobbyUI : BaseUI
             Debug.Log("방 이름이 비어있어, 랜덤 방으로 생성합니다.");
             roomName = $"Room_{Random.Range(1000, 9999)}";
         }
-        NetworkManager.Instance.CreateRoom(roomName);
+        Manager.Net.CreateRoom(roomName);
+        createRoomButton.interactable = false;
     }
 
     private void OnFindRoomButtonClicked()
     {
-        UIManager.Instance.PushUI(typeof(RoomListUI)); // RoomListUI를 띄우도록 변경
+        Manager.UI.PushUI(typeof(RoomListUI)); // RoomListUI를 띄우도록 변경
     }
 
     private void OnLogoutButtonClicked()
     {
         Debug.Log("로그아웃 버튼 클릭됨");
         Firebase.Auth.FirebaseAuth.DefaultInstance.SignOut(); // Firebase 로그아웃 처리
-        UIManager.Instance.ReplaceUI(typeof(LoginUI)); // 로그인 화면으로 돌아가기
+        Manager.UI.ReplaceUI(typeof(LoginUI)); // 로그인 화면으로 돌아가기
     }
 
     

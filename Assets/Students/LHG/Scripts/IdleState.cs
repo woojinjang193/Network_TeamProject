@@ -9,18 +9,22 @@ public class IdleState : AIBaseState
 {
     public IdleState(AIController controller) : base(controller) { }
 
+    public override void OnEnter()
+    {
+        _controller.DetectModule.detectTimer = 0f;
+    }
     public override void OnUpdate()
     {
+        if (!_controller.canControl) return;//////////////
+
         _controller.MoveModule.Wander();
         _controller.DetectModule.Update();
+        _controller.FireModule.TryFireAt(_controller.DetectModule.Target);
 
         if(_controller.DetectModule.HasEnemy)
         {
-            _controller.FireModule.FireAt(_controller.DetectModule.Target);
-        }
-        
-        if (_controller.DetectModule.HasEnemy)
-        {
+            Debug.Log($"파이어 시도 들어감{_controller.photonView.ViewID}");
+            _controller.MoveModule.StopWander();
             _controller.StateMachine.SetState(new ChaseState(_controller));
         }
     }

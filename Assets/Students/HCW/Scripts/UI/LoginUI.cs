@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Firebase.Auth;
 using Firebase.Extensions;
+using Photon.Pun;
 
 public class LoginUI : BaseUI
 {
@@ -12,8 +13,10 @@ public class LoginUI : BaseUI
     [SerializeField] private Button showSignUpUIButton;
     [SerializeField] private TMP_Text messageText;
 
+    private float loginTimer;
     private void Start()
     {
+        loginTimer = 2f;
         loginButton.onClick.AddListener(OnLoginButtonClicked);
         showSignUpUIButton.onClick.AddListener(ShowSignUpUI);
     }
@@ -30,7 +33,7 @@ public class LoginUI : BaseUI
             if (task.IsCanceled || task.IsFaulted)
             {
                 SetMessage("로그인에 실패했습니다: " + task.Exception.GetBaseException().Message);
-                Debug.LogError($"로그인 실패: {task.Exception}");
+                Debug.Log($"로그인 실패: {task.Exception}");
                 return;
             }
 
@@ -56,18 +59,23 @@ public class LoginUI : BaseUI
             Debug.Log($"Photon 닉네임 설정 완료: {user.DisplayName}");
 
             // Photon 서버 연결 및 로비 이동
-            if (!Photon.Pun.PhotonNetwork.IsConnected)
+            while (!Photon.Pun.PhotonNetwork.IsConnected)
             {
-                Debug.Log("Photon 서버에 연결되지 않음. 연결 시도 중...");
-                Photon.Pun.PhotonNetwork.ConnectUsingSettings();
+                loginTimer += Time.deltaTime;
+                if (loginTimer >= 2f)
+                {
+                    Debug.Log("Photon 서버에 연결되지 않음. 연결 시도 중...");
+                    Photon.Pun.PhotonNetwork.ConnectUsingSettings();
+                    loginTimer = 0f;
+                }
             }
-            NetworkManager.Instance.ShowLobby(); // 로그인 성공 후 로비로 이동
+            //PhotonNetwork.JoinLobby(); // 로그인 성공 후 로비로 이동
         });
     }
 
     private void ShowSignUpUI()
     {
-        UIManager.Instance.ReplaceUI(typeof(SignUpUI));
+        Manager.UI.ReplaceUI(typeof(SignUpUI));
     }
 
     // 호출할 메시지 업데이트 함수

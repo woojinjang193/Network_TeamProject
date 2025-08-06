@@ -1,32 +1,28 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ExitGames.Client.Photon;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class UIManager : MonoBehaviour
+public class UIManager : Singleton<UIManager>
 {
-    public static UIManager Instance { get; private set; }
-
     public BaseUI CurrentUI => uiStack.Count > 0 ? uiStack.Peek() : null;
 
     private Dictionary<Type, BaseUI> uiDictionary = new Dictionary<Type, BaseUI>();
     private Stack<BaseUI> uiStack = new Stack<BaseUI>();
 
-    [SerializeField] private BaseUI startPanel; // 시작 UI만 인스펙터에서 설정
+    //[SerializeField] private BaseUI startPanel; // 시작 UI만 인스펙터에서 설정
+    private BaseUI startPanel; // 시작 UI만 인스펙터에서 설정
 
-    private void Awake()
+    // 게임 중인지 판별
+    public bool IsGaming;
+    
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject); // 씬이 바뀌어도 UIManager는 유지
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        base.Awake();
 
+        startPanel = FindObjectOfType<LoginUI>(true);
         // 씬에 있는 모든 BaseUI 상속 객체를 찾아 비활성화하고 딕셔너리에 등록
         BaseUI[] allUIs = FindObjectsOfType<BaseUI>(true);
         foreach (var ui in allUIs)
@@ -45,11 +41,39 @@ public class UIManager : MonoBehaviour
         if (startPanel != null)
         {
             ReplaceUI(startPanel.GetType());
+            Debug.Log($"로그인 UI 띄움{startPanel.gameObject.name}");
         }
         else if (uiDictionary.Count > 0)
         {
             // 시작 패널이 지정되지 않았다면 찾은 UI 중 첫 번째 UI를 시작 패널로 사용
             ReplaceUI(uiDictionary.Keys.First());
+            Debug.Log("스타트패널 null임");
+        }
+    }
+
+    private void Update()
+    {
+        // ESC 키로 설정 UI 토글
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (SceneManager.GetActiveScene().name != "LoginScene") return;
+            
+            // SettingUI가 등록되어 있는지 확인
+            if (!uiDictionary.ContainsKey(typeof(SettingUI)))
+            {
+                Debug.LogWarning("UIManager에 SettingUI가 등록되지 않았습니다.");
+                return;
+            }
+
+            // 현재 UI가 SettingUI라면 닫고, 아니라면 연다.
+            if (CurrentUI != null && CurrentUI.GetType() == typeof(SettingUI))
+            {
+                PopUI();
+            }
+            else
+            {
+                PushUI(typeof(SettingUI));
+            }
         }
     }
 
@@ -66,7 +90,16 @@ public class UIManager : MonoBehaviour
         if (uiStack.Count > 0)
         {
             BaseUI currentUI = uiStack.Pop();
-            currentUI.Close();
+
+            //파괴된 오브젝트인지 체크
+            if (currentUI != null && currentUI.gameObject != null)
+            {
+                currentUI.Close();
+            }
+            else
+            {
+                Debug.LogWarning("UIManager: 이전 UI가 이미 파괴되어 Close() 생략");
+            }
         }
 
         // 새 UI를 열고 스택에 추가
@@ -121,5 +154,24 @@ public class UIManager : MonoBehaviour
         {
             Debug.LogWarning("스택에 UI가 없습니다.");
         }
+    }
+    public void Reinitialize()
+    {
+        uiStack.Clear();
+        uiDictionary.Clear();
+        
+        startPanel = FindObjectOfType<LoginUI>(true);
+        BaseUI[] allUIs = FindObjectsOfType<BaseUI>(true);
+        foreach (var ui in allUIs)
+        {
+            ui.gameObject.SetActive(false);
+            if (!uiDictionary.ContainsKey(ui.GetType()))
+            {
+                uiDictionary.Add(ui.GetType(), ui);
+                Debug.Log($"UIManager: {ui.GetType().Name} UI를 재등록했습니다.");
+            }
+        }
+
+        Debug.Log("UIManager: 씬 전환 후 UI 재등록 완료");
     }
 }

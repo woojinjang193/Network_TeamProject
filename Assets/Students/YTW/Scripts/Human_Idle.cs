@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Human_Idle : PlayerState
 {
+    private static readonly int IsMove = Animator.StringToHash("IsMove");
     private Player_Human humanState; 
 
     public Human_Idle(PlayerController player, StateMachine stateMachine, Player_Human humanState) : base(player, stateMachine)
@@ -17,7 +18,7 @@ public class Human_Idle : PlayerState
         Debug.Log("Human_Idle 상태");
         HasPhysics = true; 
 
-        // player.humanAnimator.SetBool("isMoving", false);
+        player.humanAnimator.SetBool(IsMove, false);
     }
 
     public override void Update()
@@ -43,6 +44,8 @@ public class Human_Idle : PlayerState
     
     public override void FixedUpdate() 
     {
+        SetPlayerRotation();
+
         float verticalVelocity = player.rig.velocity.y;
 
         Vector3 horizontalVelocity = new Vector3(player.rig.velocity.x, 0f, player.rig.velocity.z);

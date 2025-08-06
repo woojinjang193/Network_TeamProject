@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class Manager : Singleton<Manager>
 {
+    public static FirebaseManager FB;
+    public static NetworkManager Net;
+    public static UIManager UI;
     public static GameManager Game;
     public static AudioManager Audio;
     public static GridManager Grid;
@@ -12,8 +15,13 @@ public class Manager : Singleton<Manager>
     protected override void Awake()
     {
         base.Awake();
-        Game = GameManager.Instance;
+        Net = NetworkManager.Instance;
+        FB = FirebaseManager.Instance;
         Audio = AudioManager.Instance;
+        UI = UIManager.Instance;
+        
+        
+        Game = FindObjectOfType<GameManager>();
         Grid = FindObjectOfType<GridManager>();
 
 

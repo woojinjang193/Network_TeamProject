@@ -41,9 +41,9 @@ public class PlayerPanelItem : MonoBehaviour
         {
             string teamName = team.ToString();
             if (teamName == "Team1")
-                backgroundImage.color = new Color(1f, 0.5f, 0.5f); //빨강
+                backgroundImage.color = new Color(106f, 0f, 255f); // 1팀 : 보라
             else if (teamName == "Team2")
-                backgroundImage.color = new Color(0.5f, 0.5f, 1f); //파랑
+                backgroundImage.color = new Color(243f, 255f, 0f); // 2팀 : 노랑
             else
                 backgroundImage.color = Color.white;
         }
@@ -51,5 +51,16 @@ public class PlayerPanelItem : MonoBehaviour
         {
             backgroundImage.color = Color.white;
         }
+    }
+    public void InitBot(string botName, string team)
+    {
+        nameText.text = botName;
+        readyText.text = "Ready";
+        readyImage.color = Color.green; 
+        hostImage.enabled = false;
+
+        backgroundImage.color = team == "Team1"
+            ? new Color(106f, 0f, 255f)
+            : new Color(243f, 255f, 0f);
     }
 }
