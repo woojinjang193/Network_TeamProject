@@ -36,9 +36,10 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     public InkParticleGun inkParticleGun;
     public PhotonView weaponView;
 
-    [Header("사운드 관련")] 
-    public AudioSource fireSound;
+    public AudioSource fireSound { get; set; }
 
+    // 네트워크 사운드 판별
+    private bool fireSoundPlaying;
     
     // 팀 설정
     private Team myTeam = Team.None;
@@ -129,6 +130,10 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
         }
         Manager.Game.RegisterPlayer(col, this);
         Manager.Audio.SetFireSound(this);
+        if (!photonView.IsMine)
+        {
+            fireSound.volume = 0.5f;
+        }
     }
     
     public abstract void TakeDamage(float amount);
@@ -154,6 +159,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     protected IEnumerator HitRoutine()
     {
         FaceOff(FaceType.Hit);
+        Manager.Audio.PlayEffect("TakeDamage");
         photonView.RPC("TriggerHitAnimation",RpcTarget.AllViaServer);
         yield return new WaitForSeconds(hitRecoveryTimer);
         StopCoroutine(hitRoutine);

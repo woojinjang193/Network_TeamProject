@@ -20,6 +20,8 @@ public class Squid_Jump : PlayerState
 
         player.squidAnimator.SetTrigger(JumpTrigger);
         player.squidAnimator.SetBool(IsAir,true);
+        
+        Manager.Audio.PlayEffect("Jump");
     }
 
     public override void FixedUpdate()

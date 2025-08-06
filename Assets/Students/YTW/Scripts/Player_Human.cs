@@ -6,8 +6,6 @@ using UnityEngine;
 
 public class Player_Human : PlayerState
 {
-    private StateMachine subStateMachine;
-    public Dictionary<LowState, BaseState> lowStateDic { get; private set; }
     private Vector3 colCenter = new(0, 1f, 0);
 
     public Player_Human(PlayerController player, StateMachine stateMachine) : base(player, stateMachine)
@@ -36,6 +34,7 @@ public class Player_Human : PlayerState
         player.col.radius = 0.5f;
         subStateMachine.Initialize(lowStateDic[LowState.Idle]);
 
+        Manager.Audio.PlayEffect("ToHuman");
     }
 
     public override void Update()
@@ -56,7 +55,9 @@ public class Player_Human : PlayerState
                         player.weaponView.RPC("FireParticle", RpcTarget.All, player.MyTeam, false);
                     }
                 }
-                this.stateMachine.ChangeState(player.highStateDic[HighState.SquidForm]);
+
+                subStateMachine.CurrentState.Exit();
+                stateMachine.ChangeState(player.highStateDic[HighState.SquidForm]);
             }
             else if (player.input.IsSquidHeld)
             {

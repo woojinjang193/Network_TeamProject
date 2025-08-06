@@ -22,6 +22,7 @@ public class Squid_Swim : PlayerState
     {
         Debug.Log("squid Swim상태");
         player.squidAnimator.SetBool(IsMove,true);
+        SetPlaySound();
     }
     public override void Update()
     {
@@ -89,6 +90,8 @@ public class Squid_Swim : PlayerState
             OnSwimStop.Invoke();
             OnSwimStop = null;
         }
+
+        StopSound();
     }
     
     private void MoveOnWall()
@@ -138,5 +141,34 @@ public class Squid_Swim : PlayerState
     private void SwimEnded()
     {
         player.squidModel.transform.Rotate(90,0,0);
+    }
+
+    private void SetPlaySound()
+    {
+        if (!player.squidSwim)
+        {
+            player.squidSwim = Manager.Audio.PlayClip("Swim", player.transform.position);
+            player.squidSwim.transform.SetParent(player.transform);
+        }
+        if (!player.squidSwimBubble)
+        {
+            player.squidSwimBubble = Manager.Audio.PlayClip("Bubble", player.transform.position);
+            player.squidSwimBubble.transform.SetParent(player.transform);
+        }
+        player.squidSwim.Play();
+        player.squidSwimBubble.Play();
+    }
+
+    private void StopSound()
+    {
+        if (player.squidSwim.isPlaying)
+        {
+            player.squidSwim.Stop();
+        }
+
+        if (player.squidSwimBubble.isPlaying)
+        {
+            player.squidSwimBubble.Stop();
+        }
     }
 }
