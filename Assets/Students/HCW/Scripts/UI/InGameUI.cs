@@ -32,6 +32,12 @@ public class InGameUI : BaseUI
 
     [Header("잉크 게이지")]
     [SerializeField] private Slider slider_InkGauge;
+    [SerializeField] private Image inkGaugeFillImage;
+    [SerializeField] private Image inkGaugeHandleImage;
+
+    [Header("팀 색상")]
+    [SerializeField] private Color team1Color; // 1팀 색상
+    [SerializeField] private Color team2Color; // 2팀 색상
 
     [Header("팀 상태")]
     [SerializeField] private List<PlayerStatusIcon> teamA_Icons; // A팀
@@ -40,6 +46,36 @@ public class InGameUI : BaseUI
     void Awake()
     {
         _canvas = GetComponent<Canvas>();
+        // 슬라이더의 Fill Image를 자동으로 찾아서 연결
+        if (slider_InkGauge != null)
+        {
+            if (inkGaugeFillImage == null)
+            {
+                // 슬라이더의 자식 중 'Fill'이라는 이름의 오브젝트를 찾고 그 Image 컴포넌트를 가져옵니다.
+                Transform fillArea = slider_InkGauge.transform.Find("Fill Area");
+                if (fillArea != null)
+                {
+                    Transform fill = fillArea.Find("Fill");
+                    if (fill != null)
+                    {
+                        inkGaugeFillImage = fill.GetComponent<Image>();
+                    }
+                }
+            }
+            if (inkGaugeHandleImage == null)
+            {
+                // 슬라이더의 자식 중 'Handle'이라는 이름의 오브젝트를 찾고 그 Image 컴포넌트를 가져옵니다.
+                Transform handleArea = slider_InkGauge.transform.Find("Handle Slide Area");
+                if (handleArea != null)
+                {
+                    Transform handle = handleArea.Find("Handle");
+                    if (handle != null)
+                    {
+                        inkGaugeHandleImage = handle.GetComponent<Image>();
+                    }
+                }
+            }
+        }
     }
 
     private void Update()
@@ -132,6 +168,33 @@ public class InGameUI : BaseUI
     public void SetInkGaugeActive(bool isActive)
     {
         slider_InkGauge.gameObject.SetActive(isActive);
+    }
+
+    // 잉크 게이지 색상 설정
+    public void SetInkGaugeColor(Team team)
+    {
+        if (inkGaugeFillImage == null)
+        {
+            Debug.LogWarning("잉크게이지 Fill이 할당되지 않았습니다.", this);
+            return;
+        }
+
+        if (inkGaugeHandleImage == null)
+        {
+            Debug.LogWarning("잉크게이지 Handle이 할당되지 않았습니다.", this);
+            return;
+        }
+
+        if (team == Team.Team1)
+        {
+            inkGaugeFillImage.color = team1Color;
+            inkGaugeHandleImage.color = team1Color;
+        }
+        else if (team == Team.Team2)
+        {
+            inkGaugeFillImage.color = team2Color;
+            inkGaugeHandleImage.color = team2Color;
+        }
     }
 
     // 인원들의 생존상태를 업데이트

@@ -360,6 +360,17 @@ public class PlayerController : BaseController
         else MyTeam = Team.None;
 
         Debug.Log($"[PlayerController] 팀 할당 완료: {MyTeam}");
+
+        // InGameUI를 찾아서 잉크 게이지 색상 설정
+        InGameUI inGameUI = FindObjectOfType<InGameUI>(true);
+        if (inGameUI != null)
+        {
+            inGameUI.SetInkGaugeColor(MyTeam);
+        }
+        else
+        {
+            Debug.LogWarning("InGameUI를 찾을 수 없습니다. 잉크 게이지 색상 설정 실패.");
+        }
     }
 
     private void GroundAndInkCheck()
