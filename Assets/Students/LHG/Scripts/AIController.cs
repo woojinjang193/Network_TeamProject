@@ -359,4 +359,16 @@ public class AIController : BaseController
 
         return InkStatus.NONE;
     }
+    public void SetTeam(Team team)
+    {
+        MyTeam = team;
+
+        // 팀 관련 설정 초기화
+        if (teamColorInfo == null)
+            teamColorInfo = FindObjectOfType<TeamColorInfo>();
+
+        inkParticleGun?.FireParticle(MyTeam, true); // 잉크 색상 적용
+
+        Debug.Log($"[AIController] 팀 설정됨: {MyTeam}");
+    }
 }

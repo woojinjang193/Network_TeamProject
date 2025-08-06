@@ -1,13 +1,11 @@
 using Photon.Pun;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Photon.Realtime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+public class GameManagerCopy : Singleton<GameManagerCopy>
 {
     public bool IsGameEnd { get; private set; }
 
@@ -17,24 +15,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] public Transform[] team1SpawnPoints;   // Team1 스폰 
     [SerializeField] public Transform[] team2SpawnPoints;   // Team2 스폰 
 
-    //게임결과 UI
-    [SerializeField] private GameResultUI gameResultUI;
-    [SerializeField] private GameObject inkGauge;
-
     private double startTime;
     [SerializeField] private float matchDuration = 180f;
     [SerializeField] private TMP_Text timerText;
-    [SerializeField] private GameObject timerPanel;
-
     private PhotonView photonView;
 
-    private Animator timerAnimation;
-
-    private void Awake()
+    protected override void Awake()
     {
-        Manager.Game = this;
+        base.Awake();
         photonView = GetComponent<PhotonView>();
-        timerAnimation = GetComponentInChildren<Animator>();
     }
 
     private void Start()
@@ -97,12 +86,6 @@ public class GameManager : MonoBehaviour
         int minutes = Mathf.FloorToInt(time / 60);
         int seconds = Mathf.FloorToInt(time % 60);
         timerText.text = $"{minutes:00}:{seconds:00}";
-
-        if(time < 11)
-        {
-            timerText.color = Color.red;
-            timerAnimation.SetTrigger("signal");
-        }
     }
 
     private IEnumerator SpawnPlayerWithDelay()
@@ -140,7 +123,6 @@ public class GameManager : MonoBehaviour
         PhotonNetwork.Instantiate(prefabName, spawnPoint.position, spawnPoint.rotation);
         Debug.Log($"플레이어 생성 완료: {prefabName}, 위치: {spawnPoint.position}");
     }
-
     private void SpawnBots()
     {
         var roomManager = Manager.Net.roomManager;
@@ -190,7 +172,6 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
     private IEnumerator WaitForRoomManagerAndSpawnBots()
     {
         while (Manager.Net.roomManager == null)
@@ -202,6 +183,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("[WaitForRoomManagerAndSpawnBots] RoomManager 찾음 → SpawnBots 실행");
         SpawnBots();
     }
+
     public void RegisterPlayer(Collider col, BaseController playerController)
     {
         playerDic[col] = playerController;
@@ -230,7 +212,7 @@ public class GameManager : MonoBehaviour
 
         //플레이어 오브젝트 수동 제거
         //DestroyPlayers();
-        
+
         // foreach (var playerObj in GameObject.FindGameObjectsWithTag("Player"))
         // {
         //     var pv = playerObj.GetComponent<PhotonView>();
@@ -246,9 +228,6 @@ public class GameManager : MonoBehaviour
 
         //승리 팀 판단
         string winningTeam = Manager.Grid.GetWinningTeam();
-
-        
-
         Debug.Log($"내 팀: {myTeam}, 승리 팀: {winningTeam}");
 
         //팀이 이긴 경우
@@ -256,28 +235,10 @@ public class GameManager : MonoBehaviour
 
         FirebaseManager.UploadMatchResult(isWin);
 
-        float team1Rate = Manager.Grid.Team1Rate;
-        float team2Rate = Manager.Grid.Team2Rate;
-
-        PlayerOff(); //플레이어 비활성화
-
-        timerPanel.gameObject.SetActive(false);
-
-        inkGauge.SetActive(false);
-        if (PhotonNetwork.IsMasterClient)
-        {
-            photonView.RPC("ShowResultUI", RpcTarget.All, winningTeam, team1Rate, team2Rate);
-
-        }
+        ChangeToLoginScene();
     }
 
-    [PunRPC]
-    void ShowResultUI(string winner, float team1Rate, float team2Rate)
-    {
-        gameResultUI.UIOpen(winner, team1Rate / 100f, team2Rate / 100f);
-    }
-
-    public void ChangeToLoginScene()
+    private void ChangeToLoginScene()
     {
         AsyncOperation async = SceneManager.LoadSceneAsync("LoginScene");
         if (async != null)
@@ -286,22 +247,28 @@ public class GameManager : MonoBehaviour
                 Debug.Log("로그인 씬 불러오기 완료");
                 Manager.Net.roomManager = FindObjectOfType<RoomManager>();
                 Manager.Net.roomManager.RoomReInit();
-                
+
             };
+    }
+    private void ChangeToGameScene()
+    {
+        AsyncOperation async = SceneManager.LoadSceneAsync("JWJ_SampleScene");
+        if (async != null)
+        {
+            async.completed += (AsyncOperation op) =>
+            {
+                Debug.Log("게임 씬 로딩 완료");
+
+                SpawnBots();
+                Manager.Net.roomManager?.RoomReInit();
+            };
+        }
     }
     private void DestroyPlayers()
     {
         foreach (var playerObj in playerDic.Values)
         {
             PhotonNetwork.Destroy(playerObj.gameObject);
-        }
-    }
-
-    private void PlayerOff()
-    {
-        foreach (BaseController player in playerDic.Values)
-        {
-            player.gameObject.SetActive(false);
         }
     }
 }
