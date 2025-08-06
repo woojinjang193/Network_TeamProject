@@ -2272,7 +2272,6 @@ MonoBehaviour:
   fireInterval: 1
   detectInterval: 3
   detectRadius: 10
-  spawnPoint: {fileID: 1384964969777689815}
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -2281,6 +2280,7 @@ MonoBehaviour:
     m_Bits: 64
   inkColorThreshold: 1
   enemyInkSpeedModifier: 0.5
+  canControl: 0
 --- !u!54 &5467757474418972372
 Rigidbody:
   m_ObjectHideFlags: 0

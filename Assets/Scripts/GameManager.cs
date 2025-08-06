@@ -8,6 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
+using ExitGames.Client.Photon.StructWrapping;
 
 public class GameManager : MonoBehaviour
 {
@@ -41,6 +42,7 @@ public class GameManager : MonoBehaviour
 
     private Coroutine waitStartCoroutine;
 
+    private int botCount = 0;
     private void Awake()
     {
         Manager.Game = this;
@@ -51,6 +53,15 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         Debug.Log("=== [GameManager] Start ===");
+  
+        if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botsRaw)) //봇 카운트
+        {
+            foreach (var obj in (object[])botsRaw)
+            {
+                botCount++;
+            }
+        }
+
         StartCoroutine(InitAfterPhotonReady());
     }
 
@@ -152,7 +163,7 @@ public class GameManager : MonoBehaviour
     {
         spawnedCharCount++;
 
-        int totalChars = PhotonNetwork.PlayerList.Length + Manager.Net.roomManager.GetBots().Count;
+        int totalChars = PhotonNetwork.PlayerList.Length + botCount;
 
         Debug.Log($"참가완료 캐릭터 수: {spawnedCharCount}/{totalChars}");
 
@@ -255,7 +266,14 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator WaitForRoomManagerAndSpawnBots()
     {
-        while (Manager.Net.roomManager == null)
+        //while (Manager.Net.roomManager == null)
+        //{
+        //    Debug.Log("[WaitForRoomManagerAndSpawnBots] RoomManager를 기다리는 중...");
+        //    yield return null;
+        //}
+
+        Manager.Net.roomManager = FindObjectOfType<RoomManager>();
+        if (Manager.Net.roomManager == null)
         {
             Debug.Log("[WaitForRoomManagerAndSpawnBots] RoomManager를 기다리는 중...");
             yield return null;

@@ -135,6 +135,14 @@ public class PlayerController : BaseController
     private void DisableControl()///////////////
     {
         canControl = false;
+
+        rig.velocity = Vector3.zero;
+        rig.angularVelocity = Vector3.zero;
+
+        inkParticleGun.FireParticle(MyTeam, false);
+        humanAnimator.SetBool(IsMove, false);
+        humanAnimator.SetFloat(MoveX, 0f);
+        humanAnimator.SetFloat(MoveY, 0f);
     }
 
     void FixedUpdate()

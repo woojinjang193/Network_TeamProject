@@ -33,6 +33,8 @@ public class AIController : BaseController
     [Range(0.1f, 1f)]
     public float enemyInkSpeedModifier = 0.5f;
 
+    public bool canControl = false;/////////////
+
     //네브매쉬관련
     public NavMeshAgent agent { get; private set; }
 
@@ -49,16 +51,6 @@ public class AIController : BaseController
             rig.isKinematic = true;
         }
     }
-    void Start()
-    {
-        // 맨 처음 게임 시작 시 원격은 Ink발사가 안되는 문제 해결
-        if (!photonView.IsMine)
-        {
-            inkParticleGun.FireParticle(MyTeam, true);
-        }
-
-        //MyTeam = Team.Team1; //TODO : 임시 팀지정, 삭제할 것!!!!!!!!
-    }
 
     private void FixedUpdate()
     {
@@ -72,23 +64,50 @@ public class AIController : BaseController
         }
     }
 
+    public override void OnEnable()/////////////////
+    {
+        base.OnEnable();
+        GameManager.OnGameStarted += EnableControl;
+        GameManager.OnGameEnded += DisableControl;
+    }
+    public override void OnDisable()///////////////
+    {
+        base.OnDisable();
+        GameManager.OnGameStarted -= EnableControl;
+        GameManager.OnGameEnded += DisableControl;
+    }
+
+    private void EnableControl()///////////////
+    {
+        canControl = true;
+        inkParticleGun.FireParticle(MyTeam, true);
+    }
+
+    private void DisableControl()///////////////
+    {
+        canControl = false;
+        inkParticleGun.FireParticle(MyTeam, false);
+        StopAllActions();
+    }
+
     private void Update()
     {
-        if (photonView.IsMine)
+        if (photonView.IsMine) 
         {
             StateMachine.Update();
             GroundAndInkCheck();
             TestTeamSelection(); // TODO: 테스트코드 삭제할 것.
         }
+        
     }
 
     void Start()
     {
-        // 맨 처음 게임 시작 시 원격은 Ink발사가 안되는 문제 해결
-        if (!photonView.IsMine)
-        {
-            inkParticleGun.FireParticle(MyTeam, true);
-        }
+       //// 맨 처음 게임 시작 시 원격은 Ink발사가 안되는 문제 해결
+       //if (!photonView.IsMine)
+       //{
+       //    inkParticleGun.FireParticle(MyTeam, true);
+       //}
 
         ReadyToPlay();
 
@@ -384,4 +403,13 @@ public class AIController : BaseController
 
         Debug.Log($"[AIController] 팀 설정됨: {MyTeam}");
     }
+
+    private void StopAllActions()
+    {
+        MoveModule.StopWander();
+        FireModule.StopFire();
+        rig.velocity = Vector3.zero;
+        rig.angularVelocity = Vector3.zero;
+    }
+
 }

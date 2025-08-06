@@ -46,7 +46,7 @@ public class RoomUI : BaseUI
         readyButton.onClick.AddListener(OnReadyButtonClicked);
         startGameButton.onClick.AddListener(OnStartGameButtonClicked);
         leaveRoomButton.onClick.AddListener(OnLeaveRoomButtonClicked);
-        clearBotsButton.onClick.AddListener(OnClickClearBots);
+        //clearBotsButton.onClick.AddListener(OnClickClearBots);
 
         team1Button.onClick.AddListener(() => OnClickChooseTeam("Team1"));
         team2Button.onClick.AddListener(() => OnClickChooseTeam("Team2"));
