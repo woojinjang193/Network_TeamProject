@@ -13,6 +13,8 @@ public class PlayerController : BaseController
     public Dictionary<HighState, PlayerState> highStateDic { get; private set; }
 
     public PlayerInput input;
+
+    private bool canControl = false;/////////////
     
 
     private float recenterCooldownTimer;
@@ -103,11 +105,41 @@ public class PlayerController : BaseController
 
             rig.isKinematic = true;
         }
+
+        
+    }
+
+    private void Start()///////////////////
+    {
+        ReadyToPlay();
+    }
+
+    public override void OnEnable()/////////////////
+    {
+        base.OnEnable();
+        GameManager.OnGameStarted += EnableControl;
+        GameManager.OnGameEnded += DisableControl;
+    }
+    public override void OnDisable()///////////////
+    {
+        base.OnDisable();
+        GameManager.OnGameStarted -= EnableControl;
+        GameManager.OnGameEnded += DisableControl;
+    }
+
+    private void EnableControl()///////////////
+    {
+        canControl = true;
+    }
+
+    private void DisableControl()///////////////
+    {
+        canControl = false;
     }
 
     void FixedUpdate()
     {
-        if (photonView.IsMine && stateMachine != null)
+        if (photonView.IsMine && stateMachine != null && canControl)
         {
             stateMachine.FixedUpdate();
             if (!IsGrounded && rig.useGravity && !IsVaulting)
@@ -146,7 +178,7 @@ public class PlayerController : BaseController
     void Update()
     {
         // 본인의 photonView일 경우
-        if (photonView.IsMine)
+        if (photonView.IsMine && canControl)
         {
             if (recenterCooldownTimer > 0)
             {

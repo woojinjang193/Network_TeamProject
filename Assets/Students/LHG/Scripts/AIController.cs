@@ -82,6 +82,18 @@ public class AIController : BaseController
         }
     }
 
+    void Start()
+    {
+        // 맨 처음 게임 시작 시 원격은 Ink발사가 안되는 문제 해결
+        if (!photonView.IsMine)
+        {
+            inkParticleGun.FireParticle(MyTeam, true);
+        }
+
+        ReadyToPlay();
+
+        //MyTeam = Team.Team1; //TODO : 임시 팀지정, 삭제할 것!!!!!!!!
+    }
     void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
@@ -333,7 +345,7 @@ public class AIController : BaseController
     private void OnGroundColorRead(Color color)
     {
         CurrentGroundInkStatus = GetInkStatusFromColor(color);
-        Debug.Log($"<color=green>봇의 최종 바닥 잉크 상태: {CurrentGroundInkStatus}</color>");
+        //Debug.Log($"<color=green>봇의 최종 바닥 잉크 상태: {CurrentGroundInkStatus}</color>");
     }
 
     private InkStatus GetInkStatusFromColor(Color color)
