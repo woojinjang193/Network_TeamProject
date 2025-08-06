@@ -24,6 +24,10 @@ public class RoomUI : BaseUI
     [SerializeField] private Button addTeam1BotButton;
     [SerializeField] private Button addTeam2BotButton;
 
+    [Header("맵 선택")]
+    [SerializeField] private TMP_Dropdown mapDropdown;
+
+
     private void Awake()
     {
         Debug.Log("RoomUI: Awake 메서드 호출됨.");
@@ -45,6 +49,11 @@ public class RoomUI : BaseUI
         team2Button.onClick.AddListener(() => OnClickChooseTeam("Team2"));
         addTeam1BotButton.onClick.AddListener(() => roomManager.AddBot("Team1"));
         addTeam2BotButton.onClick.AddListener(() => roomManager.AddBot("Team2"));
+
+        mapDropdown.options.Clear();
+        mapDropdown.options.Add(new TMP_Dropdown.OptionData("Map1"));
+        mapDropdown.options.Add(new TMP_Dropdown.OptionData("Map2"));
+        mapDropdown.onValueChanged.AddListener(OnMapSelectionChanged);
     }
 
 
@@ -61,7 +70,12 @@ public class RoomUI : BaseUI
         if (PhotonNetwork.CurrentRoom != null)
         {
             roomNameText.text = PhotonNetwork.CurrentRoom.Name;
+            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("map", out object mapName))
+            {
+                UpdateMapSelectionUI((string)mapName);
+            }
         }
+        mapDropdown.interactable = PhotonNetwork.IsMasterClient;
         roomManager?.PlayerPanelSpawnAll();
     }
 
@@ -174,6 +188,27 @@ public class RoomUI : BaseUI
         else
         {
             Debug.LogError("RoomUI: RoomManager가 연결되지 않았습니다.");
+        }
+    }
+
+    private void OnMapSelectionChanged(int index)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            string selectedMap = mapDropdown.options[index].text;
+            roomManager.SetMapName(selectedMap);
+        }
+    }
+
+    public void UpdateMapSelectionUI(string mapName)
+    {
+        if (mapName == "Map1")
+        {
+            mapDropdown.value = 0;
+        }
+        else
+        {
+            mapDropdown.value = 1;
         }
     }
 }

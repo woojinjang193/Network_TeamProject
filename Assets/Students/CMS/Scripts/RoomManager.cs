@@ -1,16 +1,17 @@
-using ExitGames.Client.Photon; 
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq; // Linq 네임스페이스 추가 
+using System.Linq; // Linq 네임스페이스 추가
 using UnityEngine;
 using UnityEngine.UI;
 
 
-public class RoomManager : MonoBehaviour
+public class RoomManager : MonoBehaviourPunCallbacks
 {
     [SerializeField] private RoomUI roomUI; // RoomUI 참조 추가
+    public string selectedMapName = "Map1"; // 기본 맵 설정
 
     public Dictionary<int, PlayerPanelItem> playerPanels = new Dictionary<int, PlayerPanelItem>();
     private bool isLoading;
@@ -31,6 +32,25 @@ public class RoomManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    public void SetMapName(string mapName)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            selectedMapName = mapName;
+            PhotonNetwork.CurrentRoom.SetCustomProperties(new ExitGames.Client.Photon.Hashtable() { { "map", mapName } });
+        }
+    }
+
+    public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+    {
+        if (propertiesThatChanged.TryGetValue("map", out object mapName))
+        {
+            selectedMapName = (string)mapName;
+            roomUI?.UpdateMapSelectionUI(selectedMapName);
+        }
+    }
+
+
     /// 방 시작 버튼 클릭 시 호출
     public void OnClickGameStart()
     {
@@ -38,7 +58,7 @@ public class RoomManager : MonoBehaviour
         {
             isLoading = true;
             PhotonNetwork.AutomaticallySyncScene = true; // 마스터가 씬 전환 시 자동 동기화
-            PhotonNetwork.LoadLevel("Map2"); // 시작 시 GameScene 로드
+            PhotonNetwork.LoadLevel(selectedMapName); // 시작 시 GameScene 로드
         }
     }
 
