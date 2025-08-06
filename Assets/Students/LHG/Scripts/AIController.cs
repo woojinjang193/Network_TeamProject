@@ -420,6 +420,8 @@ public class AIController : BaseController
         MoveModule.StopWander();
         FireModule.StopFire();
         rig.isKinematic = true;
+        rig.velocity = Vector3.zero;
+        rig.angularVelocity = Vector3.zero;
     }
 
 }
