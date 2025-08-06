@@ -8,7 +8,6 @@ using UnityEngine.UI;
 public class ChangeInput : MonoBehaviour
 {
     EventSystem system;
-
     private void Start()
     {
         system = EventSystem.current;
