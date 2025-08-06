@@ -124,7 +124,7 @@ public class PlayerController : BaseController
     {
         base.OnDisable();
         GameManager.OnGameStarted -= EnableControl;
-        GameManager.OnGameEnded += DisableControl;
+        GameManager.OnGameEnded -= DisableControl;
     }
 
     private void EnableControl()///////////////
