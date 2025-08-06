@@ -135,10 +135,11 @@ public class RoomManager : MonoBehaviourPunCallbacks
                         team2Counter++;
                         bot2Counter++;
                     }
-                    Debug.Log($" 봇 상태 확인 팀 1 카운트 : {team1Counter} 팀 2 카운트 :  {team2Counter}");
                 }
             }
         }
+        Debug.Log($"쳌플 플레이어 상태 확인 팀 1 :{team1Counter} 팀2 : {team2Counter} ");
+        Debug.Log($"쳌플 봇 상태 확인 팀 1 카운트 : {bot1Counter} 팀 2 카운트 :  {bot2Counter}");
     }
     
     public void CheckAllReady() // 모든 플레이어가 준비 됐는지 확인하고, 마스터클라이언트의 시작 버튼을 활성화함
@@ -191,14 +192,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
                     }
                 }
 
-                Debug.Log($" 봇 상태 확인 팀 1 카운트 : {team1Count} 팀 2 카운트 :  {team2Count}");
             }
 
-            // 준비완료 && 팀 수 같음 && 최소 1명 이상일 때만 시작 버튼 활성화
-            bool canStart = team1Count == team2Count && team1Count > 0 && teamNone == 0 && isReady;
-            Debug.Log($"체크올레디 최종 확인 {team1Count} {team2Count} {teamNone}");
-            roomUI?.SetStartButtonActive(canStart && PhotonNetwork.IsMasterClient);
         }
+        Debug.Log($"레디쳌 봇 상태 확인 팀 1 카운트 : {team1Count} 팀 2 카운트 :  {team2Count}");
+        // 준비완료 && 팀 수 같음 && 최소 1명 이상일 때만 시작 버튼 활성화
+        bool canStart = team1Count == team2Count && team1Count > 0 && teamNone == 0 && isReady;
+        Debug.Log($"체크올레디 최종 확인 {team1Count} {team2Count} {teamNone}");
+        roomUI?.SetStartButtonActive(canStart && PhotonNetwork.IsMasterClient);
     }
     #endregion
     
