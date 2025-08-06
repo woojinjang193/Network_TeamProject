@@ -17,7 +17,7 @@ public class TestGameManager : Singleton<GameManager>
     [Header("팀별 스폰 위치")]
     [SerializeField] public Transform[] team1SpawnPoints;   // Team1 스폰 
     [SerializeField] public Transform[] team2SpawnPoints;   // Team2 스폰 
-    [SerializeField] private string playerPrefabName = "Player_CharacterTest";
+    //[SerializeField] private string playerPrefabName = "Player_CharacterTest";
 
     //게임결과 UI
     [SerializeField] private GameResultUI gameResultUI;
