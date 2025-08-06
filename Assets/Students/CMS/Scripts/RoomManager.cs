@@ -51,7 +51,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         if (!isLoading)
         {
             isLoading = true;
-            PhotonNetwork.AutomaticallySyncScene = true; // 마스터가 씬 전환 시 자동 동기화
+            // PhotonNetwork.AutomaticallySyncScene = true; // 마스터가 씬 전환 시 자동 동기화
             PhotonNetwork.LoadLevel(selectedMapName); // 시작 시 GameScene 로드
         }
     }
@@ -90,7 +90,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public void OnRoomJoined()
     {
         roomUI?.Open();
-        PlayerPanelSpawnAll();
+        //PlayerPanelSpawnAll();
     }
     public void RoomReInit()
     {
