@@ -86,7 +86,7 @@ public class AIController : BaseController
             inkParticleGun.FireParticle(MyTeam, true);
         }
 
-        MyTeam = Team.Team1; //TODO : 임시 팀지정, 삭제할 것!!!!!!!!
+        //MyTeam = Team.Team1; //TODO : 임시 팀지정, 삭제할 것!!!!!!!!
     }
     void OnDrawGizmos()
     {
