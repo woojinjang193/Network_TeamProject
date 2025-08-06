@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clipName: Fire
   clipSource: {fileID: 8300000, guid: a22bbf90a3949114e90b3f0876431fa5, type: 3}
-  volume: 1
+  volume: 0.6
   loop: 0
   mixerGroup: {fileID: 8063154892423865753, guid: e76f20a7c7b3a534b8bc98098cf2246b, type: 2}

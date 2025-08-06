@@ -40,7 +40,7 @@ public class PlayerController : BaseController
     public float fallingGravityScale = 7f;
 
 
-    [field:Header("무기 설정")]
+    [Header("무기 설정")]
     public ParticleSystem weaponFireEffect;
 
     [Header("무기 Transform")]
@@ -75,6 +75,11 @@ public class PlayerController : BaseController
     public bool IsVaulting;
     public Vector3 WallNormal { get; private set; } = Vector3.zero;
 
+    
+    // 플레이어 루프 사운드
+    public AudioSource squidSwim;
+    public AudioSource squidSwimBubble;
+    
     protected override void Awake()
     {
 
@@ -185,11 +190,11 @@ public class PlayerController : BaseController
 
         }
 
-        if (IsFiring&&!fireSound.isPlaying)
+        if (inkParticleGun.isFiring && !fireSound.isPlaying)
         {
             fireSound.Play();
         }
-        else if (!IsFiring && fireSound.isPlaying)
+        else if (!inkParticleGun.isFiring && fireSound.isPlaying)
         {
             fireSound.Stop();
         }
@@ -253,11 +258,13 @@ public class PlayerController : BaseController
             spectatorCamera = GameObject.FindWithTag("SpectatorCamera");
             if (spectatorCamera != null) spectatorCamera.SetActive(false); // 처음엔 비활성화
         }
-
     }
 
     private void OthersAnimation() // 로컬 포톤뷰가 아닌 플레이어들 설정
     {
+        // 사운드 체크
+        HandleSquidSound();
+        
         // 오징어 폼
         if (isSquidNetworked)
         {
@@ -291,7 +298,6 @@ public class PlayerController : BaseController
                 {
                     isJump = false;
                 }
-
             }
         }
         // 인간 폼
@@ -543,10 +549,10 @@ public class PlayerController : BaseController
         }
     }
 
-    // TODO : 죽을 때 처리 필요
     [PunRPC]
     public void PlayerDie() // TakeDamage의 조건에 따라서 들어옴. 전역 수행
     {
+        Manager.Audio.PlayClip("Dead",transform.position);
         Instantiate(dieParticle, transform);
         // 원격으로도 죽은 처리 해줘야 함
         IsDead = true;
@@ -615,6 +621,7 @@ public class PlayerController : BaseController
             transform.rotation = Quaternion.identity;
         }
 
+        Manager.Audio.PlayClip("Respawn", transform.position);
         stateMachine.ChangeState(highStateDic[HighState.HumanForm]);
         Debug.Log("플레이어 리스폰");
     }
@@ -803,6 +810,48 @@ public class PlayerController : BaseController
             case InkStatus.NONE:
                 // 잉크가 없는 곳에서는 아무 효과 없음
                 break;
+        }
+    }
+
+    private void HandleSquidSound()
+    {
+        // 소리 설정
+        if (isSquidNetworked)
+        {
+            if (!squidSwim)
+            {
+                squidSwim = Manager.Audio.PlayClip("Swim", transform.position);
+                squidSwim.transform.SetParent(transform);
+                squidSwim.volume = 0.5f;
+            }
+            if (!squidSwimBubble)
+            {
+                squidSwimBubble = Manager.Audio.PlayClip("Bubble", transform.position);
+                squidSwimBubble.transform.SetParent(transform);
+                squidSwimBubble.volume = 0.5f;
+            }
+
+            if (!squidSwim.isPlaying)
+            {
+                squidSwim.Play();
+            }
+
+            if (!squidSwimBubble.isPlaying)
+            {
+                squidSwimBubble.Play();
+            }
+        }
+        else
+        {
+            if (squidSwim && squidSwim.isPlaying)
+            {
+                squidSwim.Stop();
+            }
+
+            if (squidSwimBubble && squidSwimBubble.isPlaying)
+            {
+                squidSwimBubble.Stop();
+            }
         }
     }
 }

@@ -405,3 +405,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomNameText: {fileID: 773795125063012805}
   maxPlayerText: {fileID: 596079442832725116}
+  joinButton: {fileID: 0}

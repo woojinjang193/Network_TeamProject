@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -28,6 +30,10 @@ public class LobbyUI : BaseUI
         logoutButton.onClick.AddListener(OnLogoutButtonClicked);
     }
 
+    private void OnEnable()
+    {
+        createRoomButton.interactable = true;
+    }
     public override void Open()
     {
         gameObject.SetActive(true);
@@ -56,6 +62,7 @@ public class LobbyUI : BaseUI
             roomName = $"Room_{Random.Range(1000, 9999)}";
         }
         Manager.Net.CreateRoom(roomName);
+        createRoomButton.interactable = false;
     }
 
     private void OnFindRoomButtonClicked()

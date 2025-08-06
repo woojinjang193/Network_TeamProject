@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Player_Squid : PlayerState
 {
-    private StateMachine subStateMachine;
-    public Dictionary<LowState, BaseState> lowStateDic { get; private set; }
+    
 
     private float revertTimer = 0f;
     private const float REVERT_DELAY = 0.1f;
@@ -42,6 +41,8 @@ public class Player_Squid : PlayerState
 
         revertTimer = 0f;
         subStateMachine.Initialize(lowStateDic[LowState.Idle]);
+        
+        Manager.Audio.PlayEffect("ToSquid");
     }
 
     public override void Update()
@@ -56,15 +57,17 @@ public class Player_Squid : PlayerState
 
         if (!player.input.IsSquidHeld && !player.IsOnWalkableWall)
         {
-            this.stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
+            subStateMachine.CurrentState.Exit();
+            stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
             return;
         }
 
         if (player.WallNormal != Vector3.zero && !player.IsGrounded && player.CurrentWallInkStatus != InkStatus.OUR_TEAM)
         {
             player.rig.AddForce(player.WallNormal * 5f, ForceMode.Impulse);
-
-            this.stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
+            
+            subStateMachine.CurrentState.Exit();
+            stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
             return;
         }
 
@@ -74,7 +77,8 @@ public class Player_Squid : PlayerState
             revertTimer += Time.deltaTime;
             if (revertTimer >= REVERT_DELAY)
             {
-                this.stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
+                subStateMachine.CurrentState.Exit();
+                stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);
             }
         }
         else

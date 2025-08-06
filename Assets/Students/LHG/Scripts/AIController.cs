@@ -55,6 +55,16 @@ public class AIController : BaseController
             rig.isKinematic = true;
         }
     }
+    void Start()
+    {
+        // 맨 처음 게임 시작 시 원격은 Ink발사가 안되는 문제 해결
+        if (!photonView.IsMine)
+        {
+            inkParticleGun.FireParticle(MyTeam, true);
+        }
+
+        //MyTeam = Team.Team1; //TODO : 임시 팀지정, 삭제할 것!!!!!!!!
+    }
 
     private void FixedUpdate()
     {
@@ -78,16 +88,6 @@ public class AIController : BaseController
         }
     }
 
-    void Start()
-    {
-        // 맨 처음 게임 시작 시 원격은 Ink발사가 안되는 문제 해결
-        if (!photonView.IsMine)
-        {
-            inkParticleGun.FireParticle(MyTeam, true);
-        }
-
-        MyTeam = Team.Team1; //TODO : 임시 팀지정, 삭제할 것!!!!!!!!
-    }
     void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;

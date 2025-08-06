@@ -9,7 +9,7 @@ using UnityEngine.Audio;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 
-public class AudioManager : SingletonPun<AudioManager>
+public class AudioManager : Singleton<AudioManager>
 {
     // 오디오 데이터를 모아놓은 데이터베이스
     private AudioDataBase audioDB;
@@ -18,6 +18,7 @@ public class AudioManager : SingletonPun<AudioManager>
     // 기본음 세팅
     private AudioData defaultBGM; // 별도의 명령이 없을 경우 재생하는 배경음악
     private AudioData defaultAmbient; // '' 백색소음
+    private AudioData clickClip;
 
     // 믹서 세팅
     private AudioMixer mixer;  // 볼륨을 관리하는 오디오 믹서
@@ -28,6 +29,7 @@ public class AudioManager : SingletonPun<AudioManager>
     private AudioSource bgmSource; // 배경음악 오디오 소스
     private AudioSource ambientSource; // 게임에서 백색소음에 해당하는 오디오 소스
     private AudioSource effectSource; // 효과음 오디오 소스
+    private AudioSource clickSource;
     
     
     private Coroutine bgmFadeRoutine;
@@ -37,7 +39,7 @@ public class AudioManager : SingletonPun<AudioManager>
     private Coroutine startAmbRoutine;
     
     private Dictionary<string, AudioData> audioDict = new();
-    
+
     // 테스트 볼륨
     [Header("Set UI Ref")] 
     [SerializeField] private Slider masterSlider;
@@ -47,6 +49,7 @@ public class AudioManager : SingletonPun<AudioManager>
     protected override void Awake()
     {
         base.Awake();
+        
         // 오디오 데이터베이스 연결
         audioDB = Resources.Load<AudioDataBase>($"Audio/AudioDB");
         
@@ -63,16 +66,19 @@ public class AudioManager : SingletonPun<AudioManager>
         bgmSource = gameObject.GetOrAddComponent<AudioSource>();
         ambientSource = gameObject.AddComponent<AudioSource>();
         effectSource = gameObject.AddComponent<AudioSource>();
+        clickSource = gameObject.AddComponent<AudioSource>();
+        clickSource.playOnAwake = false;
         
         // 오디오 소스와 믹서 연결
         bgmSource.outputAudioMixerGroup = bgmGroup;
         ambientSource.outputAudioMixerGroup = bgmGroup;
         effectSource.outputAudioMixerGroup = sfxGroup;
-        
+        clickSource.outputAudioMixerGroup = sfxGroup;
         
         // 기본 브금 세팅
         defaultBGM = audioDict.TryGetValue("defaultBGM", out defaultBGM) ? defaultBGM : audioDB.audioList[0];
         defaultAmbient = audioDict.TryGetValue("defaultAmbient", out defaultAmbient) ? defaultAmbient : audioDB.audioList[0];
+        clickClip = audioDict.TryGetValue("Click",out clickClip)? clickClip: audioDB.audioList[0];
     }
     
     private void Start()
@@ -107,13 +113,12 @@ public class AudioManager : SingletonPun<AudioManager>
         }
     }
     
-    [PunRPC]
-    public void PlayClip(string clipName, Vector3 pos) // 인게임 오디오 클립 재생
+    public AudioSource PlayClip(string clipName, Vector3 pos) // 인게임 오디오 클립 재생
     {
         if (!audioDict.TryGetValue(clipName, out AudioData outClip))
         {
             Debug.LogError($"사운드가 딕셔너리에없음 : {clipName}");
-            return;
+            return null;
         }
         
         GameObject go = new GameObject($"AudioClip_{clipName}");
@@ -136,6 +141,8 @@ public class AudioManager : SingletonPun<AudioManager>
         {
             Destroy(go, outClip.clipSource.length); // 루프 재생이 아닐 경우, 길이가 끝나면 파괴
         }
+
+        return audioClip;
     }
     
     public void SwitchBGM(string bgmName, float fadeTime = 1f) // 배경 음악 변경 시 사용
@@ -404,6 +411,7 @@ public class AudioManager : SingletonPun<AudioManager>
         }
 
         GameObject go = new GameObject("FireSound");
+        go.transform.position = player.transform.position;
         AudioSource audio = go.AddComponent<AudioSource>();
         
         audio.clip = outFire.clipSource;
@@ -420,5 +428,15 @@ public class AudioManager : SingletonPun<AudioManager>
         player.fireSound = audio;
     }
 
-    public enum MixerType{Master,BGM,SFX}
+    public void Click()
+    {
+        clickSource.Play();
+    }
+
+    public enum MixerType
+    {
+        Master,
+        BGM,
+        SFX
+    }
 }

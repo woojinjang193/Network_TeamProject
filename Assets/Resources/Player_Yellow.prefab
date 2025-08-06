@@ -17133,7 +17133,6 @@ MonoBehaviour:
   moveSpeed: 7
   inkParticleGun: {fileID: 2333351159953186776}
   weaponView: {fileID: 0}
-  fireSound: {fileID: 0}
   faceType: 0
   rig: {fileID: 0}
   col: {fileID: 0}
@@ -19154,7 +19153,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 2
+        scalar: 1
         minScalar: 30
         maxCurve:
           serializedVersion: 2

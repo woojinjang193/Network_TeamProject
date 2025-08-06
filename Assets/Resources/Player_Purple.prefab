@@ -1936,7 +1936,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 2
+        scalar: 1
         minScalar: 30
         maxCurve:
           serializedVersion: 2
@@ -6540,7 +6540,6 @@ MonoBehaviour:
   moveSpeed: 7
   inkParticleGun: {fileID: 5702437234916080121}
   weaponView: {fileID: 0}
-  fireSound: {fileID: 0}
   faceType: 0
   rig: {fileID: 0}
   col: {fileID: 0}
@@ -6571,6 +6570,8 @@ MonoBehaviour:
   damagePerSecondOnEnemyInk: 10
   healthPerSecondOnOurInk: 5
   IsVaulting: 0
+  squidSwim: {fileID: 0}
+  squidSwimBubble: {fileID: 0}
 --- !u!114 &579056536622001376
 MonoBehaviour:
   m_ObjectHideFlags: 0
