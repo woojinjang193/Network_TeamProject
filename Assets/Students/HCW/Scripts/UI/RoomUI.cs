@@ -165,7 +165,7 @@ public class RoomUI : BaseUI
             Destroy(child.gameObject);
         }
     }
-    public void UpdatePlayerList(List<Player> players) // 받은 플레이어 리스트를 기준으로 패널 업데이트
+    public void UpdatePlayerList(List<Player> players) // 받은 플레이어 리스트를 기준으로 패널 업데이트. 이후 봇 패널 생성
     {
         // 플레이어 및 봇 패널이 재생성 된다.
         Debug.Log($"UpdatePlayerList 호출됨. 플레이어 수: {players.Count}");
@@ -247,6 +247,6 @@ public class RoomUI : BaseUI
     private void OnClickClearBots()
     {
         Debug.Log("Clear Bots 버튼 클릭됨");
-        roomManager?.ClearBots();
+        StartCoroutine(roomManager?.ClearBots());
     }
 }

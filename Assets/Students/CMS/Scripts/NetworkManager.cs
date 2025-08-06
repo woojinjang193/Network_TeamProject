@@ -164,11 +164,9 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     // 플레이어 정보가 업데이트 됐을 때
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
-        roomManager?.OnPlayerPropertiesUpdated(targetPlayer, changedProps);
-        if (PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.InRoom)
         {
-            roomManager?.CheckAllReady();
-            roomManager?.CheckPlayerCount();
+            roomManager?.OnPlayerPropertiesUpdated(targetPlayer, changedProps);
         }
     }
     public override void OnPlayerEnteredRoom(Player newPlayer) // 새 플레이어가 현재 방에 입장했을 때 호출
@@ -180,7 +178,7 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
         if (PhotonNetwork.IsMasterClient)
         {
             roomManager?.CheckAllReady();
-            roomManager?.CheckPlayerCount();
+            StartCoroutine(roomManager?.SetCountProperty());
         }
     }
     public override void OnPlayerLeftRoom(Player otherPlayer) // 현재 방에서 다른 플레이어가 떠났을 때 호출
@@ -188,8 +186,8 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
         roomManager?.PlayerPanelRemove(otherPlayer);
         if (PhotonNetwork.IsMasterClient)
         {
-            roomManager?.CheckAllReady();
             roomManager?.CheckPlayerCount();
+            StartCoroutine(roomManager?.SetCountProperty());
         }
     }
     #endregion
