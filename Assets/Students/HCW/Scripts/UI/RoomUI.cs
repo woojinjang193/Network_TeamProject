@@ -95,6 +95,7 @@ public class RoomUI : BaseUI
 
     public void SetMaster()
     {
+        startGameButton.interactable = PhotonNetwork.IsMasterClient;
         addTeam1BotButton.interactable = PhotonNetwork.IsMasterClient;
         addTeam2BotButton.interactable = PhotonNetwork.IsMasterClient;
         mapDropdown.interactable = PhotonNetwork.IsMasterClient;

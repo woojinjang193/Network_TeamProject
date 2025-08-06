@@ -178,28 +178,25 @@ public class RoomManager : MonoBehaviourPunCallbacks
                 roomUI?.SetStartButtonActive(false);
                 isReady = false;
             }
-
-            //봇 상태 확인
-            if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botRaw))
+        }
+        //봇 상태 확인
+        if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botRaw))
+        {
+            var botList = botRaw as object[];
+            foreach (var bot in botList)
             {
-                var botList = botRaw as object[];
-                foreach (var bot in botList)
+                var b = bot as Hashtable;
+                if ((string)b["team"] == "Team1")
                 {
-                    var b = bot as Hashtable;
-                    if ((string)b["team"] == "Team1")
-                    {
-                        team1Count++;
-                        Debug.Log($"팀1 카운트 ++ {team1Count}");
-                    }
-                    else if ((string)b["team"] == "Team2")
-                    {
-                        team2Count++;
-                        Debug.Log($"팀2 카운트 ++ {team2Count}");
-                    }
+                    team1Count++;
+                    Debug.Log($"팀1 카운트 ++ {team1Count}");
                 }
-
+                else if ((string)b["team"] == "Team2")
+                {
+                    team2Count++;
+                    Debug.Log($"팀2 카운트 ++ {team2Count}");
+                }
             }
-
         }
         Debug.Log($"레디쳌 봇 상태 확인 팀 1 카운트 : {team1Count} 팀 2 카운트 :  {team2Count}");
         // 준비완료 && 팀 수 같음 && 최소 1명 이상일 때만 시작 버튼 활성화
