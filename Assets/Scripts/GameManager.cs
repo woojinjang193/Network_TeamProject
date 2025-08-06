@@ -6,10 +6,13 @@ using Photon.Realtime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEditor.ShaderGraph.Internal;
 
 public class GameManager : MonoBehaviour
 {
     public bool IsGameEnd { get; private set; }
+
+    [SerializeField] private float waitForOtherPlayersTime = 60f;
 
     private Dictionary<Collider, BaseController> playerDic = new();
 
@@ -17,6 +20,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] public Transform[] team1SpawnPoints;   // Team1 스폰 
     [SerializeField] public Transform[] team2SpawnPoints;   // Team2 스폰 
 
+    //게임 스타트 UI
+    [SerializeField] private GameStartUI gameStartUI;
     //게임결과 UI
     [SerializeField] private GameResultUI gameResultUI;
     [SerializeField] private GameObject inkGauge;
@@ -27,8 +32,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject timerPanel;
 
     private PhotonView photonView;
-
+    private int spawnedCharCount = 0; //
     private Animator timerAnimation;
+
+    public static event Action OnGameStarted;
+    public static event Action OnGameEnded;
+
+    private Coroutine waitStartCoroutine;
 
     private void Awake()
     {
@@ -64,11 +74,6 @@ public class GameManager : MonoBehaviour
         if (PhotonNetwork.IsMasterClient)
         {
             StartCoroutine(WaitForRoomManagerAndSpawnBots());
-        }
-
-        if (PhotonNetwork.IsMasterClient)
-        {
-            GameStart();  // 마스터만 호출
         }
     }
 
@@ -141,23 +146,80 @@ public class GameManager : MonoBehaviour
         Debug.Log($"플레이어 생성 완료: {prefabName}, 위치: {spawnPoint.position}");
     }
 
-    private void SpawnBots()
+    [PunRPC]
+    void NotifyCharSpawned() /// 플레이 준비가 완료되면 호출
     {
-        var roomManager = Manager.Net.roomManager;
-        if (roomManager == null)
+        spawnedCharCount++;
+
+        int totalChars = PhotonNetwork.PlayerList.Length + Manager.Net.roomManager.GetBots().Count;
+
+        Debug.Log($"참가완료 캐릭터 수: {spawnedCharCount}/{totalChars}");
+
+        if (spawnedCharCount == totalChars)
         {
-            Debug.LogError("SpawnBots: RoomManager 찾을 수 없음");
+            if (waitStartCoroutine != null)
+            {
+                StopCoroutine(waitStartCoroutine);
+                waitStartCoroutine = null;
+            }
+            photonView.RPC("OpenGameStartUITogether", RpcTarget.All);
             return;
         }
 
-        var bots = roomManager.GetBots();
-        Debug.Log($"[SpawnBots] 봇 수: {bots.Count}");
-
-        for (int i = 0; i < bots.Count; i++)
+        if (waitStartCoroutine == null && spawnedCharCount > 0) //참가자가 1명 이상일때 한번 실행
         {
-            var bot = bots[i];
+            waitStartCoroutine = StartCoroutine(WaitAndStartGame());
+        }
+    }
 
-            Transform[] spawnArray = bot.Team == "Team1" ? team1SpawnPoints : team2SpawnPoints;
+    [PunRPC]
+    private void OpenGameStartUITogether()
+    {
+        gameStartUI.openGameStartUI();
+    }
+
+    private IEnumerator WaitAndStartGame() //참가자가 2분동안 꽉차지않으면 게임 그냥 실행
+    {
+        Debug.Log($"다른 플레이어 기다리는중..{waitForOtherPlayersTime}초 대기 타이머 시작");
+        yield return new WaitForSeconds(waitForOtherPlayersTime);
+        photonView.RPC("OpenGameStartUITogether", RpcTarget.All);
+        waitStartCoroutine = null;
+    }
+
+    private void SpawnBots()
+    {
+        if (!PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botsRaw))
+        {
+            Debug.Log("[SpawnBots] CustomProperties에 봇 정보 없음");
+            return;
+        }
+
+        if (!(botsRaw is object[] bots))
+        {
+            Debug.LogError($"[SpawnBots] 'bots'는 object[] 타입이 아닙니다: {botsRaw?.GetType()}");
+            return;
+        }
+
+        if (bots.Length == 0)
+        {
+            Debug.Log("[SpawnBots] 봇 리스트 비어있음");
+            return;
+        }
+
+        Debug.Log($"[SpawnBots] 봇 수: {bots.Length}");
+
+        for (int i = 0; i < bots.Length; i++)
+        {
+            if (!(bots[i] is ExitGames.Client.Photon.Hashtable botData))
+            {
+                Debug.LogWarning($"[SpawnBots] botData 캐스팅 실패: index {i}");
+                continue;
+            }
+
+            string team = (string)botData["team"];
+            string name = (string)botData["name"];
+
+            Transform[] spawnArray = team == "Team1" ? team1SpawnPoints : team2SpawnPoints;
             if (spawnArray.Length == 0)
             {
                 Debug.LogError("SpawnBots: 스폰 포인트 없음");
@@ -166,8 +228,7 @@ public class GameManager : MonoBehaviour
 
             Transform spawnPoint = spawnArray[i % spawnArray.Length];
 
-            //팀별 봇 프리팹 이름 결정
-            string prefabName = bot.Team switch
+            string prefabName = team switch
             {
                 "Team1" => "AI_Purple",
                 "Team2" => "AI_Yellow",
@@ -176,7 +237,7 @@ public class GameManager : MonoBehaviour
 
             if (string.IsNullOrEmpty(prefabName))
             {
-                Debug.LogError($"SpawnBots: 알 수 없는 팀 {bot.Team}");
+                Debug.LogError($"SpawnBots: 알 수 없는 팀 {team}");
                 continue;
             }
 
@@ -185,8 +246,8 @@ public class GameManager : MonoBehaviour
             var ai = botGO.GetComponent<AIController>();
             if (ai != null)
             {
-                ai.MyTeam = bot.Team == "Team1" ? Team.Team1 : Team.Team2;
-                Debug.Log($"봇 생성 완료: {bot.Name}, 프리팹: {prefabName}, 팀: {ai.MyTeam}");
+                ai.MyTeam = team == "Team1" ? Team.Team1 : Team.Team2;
+                Debug.Log($"봇 생성 완료: {name}, 프리팹: {prefabName}, 팀: {ai.MyTeam}");
             }
         }
     }
@@ -221,25 +282,26 @@ public class GameManager : MonoBehaviour
         {
             double start = PhotonNetwork.Time;
             photonView.RPC("SetStartTime", RpcTarget.All, start);
+            photonView.RPC("RpcGameStart", RpcTarget.All);
         }
+    }
+
+    [PunRPC]
+    void RpcGameStart()
+    {
+        OnGameStarted?.Invoke();
+    }
+
+    [PunRPC]
+    void RpcGameEnd()
+    {
+        OnGameEnded?.Invoke(); // 캐릭터들 움직임
     }
 
     private void GameEnd()
     {
         Debug.Log("게임 엔드");
-
-        //플레이어 오브젝트 수동 제거
-        //DestroyPlayers();
-        
-        // foreach (var playerObj in GameObject.FindGameObjectsWithTag("Player"))
-        // {
-        //     var pv = playerObj.GetComponent<PhotonView>();
-        //     if (pv != null && pv.IsMine)
-        //     {
-        //         PhotonNetwork.Destroy(playerObj);
-        //         Debug.Log($"플레이어 오브젝트 제거됨: {playerObj.name}");
-        //     }
-        // }
+        photonView.RPC("RpcGameEnd", RpcTarget.All);
 
         // 현재 유저가 속한 팀 가져오기
         string myTeam = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
@@ -259,7 +321,7 @@ public class GameManager : MonoBehaviour
         float team1Rate = Manager.Grid.Team1Rate;
         float team2Rate = Manager.Grid.Team2Rate;
 
-        PlayerOff(); //플레이어 비활성화
+        //PlayerOff(); //플레이어 비활성화
 
         timerPanel.gameObject.SetActive(false);
 
@@ -267,7 +329,6 @@ public class GameManager : MonoBehaviour
         if (PhotonNetwork.IsMasterClient)
         {
             photonView.RPC("ShowResultUI", RpcTarget.All, winningTeam, team1Rate, team2Rate);
-
         }
     }
 
@@ -284,9 +345,16 @@ public class GameManager : MonoBehaviour
             async.completed += (AsyncOperation op) =>
             {
                 Debug.Log("로그인 씬 불러오기 완료");
+                Manager.Audio.SwitchBGM("defaultBGM");
+                Manager.Audio.SwitchAmbient("defaultAmbient");
                 Manager.Net.roomManager = FindObjectOfType<RoomManager>();
                 Manager.Net.roomManager.RoomReInit();
-                
+
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    PhotonNetwork.CurrentRoom.IsOpen = true; // 다시 유저 받기 가능하게
+                    PhotonNetwork.CurrentRoom.IsVisible = true;  // 로비에 표시
+                }
             };
     }
     private void DestroyPlayers()
@@ -297,7 +365,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void PlayerOff()
+    public void PlayerOff()
     {
         foreach (BaseController player in playerDic.Values)
         {

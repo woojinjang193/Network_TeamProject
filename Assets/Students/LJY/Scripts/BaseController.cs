@@ -130,6 +130,15 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
         Manager.Game.RegisterPlayer(col, this);
         Manager.Audio.SetFireSound(this);
     }
+
+    protected void ReadyToPlay() //봇이나 플레이어가 준비가 되면 마스터에게 알림
+    {
+        if (!photonView.IsMine) return;
+
+        GameManager gameManager = FindObjectOfType<GameManager>();
+        PhotonView gameManagerPhotonView = gameManager.GetComponent<PhotonView>();
+        gameManagerPhotonView.RPC("NotifyCharSpawned", RpcTarget.MasterClient); 
+    }
     
     public abstract void TakeDamage(float amount);
     public abstract void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info);

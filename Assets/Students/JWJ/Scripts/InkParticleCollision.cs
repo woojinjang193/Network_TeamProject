@@ -142,7 +142,7 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
             //Debug.Log("마스터 클라이언트가 아닙니다.");
             return;
         }
-        Debug.Log("트리거 충돌.");
+        //Debug.Log("트리거 충돌.");
 
         int numEnter = particleSys.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter);
         //트리거Enter 한 파티클 수
@@ -183,7 +183,7 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
     private void RpcSetGridTeam(int gridID, int teamIndex) // 모든클라이언트가 그리드 팀정보 업데이트
     {
         var grid = Manager.Grid.GetGridByID(gridID);
-        Debug.Log(grid);
+        //Debug.Log(grid);
 
         if (grid != null)
         {

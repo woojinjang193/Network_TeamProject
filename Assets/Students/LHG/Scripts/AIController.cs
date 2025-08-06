@@ -86,7 +86,9 @@ public class AIController : BaseController
             inkParticleGun.FireParticle(MyTeam, true);
         }
 
-        MyTeam = Team.Team1; //TODO : 임시 팀지정, 삭제할 것!!!!!!!!
+        ReadyToPlay();
+
+        //MyTeam = Team.Team1; //TODO : 임시 팀지정, 삭제할 것!!!!!!!!
     }
     void OnDrawGizmos()
     {
@@ -332,7 +334,7 @@ public class AIController : BaseController
     private void OnGroundColorRead(Color color)
     {
         CurrentGroundInkStatus = GetInkStatusFromColor(color);
-        Debug.Log($"<color=green>봇의 최종 바닥 잉크 상태: {CurrentGroundInkStatus}</color>");
+        //Debug.Log($"<color=green>봇의 최종 바닥 잉크 상태: {CurrentGroundInkStatus}</color>");
     }
 
     private InkStatus GetInkStatusFromColor(Color color)
