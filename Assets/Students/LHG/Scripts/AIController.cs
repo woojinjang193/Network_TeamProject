@@ -214,18 +214,25 @@ public class AIController : BaseController
 
     public void Respawn() // DeathState 상태에서 호출됨. 본인만 수행
     {
-        // TODO: 리스폰 포인트로 이동
-        transform.position = _initialPosition;
-        transform.rotation = _initialRotation;
-
         humanModel.SetActive(true);
         col.enabled = true;
-
 
         //AI 리셋
         CurHp = MaxHp;
         IsDead = false;
         StateMachine.SetState(new IdleState(this));
+
+        //리스폰 위치버그조치
+        Transform[] spawnArray = MyTeam == Team.Team1 ? Manager.Game.team1SpawnPoints : Manager.Game.team2SpawnPoints;
+        transform.position = spawnArray[0].position; //TODO 스폰어레이 0번에 넣는거..조금불안하긴함
+        transform.rotation = spawnArray[0].rotation;
+
+        rig.velocity = Vector3.zero;
+        rig.angularVelocity = Vector3.zero;
+
+        Manager.Audio.PlayClip("Respawn", transform.position);
+
+        Debug.Log("봇 리스폰 완료");
     }
 
     // TODO: 테스트 종료 후 삭제
