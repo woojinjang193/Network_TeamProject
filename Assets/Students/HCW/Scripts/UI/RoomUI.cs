@@ -14,7 +14,6 @@ public class RoomUI : BaseUI
     [SerializeField] private Button readyButton;
     [SerializeField] private Button startGameButton; // 방장만 활성화
     [SerializeField] private Button leaveRoomButton;
-    [SerializeField] private Button clearBotsButton;
 
     [SerializeField] private RoomManager roomManager; // RoomManager 참조 추가
 
@@ -41,7 +40,6 @@ public class RoomUI : BaseUI
         readyButton.onClick.AddListener(OnReadyButtonClicked);
         startGameButton.onClick.AddListener(OnStartGameButtonClicked);
         leaveRoomButton.onClick.AddListener(OnLeaveRoomButtonClicked);
-        clearBotsButton.onClick.AddListener(OnClickClearBots);
 
         team1Button.onClick.AddListener(() => OnClickChooseTeam("Team1"));
         team2Button.onClick.AddListener(() => OnClickChooseTeam("Team2"));
@@ -52,18 +50,9 @@ public class RoomUI : BaseUI
 
     public override void Open()
     {
-        //RoomManager 참조 복구 (씬 복귀했을 때)
-        if (roomManager == null)
-        {
-            roomManager = FindObjectOfType<RoomManager>();
-            if (roomManager == null)
-            {
-                Debug.LogError("RoomManager를 찾을 수 없습니다.");
-            }
-        }
         if (!PhotonNetwork.InRoom)
         {
-            Debug.LogWarning("현재 방에 입장한 상태가 아님, UI 비활성화");
+            Debug.LogWarning("RoomUI.Open(): 현재 방에 입장한 상태가 아님, UI 비활성화");
             return;
         }
 
@@ -118,16 +107,10 @@ public class RoomUI : BaseUI
             roomManager.OnClickGameStart();
         }
     }
-    private void UpdateStartButton()
-    {
-        startGameButton.gameObject.SetActive(PhotonNetwork.IsMasterClient);
-    }
 
     private void OnLeaveRoomButtonClicked()
     {
         Debug.Log("방 나가기 버튼 클릭됨");
-
-        Manager.Net.roomManager?.ClearRoomData(); 
         Manager.Net.LeaveRoom();
     }
 
@@ -192,10 +175,5 @@ public class RoomUI : BaseUI
         {
             Debug.LogError("RoomUI: RoomManager가 연결되지 않았습니다.");
         }
-    }
-    private void OnClickClearBots()
-    {
-        Debug.Log("Clear Bots 버튼 클릭됨");
-        roomManager?.ClearBots();
     }
 }
