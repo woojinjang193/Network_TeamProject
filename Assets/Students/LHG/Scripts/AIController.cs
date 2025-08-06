@@ -87,11 +87,13 @@ public class AIController : BaseController
     {
         canControl = true;
         inkParticleGun.FireParticle(MyTeam, true);
+        IsMoving = true;
     }
 
     private void DisableControl()///////////////
     {
         canControl = false;
+        IsMoving = false;
         inkParticleGun.FireParticle(MyTeam, false);
         if (photonView.IsMine)
         {
@@ -417,8 +419,7 @@ public class AIController : BaseController
     {
         MoveModule.StopWander();
         FireModule.StopFire();
-        rig.velocity = Vector3.zero;
-        rig.angularVelocity = Vector3.zero;
+        rig.isKinematic = true;
     }
 
 }
