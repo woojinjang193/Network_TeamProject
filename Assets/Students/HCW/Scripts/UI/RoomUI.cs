@@ -46,7 +46,7 @@ public class RoomUI : BaseUI
         readyButton.onClick.AddListener(OnReadyButtonClicked);
         startGameButton.onClick.AddListener(OnStartGameButtonClicked);
         leaveRoomButton.onClick.AddListener(OnLeaveRoomButtonClicked);
-        //clearBotsButton.onClick.AddListener(OnClickClearBots);
+//        clearBotsButton.onClick.AddListener(OnClickClearBots);
 
         team1Button.onClick.AddListener(() => OnClickChooseTeam("Team1"));
         team2Button.onClick.AddListener(() => OnClickChooseTeam("Team2"));
@@ -87,12 +87,19 @@ public class RoomUI : BaseUI
                 UpdateMapSelectionUI((string)mapName);
             }
         }
-        addTeam1BotButton.interactable = PhotonNetwork.IsMasterClient;
-        addTeam2BotButton.interactable = PhotonNetwork.IsMasterClient;
-        mapDropdown.interactable = PhotonNetwork.IsMasterClient;
+
+        SetMaster();
+
         roomManager?.PlayerPanelSpawnAll();
     }
 
+    public void SetMaster()
+    {
+        addTeam1BotButton.interactable = PhotonNetwork.IsMasterClient;
+        addTeam2BotButton.interactable = PhotonNetwork.IsMasterClient;
+        mapDropdown.interactable = PhotonNetwork.IsMasterClient;
+        //clearBotsButton.interactable = PhotonNetwork.IsMasterClient;
+    }
     public override void Close()
     {
         gameObject.SetActive(false);

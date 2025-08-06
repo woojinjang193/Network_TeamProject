@@ -66,13 +66,16 @@ public class RoomManager : MonoBehaviourPunCallbacks
     }
     public void OnClickChooseTeam(string team) // 플레이어 팀 변경 시 호출됨. 버튼에 의해서 호출
     {
-        Debug.Log($"RoomManager: 플레이어 {PhotonNetwork.LocalPlayer.NickName} 팀을 {team}으로 설정 시도");
-        // 현재 플레이어의 정보를 저장함
-        PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable
+        if (PhotonNetwork.LocalPlayer.IsLocal)
         {
-            { "team", team },
-            { "Ready", false }
-        });
+            Debug.Log($"RoomManager: 플레이어 {PhotonNetwork.LocalPlayer.NickName} 팀을 {team}으로 설정 시도");
+            // 현재 플레이어의 정보를 저장함
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable
+            {
+                { "team", team },
+                { "Ready", false }
+            });
+        }
     }
     
     public IEnumerator SetCountProperty()
@@ -98,6 +101,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     #region 커스텀 프로퍼티 체크
     public void CheckPlayerCount() // 현재 방의 플레이어 + 봇 숫자 체크 및 팀 체크
     {
+        if (!PhotonNetwork.IsMasterClient) return;
         team1Counter = 0;
         team2Counter = 0;
         teamNoneCounter = 0;
@@ -144,6 +148,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
     
     public void CheckAllReady() // 모든 플레이어가 준비 됐는지 확인하고, 마스터클라이언트의 시작 버튼을 활성화함
     {
+        if (!PhotonNetwork.IsMasterClient) return;
+        
         bool isReady = true;
 
         Debug.Log("체크올레디 시작");

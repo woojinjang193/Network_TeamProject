@@ -12,7 +12,7 @@ public class RoomListItemUI : MonoBehaviour
 
     private string roomName;
 
-    public void Setup(Photon.Realtime.RoomInfo info)
+    public void Setup(RoomInfo info)
     {
         roomName = info.Name;
         roomNameText.text = info.Name;
