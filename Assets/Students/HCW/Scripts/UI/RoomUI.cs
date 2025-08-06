@@ -21,8 +21,10 @@ public class RoomUI : BaseUI
     [SerializeField] private Button team1Button;
     [SerializeField] private Button team2Button;
 
+    [Header("봇 추가 및 제거")]
     [SerializeField] private Button addTeam1BotButton;
     [SerializeField] private Button addTeam2BotButton;
+    [SerializeField] private Button clearBotsButton;
 
     [Header("맵 선택")]
     [SerializeField] private TMP_Dropdown mapDropdown;
@@ -44,6 +46,7 @@ public class RoomUI : BaseUI
         readyButton.onClick.AddListener(OnReadyButtonClicked);
         startGameButton.onClick.AddListener(OnStartGameButtonClicked);
         leaveRoomButton.onClick.AddListener(OnLeaveRoomButtonClicked);
+        clearBotsButton.onClick.AddListener(OnClickClearBots);
 
         team1Button.onClick.AddListener(() => OnClickChooseTeam("Team1"));
         team2Button.onClick.AddListener(() => OnClickChooseTeam("Team2"));
@@ -59,6 +62,15 @@ public class RoomUI : BaseUI
 
     public override void Open()
     {
+        //RoomManager 참조 복구 (씬 복귀했을 때)
+        if (roomManager == null)
+        {
+            roomManager = FindObjectOfType<RoomManager>();
+            if (roomManager == null)
+            {
+                Debug.LogError("RoomManager를 찾을 수 없습니다.");
+            }
+        }
         if (!PhotonNetwork.InRoom)
         {
             Debug.LogWarning("RoomUI.Open(): 현재 방에 입장한 상태가 아님, UI 비활성화");
@@ -121,10 +133,16 @@ public class RoomUI : BaseUI
             roomManager.OnClickGameStart();
         }
     }
+    private void UpdateStartButton()
+    {
+        startGameButton.gameObject.SetActive(PhotonNetwork.IsMasterClient);
+    }
 
     private void OnLeaveRoomButtonClicked()
     {
         Debug.Log("방 나가기 버튼 클릭됨");
+
+        Manager.Net.roomManager?.ClearRoomData();
         Manager.Net.LeaveRoom();
     }
 
@@ -210,5 +228,10 @@ public class RoomUI : BaseUI
         {
             mapDropdown.value = 1;
         }
+    }
+    private void OnClickClearBots()
+    {
+        Debug.Log("Clear Bots 버튼 클릭됨");
+        roomManager?.ClearBots();
     }
 }
