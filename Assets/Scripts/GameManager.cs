@@ -2,10 +2,12 @@ using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 public class GameManager : MonoBehaviour
 {
@@ -220,12 +222,19 @@ public class GameManager : MonoBehaviour
         if (PhotonNetwork.IsMasterClient)
         {
             double start = PhotonNetwork.Time;
-            photonView.RPC("SetStartTime", RpcTarget.All, start);
+            photonView.RPC("SetStartTime", RpcTarget.AllViaServer, start);
         }
+        // 스테이지에 따라 음악 다르게 재생
+        Manager.Audio.SwitchBGM("Stage1");
+        //Manager.Audio.SwitchBGM("Stage2");
     }
 
     private void GameEnd()
     {
+        // 게임 종료 사운드 재생 및 브금 종료
+        Manager.Audio.PlayEffect("GameSet");
+        Manager.Audio.StopAllSounds();
+        
         Debug.Log("게임 엔드");
 
         //플레이어 오브젝트 수동 제거
@@ -284,6 +293,8 @@ public class GameManager : MonoBehaviour
             async.completed += (AsyncOperation op) =>
             {
                 Debug.Log("로그인 씬 불러오기 완료");
+                Manager.Audio.SwitchBGM("defaultBGM");
+                Manager.Audio.SwitchAmbient("defaultAmbient");
                 Manager.Net.roomManager = FindObjectOfType<RoomManager>();
                 Manager.Net.roomManager.RoomReInit();
                 
