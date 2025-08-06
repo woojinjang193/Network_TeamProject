@@ -17,6 +17,9 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
 
     private string _desiredRoomNameOnFail; // 빠른 입장 실패 시 사용할 방 이름을 임시 저장하는 변수
 
+    private Coroutine waitRoutine;
+    
+    #region 유니티함수
     protected override void Awake()
     {
         base.Awake();
@@ -25,120 +28,130 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
         
     }
 
-
     private void Start()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
     }
-    public override void OnConnectedToMaster()
+    #endregion
+    
+    #region 서버 연결
+    public override void OnConnectedToMaster() // 마스터 서버 연결
     {
-        Debug.Log("Photon 연결 완료");
+        if (PhotonNetwork.NetworkClientState == ClientState.ConnectedToMasterServer)
+        {
+            Debug.Log("Photon 연결 완료");
 
-        if (PhotonNetwork.InRoom)
-        {
-            Debug.Log("[NetworkManager] 이미 방에 있음,LobbyUI 띄우기");
-            ShowLobby();
-        }
-        else
-        {
-            ShowLobby();
+            // if (PhotonNetwork.InRoom)
+            // {
+            //     Debug.Log("[NetworkManager] 이미 방에 있음,LobbyUI 띄우기");
+            //     ShowLobby();
+            // }
+            // TODO : 로비쪽에서 구현 필요
+            
+            PhotonNetwork.JoinLobby();
         }
     }
-
-
-    public override void OnDisconnected(DisconnectCause cause)
+    
+    public override void OnDisconnected(DisconnectCause cause) // 연결이 끊어 졌을 때
     {
         Debug.LogWarning($"서버 연결 끊김: {cause}");
         PhotonNetwork.ConnectUsingSettings();
     }
-
-    public void CreateRoom(string roomName)
+    #endregion
+    
+    #region 로비 연결, 방목록
+    public override void OnJoinedLobby() //로비에 들어갔을 때
     {
-        if (string.IsNullOrEmpty(roomName))
-        {
-            Debug.LogError("방 이름 없음");
-            return;
-        }
-
-        if (!PhotonNetwork.InLobby)
-        {
-            PhotonNetwork.JoinLobby(); //로비 참가부터 시도
-            return;
-        }
-
-        RoomOptions options = new RoomOptions { MaxPlayers = 6, IsVisible = true, IsOpen = true };
-        PhotonNetwork.CreateRoom(roomName, options);
+        Debug.Log("로비 입장 완료");
+        Manager.UI.ReplaceUI(typeof(LobbyUI)); // 로비 UI 띄움
     }
-
-    public void QuickJoinRoom(string desiredName)
+    
+    public override void OnRoomListUpdate(List<RoomInfo> roomList) // 방 목록 정보에 변경이 있었을 때
     {
-        _desiredRoomNameOnFail = string.IsNullOrEmpty(desiredName)
-            ? $"Room_{Random.Range(1000, 9999)}"
-            : desiredName;
-
-        if (PhotonNetwork.IsConnectedAndReady)
-            PhotonNetwork.JoinRandomRoom();
-        else
-            PhotonNetwork.ConnectUsingSettings();
-    }
-
-    public override void OnCreateRoomFailed(short returnCode, string message)
-    {
-        Debug.LogError($"방 생성 실패: {message}");
-    }
-
-    public override void OnJoinedRoom()
-    {
-        Debug.Log("방 입장 성공!");
-
-        roomManager?.OnRoomJoined();
-        Manager.UI.ReplaceUI(typeof(LobbyUI));
-    }
-
-
-    // 랜덤 입장에 실패했을 때 호출되는 콜백 (입장 가능한 방이 없을 때)
-    public override void OnJoinRandomFailed(short returnCode, string message)
-    {
-        Debug.LogWarning($"랜덤 입장 실패 생성: {message}");
-
-        RoomOptions options = new RoomOptions { MaxPlayers = 6 };
-        PhotonNetwork.CreateRoom(_desiredRoomNameOnFail, options);
-    }
-
-    public void ShowLobby()
-    {
-        Manager.UI.ReplaceUI(typeof(LobbyUI));
-    }
-
-    public override void OnRoomListUpdate(List<RoomInfo> roomList)
-    {
-        cachedRoomList = roomList;
+        cachedRoomList = roomList; // 방 목록을 캐싱함
 
         Debug.Log($"[NetworkManager] RoomList 업데이트 수신됨, 방 수: {roomList.Count}");
 
-        if (Manager.UI.CurrentUI is RoomListUI roomListUI)
+        if (Manager.UI.CurrentUI is RoomListUI roomListUI) // 현재 띄워지고 있는 UI가 방목록이면
         {
-            roomListUI.UpdateRoomList(roomList);
+            roomListUI.UpdateRoomList(roomList); // 방 목록 업데이트함
             Debug.Log("룸리스트 UI 업데이트 실행");
         }
-        foreach (var room in roomList)
+        foreach (var room in roomList) // 방 정보들을 순회
         {
             Debug.Log($"방 이름 확인: {room.Name}");
         }
     }
+    
+    // public void RequestRoomListUpdate() // 로비 다시 참가 요청
+    // {
+    //     if (PhotonNetwork.NetworkClientState == ClientState.JoinedLobby) // 로비 상태일 때만 사용
+    //     {
+    //         PhotonNetwork.JoinLobby(); // 로비에 다시 조인하여 방 목록 업데이트 요청
+    //         Debug.Log("방 목록 업데이트 요청");
+    //     }
+    //     else
+    //     {
+    //         Debug.LogWarning($"로비 재참가 요청 실패{PhotonNetwork.NetworkClientState}");
+    //     }
+    //
+    //     Manager.UI.ReplaceUI(typeof(RoomListUI));
+    // }
+    #endregion
 
-    public void JoinRoom(string roomName)
+    #region 방 생성
+    public void CreateRoom(string roomName) // 방을 만들 때 사용하는 함수
     {
-        if (PhotonNetwork.IsConnectedAndReady)
+        if (PhotonNetwork.NetworkClientState != ClientState.JoinedLobby)
         {
-            PhotonNetwork.JoinRoom(roomName);
+            PhotonNetwork.JoinLobby(); //로비 참가부터 시도
+        }
+
+        if (waitRoutine == null)
+        {
+            waitRoutine = StartCoroutine(CreateRoomRoutine(roomName)); // 방 생성 코루틴
         }
         else
         {
-            Debug.LogWarning("Photon 준비 안 됨 → JoinRoom 실패");
+            Debug.Log("방 생성 대기중");
+        }
+
+    }
+    
+    private IEnumerator CreateRoomRoutine(string roomName) // 방 생성 시도 코루틴
+    {
+        while (true)
+        {
+            if (PhotonNetwork.NetworkClientState == ClientState.JoinedLobby) // 로비에 접속 해야만 방 생성
+            {
+                        
+                RoomOptions options = new RoomOptions { MaxPlayers = 8, IsVisible = true, IsOpen = true };
+        
+                PhotonNetwork.CreateRoom(roomName, options); // 방 생성
+                if (waitRoutine != null)
+                {
+                    StopCoroutine(waitRoutine);
+                    waitRoutine = null;
+                    
+                }
+                yield break;
+            }
+            yield return new WaitForSecondsRealtime(0.5f);
         }
     }
-
+    public override void OnCreateRoomFailed(short returnCode, string message) // 룸 생성 실패
+    {
+        Debug.LogWarning($"방 생성 실패: {message}");
+    }
+    #endregion
+    
+    #region 방 안에서 업데이트
+    // 플레이어 정보가 업데이트 됐을 때
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    {
+        roomManager?.OnPlayerPropertiesUpdated(targetPlayer, changedProps);
+        roomManager?.CheckAllReady();
+    }
     public override void OnPlayerEnteredRoom(Player newPlayer) // 새 플레이어가 현재 방에 입장했을 때 호출
     {
         if (newPlayer != PhotonNetwork.LocalPlayer)
@@ -146,18 +159,18 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
 
         roomManager?.PlayerPanelSpawn(newPlayer);
     }
-
-    public override void OnPlayerLeftRoom(Player otherPlayer)
+    public override void OnPlayerLeftRoom(Player otherPlayer) // 현재 방에서 다른 플레이어가 떠났을 때 호출
     {
         roomManager?.PlayerPanelRemove(otherPlayer);
     }
-
-    public void LeaveRoom()
+    #endregion
+    
+    #region 방 나갈 때
+    public void LeaveRoom() // 방을 떠날 때 사용하는 함수
     {
-        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.LeaveRoom(); // OnLeftRoom 호출 됨
     }
-
-    public override void OnLeftRoom()
+    public override void OnLeftRoom() // 방을 떠날 때 호출
     {
         Debug.Log("OnLeftRoom 호출됨");
 
@@ -170,42 +183,58 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
             Debug.Log("CurrentUI가 null임");
         }
 
-        var allUIs = GameObject.FindObjectsOfType<RoomUI>(true);
+        var allUIs = FindObjectsOfType<RoomUI>(true);
         foreach (var roomUI in allUIs)
         {
             roomUI.Close();
         }
-
-        Manager.UI.ReplaceUI(typeof(LobbyUI));
+        PhotonNetwork.JoinLobby(); //방을 떠날 때, 로비에 재참가
     }
 
-    public override void OnJoinedLobby()
-    {
-        Debug.Log("로비 입장 완료");
-        ShowLobby(); 
-    }
+    #endregion
 
-    public void RequestRoomListUpdate()
+    #region 방 참가
+    public override void OnJoinedRoom() // 방 참가 시 호출
     {
-        if (PhotonNetwork.IsConnectedAndReady)
+        Debug.Log("방 입장 성공!");
+
+        Manager.UI.ReplaceUI(typeof(RoomUI));
+        roomManager?.OnRoomJoined();
+    }
+    public void JoinRoom(string roomName) // 방에 참가할 때 사용되는 함수
+    {
+        if (PhotonNetwork.NetworkClientState == ClientState.JoinedLobby)
         {
-            PhotonNetwork.JoinLobby(); // 로비에 다시 조인하여 방 목록 업데이트 요청
-            Debug.Log("방 목록 업데이트 요청");
+            PhotonNetwork.JoinRoom(roomName);
         }
         else
         {
-            Debug.LogWarning("Photon 연결되지 않음");
+            Debug.LogWarning("Photon 준비 안 됨 → JoinRoom 실패");
         }
     }
-    // 이전 방으로 돌아가기
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
-    {
-        roomManager?.OnPlayerPropertiesUpdated(targetPlayer, changedProps);
-        roomManager?.CheckAllReady();
-    }
     // JoinRoom 실패 시 콜백
-    public override void OnJoinRoomFailed(short returnCode, string message)
+    public override void OnJoinRoomFailed(short returnCode, string message) // 방 참가 실패
     {
         Debug.LogWarning($"JoinRoom 실패: {message}");
     }
+    #endregion
+    // public void QuickJoinRoom(string desiredName) // 빠른 참가
+    // {
+    //     _desiredRoomNameOnFail = string.IsNullOrEmpty(desiredName)
+    //         ? $"Room_{Random.Range(1000, 9999)}"
+    //         : desiredName; // 죽은코드
+    //
+    //     if (PhotonNetwork.IsConnectedAndReady)
+    //         PhotonNetwork.JoinRandomRoom();
+    //     else
+    //         PhotonNetwork.ConnectUsingSettings();
+    // }
+    // // 랜덤 입장에 실패했을 때 호출되는 콜백 (입장 가능한 방이 없을 때)
+    // public override void OnJoinRandomFailed(short returnCode, string message)
+    // {
+    //     Debug.LogWarning($"랜덤 입장 실패 생성: {message}");
+    //
+    //     RoomOptions options = new RoomOptions { MaxPlayers = 6 };
+    //     PhotonNetwork.CreateRoom(_desiredRoomNameOnFail, options);
+    // }
 }

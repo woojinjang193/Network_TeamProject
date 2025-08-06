@@ -157,7 +157,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
             Debug.Log("roomUI.Open() 호출");
 
         roomUI?.Open();
-        PlayerPanelSpawnAll();
+        //PlayerPanelSpawnAll();
     }
 
     public void OnPlayerPropertiesUpdated(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)

@@ -183,7 +183,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -925,6 +926,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   team: 0
+  id: 0
 --- !u!65 &1170120836
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1203,9 +1205,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team1SpawnPoints: []
   team2SpawnPoints: []
-  playerPrefabName: Player_CharacterTest
+  gameResultUI: {fileID: 0}
+  inkGauge: {fileID: 0}
   matchDuration: 180
   timerText: {fileID: 0}
+  timerPanel: {fileID: 0}
 --- !u!4 &1520500786
 Transform:
   m_ObjectHideFlags: 0
@@ -1298,6 +1302,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teamRateText: {fileID: 174784850}
+  MapWithGrid: {fileID: 0}
 --- !u!4 &1718689002
 Transform:
   m_ObjectHideFlags: 0
