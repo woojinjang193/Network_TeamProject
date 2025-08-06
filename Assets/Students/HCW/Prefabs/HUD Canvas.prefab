@@ -858,8 +858,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Timer
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
-  m_sharedMaterial: {fileID: 7186600760089732348, guid: f24a2a9b01d6e104098730086c23af6e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 166992c89cad42e4697511f00a61312c, type: 2}
+  m_sharedMaterial: {fileID: 7186600760089732348, guid: 166992c89cad42e4697511f00a61312c, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1058,6 +1058,7 @@ MonoBehaviour:
   tmp_Timer: {fileID: 3311711666204437862}
   slider_InkGauge: {fileID: 1454552783567390984}
   inkGaugeFillImage: {fileID: 4149309094432477056}
+  inkGaugeHandleImage: {fileID: 0}
   team1Color: {r: 0.41568628, g: 0, b: 1, a: 1}
   team2Color: {r: 0.91764706, g: 1, b: 0, a: 1}
   teamA_Icons:
@@ -1113,10 +1114,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
