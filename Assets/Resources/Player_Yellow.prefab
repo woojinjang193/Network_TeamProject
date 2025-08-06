@@ -31102,6 +31102,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: InkTank
       objectReference: {fileID: 0}
+    - target: {fileID: 6036162968116956848, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: inkColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6036162968116956848, guid: 499fb0567bf048f469c0d40896635217, type: 3}
+      propertyPath: inkColor.r
+      value: 0.91764706
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3462409266744178851, guid: 499fb0567bf048f469c0d40896635217, type: 3}
     - {fileID: 894155106982280454, guid: 499fb0567bf048f469c0d40896635217, type: 3}
