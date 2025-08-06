@@ -13,12 +13,16 @@ public class GameManager : MonoBehaviour
 {
     public bool IsGameEnd { get; private set; }
 
+    [SerializeField] private float waitForOtherPlayersTime = 60f;
+
     private Dictionary<Collider, BaseController> playerDic = new();
 
     [Header("팀별 스폰 위치")]
     [SerializeField] public Transform[] team1SpawnPoints;   // Team1 스폰 
     [SerializeField] public Transform[] team2SpawnPoints;   // Team2 스폰 
 
+    //게임 스타트 UI
+    [SerializeField] private GameStartUI gameStartUI;
     //게임결과 UI
     [SerializeField] private GameResultUI gameResultUI;
     [SerializeField] private GameObject inkGauge;
@@ -29,8 +33,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject timerPanel;
 
     private PhotonView photonView;
-
+    private int spawnedCharCount = 0; //
     private Animator timerAnimation;
+
+    public static event Action OnGameStarted;
+    public static event Action OnGameEnded;
+
+    private Coroutine waitStartCoroutine;
 
     private void Awake()
     {
@@ -66,11 +75,6 @@ public class GameManager : MonoBehaviour
         if (PhotonNetwork.IsMasterClient)
         {
             StartCoroutine(WaitForRoomManagerAndSpawnBots());
-        }
-
-        if (PhotonNetwork.IsMasterClient)
-        {
-            GameStart();  // 마스터만 호출
         }
     }
 
@@ -143,6 +147,46 @@ public class GameManager : MonoBehaviour
         Debug.Log($"플레이어 생성 완료: {prefabName}, 위치: {spawnPoint.position}");
     }
 
+    [PunRPC]
+    void NotifyCharSpawned() /// 플레이 준비가 완료되면 호출
+    {
+        spawnedCharCount++;
+
+        int totalChars = PhotonNetwork.PlayerList.Length + Manager.Net.roomManager.GetBots().Count;
+
+        Debug.Log($"참가완료 캐릭터 수: {spawnedCharCount}/{totalChars}");
+
+        if (spawnedCharCount == totalChars)
+        {
+            if (waitStartCoroutine != null)
+            {
+                StopCoroutine(waitStartCoroutine);
+                waitStartCoroutine = null;
+            }
+            photonView.RPC("OpenGameStartUITogether", RpcTarget.All);
+            return;
+        }
+
+        if (waitStartCoroutine == null && spawnedCharCount > 0) //참가자가 1명 이상일때 한번 실행
+        {
+            waitStartCoroutine = StartCoroutine(WaitAndStartGame());
+        }
+    }
+
+    [PunRPC]
+    private void OpenGameStartUITogether()
+    {
+        gameStartUI.openGameStartUI();
+    }
+
+    private IEnumerator WaitAndStartGame() //참가자가 2분동안 꽉차지않으면 게임 그냥 실행
+    {
+        Debug.Log($"다른 플레이어 기다리는중..{waitForOtherPlayersTime}초 대기 타이머 시작");
+        yield return new WaitForSeconds(waitForOtherPlayersTime);
+        photonView.RPC("OpenGameStartUITogether", RpcTarget.All);
+        waitStartCoroutine = null;
+    }
+
     private void SpawnBots()
     {
         if (!PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botsRaw))
@@ -151,8 +195,13 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        object[] bots = botsRaw as object[];
-        if (bots == null || bots.Length == 0)
+        if (!(botsRaw is object[] bots))
+        {
+            Debug.LogError($"[SpawnBots] 'bots'는 object[] 타입이 아닙니다: {botsRaw?.GetType()}");
+            return;
+        }
+
+        if (bots.Length == 0)
         {
             Debug.Log("[SpawnBots] 봇 리스트 비어있음");
             return;
@@ -162,11 +211,9 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < bots.Length; i++)
         {
-            var botData = bots[i] as ExitGames.Client.Photon.Hashtable;
-
-            if (botData == null)
+            if (!(bots[i] is ExitGames.Client.Photon.Hashtable botData))
             {
-                Debug.LogWarning($"[SpawnBots] botData null: index {i}");
+                Debug.LogWarning($"[SpawnBots] botData 캐스팅 실패: index {i}");
                 continue;
             }
 
@@ -235,11 +282,24 @@ public class GameManager : MonoBehaviour
         if (PhotonNetwork.IsMasterClient)
         {
             double start = PhotonNetwork.Time;
-            photonView.RPC("SetStartTime", RpcTarget.AllViaServer, start);
+            photonView.RPC("SetStartTime", RpcTarget.All, start);
+            photonView.RPC("RpcGameStart", RpcTarget.All);
         }
         // 스테이지에 따라 음악 다르게 재생
         Manager.Audio.SwitchBGM("Stage1");
         //Manager.Audio.SwitchBGM("Stage2");
+    }
+
+    [PunRPC]
+    void RpcGameStart()
+    {
+        OnGameStarted?.Invoke();
+    }
+
+    [PunRPC]
+    void RpcGameEnd()
+    {
+        OnGameEnded?.Invoke(); // 캐릭터들 움직임
     }
 
     private void GameEnd()
@@ -249,19 +309,7 @@ public class GameManager : MonoBehaviour
         Manager.Audio.StopAllSounds();
         
         Debug.Log("게임 엔드");
-
-        //플레이어 오브젝트 수동 제거
-        //DestroyPlayers();
-        
-        // foreach (var playerObj in GameObject.FindGameObjectsWithTag("Player"))
-        // {
-        //     var pv = playerObj.GetComponent<PhotonView>();
-        //     if (pv != null && pv.IsMine)
-        //     {
-        //         PhotonNetwork.Destroy(playerObj);
-        //         Debug.Log($"플레이어 오브젝트 제거됨: {playerObj.name}");
-        //     }
-        // }
+        photonView.RPC("RpcGameEnd", RpcTarget.All);
 
         // 현재 유저가 속한 팀 가져오기
         string myTeam = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
@@ -281,7 +329,7 @@ public class GameManager : MonoBehaviour
         float team1Rate = Manager.Grid.Team1Rate;
         float team2Rate = Manager.Grid.Team2Rate;
 
-        PlayerOff(); //플레이어 비활성화
+        //PlayerOff(); //플레이어 비활성화
 
         timerPanel.gameObject.SetActive(false);
 
@@ -289,7 +337,6 @@ public class GameManager : MonoBehaviour
         if (PhotonNetwork.IsMasterClient)
         {
             photonView.RPC("ShowResultUI", RpcTarget.All, winningTeam, team1Rate, team2Rate);
-
         }
     }
 
@@ -310,7 +357,12 @@ public class GameManager : MonoBehaviour
                 Manager.Audio.SwitchAmbient("defaultAmbient");
                 Manager.Net.roomManager = FindObjectOfType<RoomManager>();
                 Manager.Net.roomManager.RoomReInit();
-                
+
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    PhotonNetwork.CurrentRoom.IsOpen = true; // 다시 유저 받기 가능하게
+                    PhotonNetwork.CurrentRoom.IsVisible = true;  // 로비에 표시
+                }
             };
     }
     private void DestroyPlayers()
@@ -321,7 +373,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void PlayerOff()
+    public void PlayerOff()
     {
         foreach (BaseController player in playerDic.Values)
         {

@@ -56,6 +56,12 @@ MonoBehaviour:
   - RequestGridPaint
   - SyncGridPaint
   - RpcSetGridTeam
+  - NotifyPlayerSpawned
+  - NotifyCharSpawned
+  - RPC_OpenGameStartUI
+  - OpenGameStartUITogether
+  - RpcGameStart
+  - RpcGameEnd
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

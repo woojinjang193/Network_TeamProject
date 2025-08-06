@@ -1,13 +1,11 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.ExceptionServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.Rendering.DebugUI;
 
 public class GameResultUI : MonoBehaviour
 {
@@ -43,6 +41,7 @@ public class GameResultUI : MonoBehaviour
     [SerializeField] private GameObject drawImage;
     [SerializeField] private Sprite win;
     [SerializeField] private Sprite lose;
+    [SerializeField] private GameObject finishAnimation;
 
     private string winnerTeam;
     private float firstShowRateValue;
@@ -64,6 +63,7 @@ public class GameResultUI : MonoBehaviour
         team1ResultImage.gameObject.SetActive(false);
         team2ResultImage.gameObject.SetActive(false);
         drawImage.gameObject.SetActive(false);
+        finishAnimation.SetActive(false);
 
         team1animator = team1animator.GetComponent<Animator>();
         team2animator = team2animator.GetComponent<Animator>();
@@ -73,8 +73,6 @@ public class GameResultUI : MonoBehaviour
     public void UIOpen(string winTeam, float team1Rate, float team2Rate)
     {
         winnerTeam = winTeam;
-        resultCam.gameObject.SetActive(true);
-
         //그리드매니저에서 팀 점유율 가져옴
         team1RateValue = team1Rate;
         team2RateValue = team2Rate;
@@ -85,12 +83,19 @@ public class GameResultUI : MonoBehaviour
 
     IEnumerator GameResultUICoroutine()
     {
+        finishAnimation.SetActive(true);
+        Debug.Log("게임종료 애니메이션");
+        
+        yield return new WaitForSeconds(openUIDelayTime);
+        finishAnimation.SetActive(false);
+        Manager.Game.PlayerOff();
+        resultCam.gameObject.SetActive(true);
         team1Slider.value = 0;
         team2Slider.value = 0;
 
         team1Char.gameObject.SetActive(true);
         team2Char.gameObject.SetActive(true);
-        yield return new WaitForSeconds(openUIDelayTime);
+        
 
         //Debug.Log($"첫 밸류: {firstShowRateValue}, 팀1 벨류: {team1RateValue}, 팀2 벨류: {team2RateValue}");
 
