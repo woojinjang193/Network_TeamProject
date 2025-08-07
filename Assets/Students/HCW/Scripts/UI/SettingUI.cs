@@ -11,6 +11,7 @@ public class SettingUI : BaseUI
     [SerializeField] private Button graphicsTab;
     [SerializeField] private Button controlsTab;
     [SerializeField] private Button closeButton;
+    [SerializeField] private Button exitButton;
 
     [Header("카테고리 패널")]
     [SerializeField] private GameObject graphicsContent;
@@ -43,6 +44,9 @@ public class SettingUI : BaseUI
 
         // 닫기 버튼에 리스너 추가
         closeButton.onClick.AddListener(OnCloseButtonClicked);
+
+        // 종료 버튼에 리스너 추가
+        exitButton.onClick.AddListener(OnClickExitButton);
 
 
 
@@ -105,6 +109,15 @@ public class SettingUI : BaseUI
         {
             Manager.UI.PopUI();
         }
+    }
+
+    private void OnClickExitButton()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     // 설정 로드/저장 및 UI 업데이트

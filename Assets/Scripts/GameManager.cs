@@ -391,6 +391,7 @@ public class GameManager : MonoBehaviour
                 Manager.Audio.SwitchAmbient("defaultAmbient");
                 Manager.Net.roomManager = FindObjectOfType<RoomManager>();
                 Manager.Net.roomManager.RoomReInit();
+                
 
                 if (PhotonNetwork.IsMasterClient)
                 {
