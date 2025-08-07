@@ -99,7 +99,6 @@ public class SettingUI : BaseUI
         // 저장된 사용자의 볼륨 설정 값 가져오기
         if (Manager.Audio.hasMasterVolume)
         {
-            Debug.Log($"저장된 master 값 있음 {Manager.Audio.masterVolume}");
             masterVolumeSlider.value = Manager.Audio.masterVolume;
         }
         else
@@ -109,7 +108,6 @@ public class SettingUI : BaseUI
 
         if (Manager.Audio.hasBgmVolume)
         {
-            Debug.Log($"저장된 bgm 값 있음 {Manager.Audio.bgmVolume}");
             bgmVolumeSlider.value = Manager.Audio.bgmVolume;
         }
         else
@@ -119,7 +117,6 @@ public class SettingUI : BaseUI
 
         if (Manager.Audio.hasSfxVolume)
         {
-            Debug.Log($"저장된 sfx 값 있음 {Manager.Audio.sfxVolume}");
             sfxVolumeSlider.value = Manager.Audio.sfxVolume;
         }
         else

@@ -14,10 +14,12 @@ public class SignUpUI : BaseUI
     [SerializeField] private Button backToLoginButton;
     [SerializeField] private TMP_Text messageText;
 
+    private bool canName;
     private void Start()
     {
         registerButton.onClick.AddListener(OnRegisterButtonClicked);
         backToLoginButton.onClick.AddListener(ShowLoginUI);
+        nameInputField.onValueChanged.AddListener(CheckNicknameSolid);
     }
 
     private void OnRegisterButtonClicked()
@@ -30,6 +32,12 @@ public class SignUpUI : BaseUI
         if (password != confirmPassword)
         {
             SetMessage("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+
+        if (!canName)
+        {
+            SetMessage("닉네임을 확인해주세요");
             return;
         }
 
@@ -102,5 +110,24 @@ public class SignUpUI : BaseUI
     public override void Close()
     {
         gameObject.SetActive(false);
+    }
+
+    private void CheckNicknameSolid(string str)
+    {
+        if (str.Length <= 0)
+        {
+            SetMessage("닉네임을 입력해주세요");
+            canName = false;
+        }
+        else if (str.Length > 12)
+        {
+            SetMessage("닉네임은 12글자 이하로 해주세요");
+            canName = false;
+        }
+        else
+        {
+            SetMessage("");
+            canName = true;
+        }
     }
 }
