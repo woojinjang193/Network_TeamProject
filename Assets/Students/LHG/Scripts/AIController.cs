@@ -7,6 +7,7 @@ using UnityEngine.InputSystem.XR;
 using UnityEngine.UI;
 using UnityEngine.AI;
 using System.Globalization;
+using UnityEngine.SceneManagement;
 
 
 public class AIController : BaseController
@@ -42,6 +43,7 @@ public class AIController : BaseController
 
     //네브매쉬관련
     public NavMeshAgent agent { get; private set; }
+    [SerializeField] private List<Transform> patrolPoints = new List<Transform>();
 
     protected override void Awake()
     {
@@ -123,19 +125,31 @@ public class AIController : BaseController
 
     void Start()
     {
-       //// 맨 처음 게임 시작 시 원격은 Ink발사가 안되는 문제 해결
-       //if (!photonView.IsMine)
-       //{
-       //    inkParticleGun.FireParticle(MyTeam, true);
-       //}
-
         ReadyToPlay();
 
-        //MyTeam = Team.Team1; //TODO : 임시 팀지정, 삭제할 것!!!!!!!!
+        // 무브모듈수정관련
+        string sceneName = SceneManager.GetActiveScene().name;
+        string groupName = $"PatrolPointGroup_{sceneName}";
+        GameObject patrolGroup = GameObject.Find(groupName);
+
+        if (patrolGroup != null)
+        {
+            patrolPoints.Clear(); // 필드 리스트 초기화
+            foreach (Transform child in patrolGroup.transform)
+            {
+                patrolPoints.Add(child);
+            }
+            MoveModule.SetPatrolPoints(patrolPoints);
+            Debug.Log($"[AIController] 패트롤포인트 {patrolPoints.Count}개 설정됨 (씬: {sceneName})");
+        }
+        else
+        {
+            Debug.LogWarning($"[AIController] PatrolPointGroup 오브젝트를 찾을 수 없음 (이름: {groupName})");
+        }
     }
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
+        Gizmos.color = MyTeam ==Team.Team1 ? Color.magenta : Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectRadius);
     }
 
@@ -157,8 +171,8 @@ public class AIController : BaseController
         IsDead = false;
 
         agent = GetComponent<NavMeshAgent>();
-        agent.updatePosition = false;
-        agent.updateRotation = false;
+        //agent.updatePosition = false;
+        //agent.updateRotation = false;
     }
 
     private void MineAnimationProcess()
@@ -390,13 +404,7 @@ public class AIController : BaseController
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (photonView.IsMine)
-        {
-            MoveModule.OnCollisionEnter(collision);
-        }
-    }
+    
 
 
     private void GroundAndInkCheck()
@@ -475,7 +483,7 @@ public class AIController : BaseController
 
     private void StopAllActions()
     {
-        MoveModule.StopWander();
+        MoveModule.StopPatrol();
         FireModule.StopFire();
         rig.isKinematic = true;
         rig.velocity = Vector3.zero;
