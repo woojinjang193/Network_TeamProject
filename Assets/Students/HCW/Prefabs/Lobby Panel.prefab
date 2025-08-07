@@ -239,6 +239,7 @@ GameObject:
   - component: {fileID: 172295107630328680}
   - component: {fileID: 3534338676486753055}
   - component: {fileID: 5604629007405058584}
+  - component: {fileID: 8591816531223482504}
   m_Layer: 5
   m_Name: Logout Button
   m_TagString: Untagged
@@ -348,6 +349,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8591816531223482504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106408465809609025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0e5618449b7c74a84c63a2cb9dc898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2485789607092395146
 GameObject:
   m_ObjectHideFlags: 0
@@ -439,6 +452,7 @@ GameObject:
   - component: {fileID: 2397639114952660357}
   - component: {fileID: 7143707440014178734}
   - component: {fileID: 5011034856616876398}
+  - component: {fileID: 2446263495118718877}
   m_Layer: 5
   m_Name: CreateRoom Button
   m_TagString: Untagged
@@ -548,6 +562,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2446263495118718877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2507953321644147086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0e5618449b7c74a84c63a2cb9dc898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3141248060408454008
 GameObject:
   m_ObjectHideFlags: 0
@@ -882,7 +908,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4070146375812943680}
   - component: {fileID: 8180788905775049405}
-  - component: {fileID: 6885390684103970918}
   - component: {fileID: 8680072714476058068}
   m_Layer: 0
   m_Name: CharacterDisplay Camera
@@ -957,14 +982,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &6885390684103970918
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4095863374232518481}
-  m_Enabled: 1
 --- !u!114 &8680072714476058068
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1021,6 +1038,7 @@ GameObject:
   - component: {fileID: 8277217767900184978}
   - component: {fileID: 2213657109206034868}
   - component: {fileID: 1606444910307286248}
+  - component: {fileID: 6120062492153748338}
   m_Layer: 5
   m_Name: FindRoom Button
   m_TagString: Untagged
@@ -1130,6 +1148,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6120062492153748338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5832628637274583269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0e5618449b7c74a84c63a2cb9dc898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6109025761353011646
 GameObject:
   m_ObjectHideFlags: 0
@@ -1148,7 +1178,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7860286898481996323
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1191,7 +1221,6 @@ MonoBehaviour:
   findRoomButton: {fileID: 1606444910307286248}
   logoutButton: {fileID: 5604629007405058584}
   characterDisplayPanel: {fileID: 3930368617607545336}
-  characterDisplayCamera: {fileID: 8180788905775049405}
   createRoomNameInput: {fileID: 3766870290714562935}
 --- !u!222 &1303389673470760539
 CanvasRenderer:
@@ -1967,7 +1996,9 @@ PrefabInstance:
       propertyPath: m_SortingLayer
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5467757474418972372, guid: ffde36d009404314eba496473c81aaf5, type: 3}
+    - {fileID: 8898939432524565359, guid: ffde36d009404314eba496473c81aaf5, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -2209,7 +2240,9 @@ PrefabInstance:
       propertyPath: m_SortingLayer
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2172642898234870924, guid: ca1483330d0f48c47936888e37dde986, type: 3}
+    - {fileID: 6055995308547675617, guid: ca1483330d0f48c47936888e37dde986, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

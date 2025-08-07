@@ -869,6 +869,7 @@ GameObject:
   - component: {fileID: 5820913420959130339}
   - component: {fileID: 8813063077947772430}
   - component: {fileID: 1200157331351137782}
+  - component: {fileID: 7905689692514178721}
   m_Layer: 5
   m_Name: SignUp Button
   m_TagString: Untagged
@@ -990,6 +991,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &7905689692514178721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4815588869808367567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0e5618449b7c74a84c63a2cb9dc898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4865748532622968869
 GameObject:
   m_ObjectHideFlags: 0
@@ -1579,6 +1592,7 @@ GameObject:
   - component: {fileID: 6994798435423751262}
   - component: {fileID: 6555257389490575299}
   - component: {fileID: 4183914733558312360}
+  - component: {fileID: 2074473152793871592}
   m_Layer: 5
   m_Name: Login Button
   m_TagString: Untagged
@@ -1700,6 +1714,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &2074473152793871592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7292540548851294592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0e5618449b7c74a84c63a2cb9dc898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7630863593620388068
 GameObject:
   m_ObjectHideFlags: 0
@@ -1718,7 +1744,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &6314621252777683434
 RectTransform:
   m_ObjectHideFlags: 0
