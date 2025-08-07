@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3189141660956487101}
   - component: {fileID: 2410545108405293701}
   - component: {fileID: 1812871293654024779}
+  - component: {fileID: 4434008241507816465}
   m_Layer: 5
   m_Name: Ready Button
   m_TagString: Untagged
@@ -121,6 +122,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4434008241507816465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981745928404414451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0e5618449b7c74a84c63a2cb9dc898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1151302781987457669
 GameObject:
   m_ObjectHideFlags: 0
@@ -453,9 +466,9 @@ RectTransform:
   m_Father: {fileID: 6250650541547109316}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 20}
+  m_SizeDelta: {x: -17, y: 20}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &3741197737675026967
 CanvasRenderer:
@@ -691,6 +704,7 @@ GameObject:
   - component: {fileID: 5086294913302941500}
   - component: {fileID: 4365725192081065321}
   - component: {fileID: 803040030041400144}
+  - component: {fileID: 5227218970437766698}
   m_Layer: 5
   m_Name: Team 2 Button
   m_TagString: Untagged
@@ -800,6 +814,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5227218970437766698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2347328873082646463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0e5618449b7c74a84c63a2cb9dc898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2413272368303984266
 GameObject:
   m_ObjectHideFlags: 0
@@ -1081,7 +1107,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0.000030517578}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 20}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &3642766414516673019
 MonoBehaviour:
@@ -1135,6 +1161,7 @@ GameObject:
   - component: {fileID: 2949180504741999879}
   - component: {fileID: 8909469647621049537}
   - component: {fileID: 8068819376681610189}
+  - component: {fileID: 4068766404074633407}
   m_Layer: 5
   m_Name: Team 1 Button
   m_TagString: Untagged
@@ -1244,6 +1271,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4068766404074633407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3230247923258499504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0e5618449b7c74a84c63a2cb9dc898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3477238399236036394
 GameObject:
   m_ObjectHideFlags: 0
@@ -1802,7 +1841,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8929793568498653224
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2065,9 +2104,9 @@ RectTransform:
   m_Father: {fileID: 6250650541547109316}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -17, y: -17}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7631070821348742276
 CanvasRenderer:
@@ -2243,6 +2282,7 @@ GameObject:
   - component: {fileID: 7540721412160473713}
   - component: {fileID: 6446806189224251978}
   - component: {fileID: 6075270757516163114}
+  - component: {fileID: 3830372921572614860}
   m_Layer: 5
   m_Name: StartGame Button
   m_TagString: Untagged
@@ -2352,6 +2392,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3830372921572614860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6478264258549195845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0e5618449b7c74a84c63a2cb9dc898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6631428029996474475
 GameObject:
   m_ObjectHideFlags: 0
@@ -2734,7 +2786,7 @@ RectTransform:
   m_Father: {fileID: 2175228663808708155}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3300,6 +3352,7 @@ GameObject:
   - component: {fileID: 3060276437471184022}
   - component: {fileID: 6293914987286121432}
   - component: {fileID: 9181575147892976124}
+  - component: {fileID: 7574410927807010695}
   m_Layer: 5
   m_Name: Bot Team 1 Button
   m_TagString: Untagged
@@ -3409,6 +3462,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7574410927807010695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7908681482996487281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0e5618449b7c74a84c63a2cb9dc898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7912068893211051545
 GameObject:
   m_ObjectHideFlags: 0
@@ -3532,7 +3597,7 @@ RectTransform:
   m_Father: {fileID: 3837504836624625504}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3609,9 +3674,9 @@ RectTransform:
   m_Father: {fileID: 6250650541547109316}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 20, y: 0}
+  m_SizeDelta: {x: 20, y: -17}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &3990138509499508517
 CanvasRenderer:
@@ -3748,6 +3813,7 @@ GameObject:
   - component: {fileID: 2468771404404227254}
   - component: {fileID: 8572371813870963196}
   - component: {fileID: 2637899618275899859}
+  - component: {fileID: 7255571945415688456}
   m_Layer: 5
   m_Name: LeaveRoom Button
   m_TagString: Untagged
@@ -3857,6 +3923,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7255571945415688456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8390647587562597899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0e5618449b7c74a84c63a2cb9dc898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8719604425390976029
 GameObject:
   m_ObjectHideFlags: 0
@@ -3869,6 +3947,7 @@ GameObject:
   - component: {fileID: 7558010420704825835}
   - component: {fileID: 1950975106428244292}
   - component: {fileID: 4308390278823851066}
+  - component: {fileID: 12832185091803644}
   m_Layer: 5
   m_Name: Bot Team 2 Button
   m_TagString: Untagged
@@ -3978,3 +4057,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &12832185091803644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8719604425390976029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0e5618449b7c74a84c63a2cb9dc898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

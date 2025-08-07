@@ -11,7 +11,7 @@ public class RoomListUI : BaseUI
     [SerializeField] private Transform roomListContent; // 스크롤뷰의 Content 넣기
     [SerializeField] private GameObject roomListItemPrefab; // 각 방 정보를 표시할 UI 프리팹
     [SerializeField] private Button backButton;
-    [SerializeField] private Button refreshButton; // 새로고침 버튼 추가
+    //[SerializeField] private Button refreshButton; // 새로고침 버튼 추가
     
     private Dictionary<string, RoomListItemUI> roomListItems = new Dictionary<string, RoomListItemUI>();
 
