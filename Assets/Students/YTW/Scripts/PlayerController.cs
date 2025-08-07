@@ -83,10 +83,13 @@ public class PlayerController : BaseController
     public AudioSource squidSwimBubble;
 
     private KillBoard killBoard;
-    
+    private PhotonView killLogView;
+
+
     protected override void Awake()
     {
         killBoard = FindObjectOfType<KillBoard>();
+        killLogView = killBoard.gameObject.GetComponent<PhotonView>();
 
         base.Awake();
         squidAnimator = squidModel.GetComponentInChildren<Animator>();
@@ -633,28 +636,32 @@ public class PlayerController : BaseController
     public void PlayerDie(string killerName, int cause) // TakeDamage의 조건에 따라서 들어옴. 전역 수행
     {
         deathCause = (DeathCause)cause; //int 를 다시 enum으로 바꿔줌
+        victimName = photonView.Owner.NickName;
 
-        if(photonView.IsMine)
+        if (photonView.IsMine)
         {
             switch (deathCause)
             {
                 case DeathCause.PlayerAttack:
-                    photonView.RPC("LogForAll", RpcTarget.All, killerName, (int)deathCause);
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
                     killBoard.KillLog($"{killerName}에게 처치당함");
                     Debug.Log($"{killerName}에게 처치당함");
                     break;
 
                 case DeathCause.BotAttck:
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
                     killBoard.KillLog($"{killerName}봇 에게 처치당함");
                     Debug.Log($"{killerName}봇 에게 처치당함");
                     break;
 
                 case DeathCause.Fall:
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
                     killBoard.KillLog("낙사함");
                     Debug.Log($"낙사");
                     break;
 
                 case DeathCause.EnemyInk:
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
                     killBoard.KillLog("적잉크때문에 죽음");
                     Debug.Log("적잉크때문에 죽음");
                     break;

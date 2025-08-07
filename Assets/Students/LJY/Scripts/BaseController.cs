@@ -124,8 +124,9 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
         set { isDeadState = value; }
     }
 
-    protected string killerName = "";  ////// JWJ 추가
-    protected DeathCause deathCause;   ////// JWJ 추가
+    protected string killerName = "";
+    protected string victimName = "";
+    protected DeathCause deathCause; 
 
     protected virtual void Awake()
     {

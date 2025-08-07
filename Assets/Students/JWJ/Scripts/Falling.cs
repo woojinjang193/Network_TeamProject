@@ -15,7 +15,7 @@ public class Falling : MonoBehaviour
         else if (other.TryGetComponent<AIController>(out AIController bot))
         {
             Debug.Log("봇 낙사");
-            bot.TakeDamage(444f);
+            bot.BotFallingDeath();
         }
     }
 }

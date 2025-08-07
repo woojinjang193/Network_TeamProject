@@ -28654,7 +28654,7 @@ GameObject:
   - component: {fileID: 2172642898234870924}
   - component: {fileID: 8877593782652075405}
   - component: {fileID: 4010641483305805933}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: AI_Yellow
   m_TagString: Bot
   m_Icon: {fileID: 0}
