@@ -49,7 +49,7 @@ public class MoveModule
         {
             if (!_controller.agent.pathPending && _controller.agent.remainingDistance < _controller.agent.stoppingDistance + 0.1f)
             {
-                _controller.IsMoving = false;
+                //_controller.IsMoving = false;
 
                 yield return new WaitForSeconds(1f); // 도착 후 대기 시간
 
@@ -87,7 +87,7 @@ public class MoveModule
 
         else
         {
-            _controller.IsMoving = false;
+            //_controller.IsMoving = false;
         }
         //_controller.IsMoving = !_controller.agent.pathPending && _controller.agent.remainingDistance > _controller.agent.stoppingDistance;
     }
