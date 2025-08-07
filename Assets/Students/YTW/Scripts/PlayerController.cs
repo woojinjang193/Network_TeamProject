@@ -643,25 +643,25 @@ public class PlayerController : BaseController
             switch (deathCause)
             {
                 case DeathCause.PlayerAttack:
-                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause, (int)MyTeam);
                     killBoard.KillLog($"{killerName}에게\n<color=red>처치됨</color>");
                     Debug.Log($"{killerName}에게 처치당함");
                     break;
 
                 case DeathCause.BotAttck:
-                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause, (int)MyTeam);
                     killBoard.KillLog($"{killerName}에게\n<color=red>처치됨</color>");
                     Debug.Log($"{killerName}봇 에게 처치당함");
                     break;
 
                 case DeathCause.Fall:
-                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause, (int)MyTeam);
                     killBoard.KillLog("<color=red>낙사</color>");
                     Debug.Log($"낙사");
                     break;
 
                 case DeathCause.EnemyInk:
-                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause, (int)MyTeam);
                     killBoard.KillLog("적팀 바닥은\n<color=red>아파요</color>");
                     Debug.Log("적잉크때문에 죽음");
                     break;

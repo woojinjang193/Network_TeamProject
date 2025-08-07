@@ -269,7 +269,7 @@ public class AIController : BaseController
             case DeathCause.PlayerAttack: 
                 if(PhotonNetwork.LocalPlayer.NickName == killerName) 
                 {
-                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, botName, (int)deathCause);
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, botName, (int)deathCause, (int)MyTeam);
                     killBoard.KillLog($"{botName}\n<color=red>처치</color>");
                 }
                 break;
@@ -277,14 +277,14 @@ public class AIController : BaseController
             case DeathCause.BotAttck:
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, botName, (int)deathCause);
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, botName, (int)deathCause, (int)MyTeam);
                 }
                 break;
 
             case DeathCause.Fall:
                 if (photonView.IsMine)
                 {
-                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, botName, (int)deathCause);
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, botName, (int)deathCause, (int)MyTeam);
                 }
                 break;
         }

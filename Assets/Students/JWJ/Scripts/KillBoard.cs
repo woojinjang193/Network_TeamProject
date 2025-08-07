@@ -8,6 +8,8 @@ using UnityEngine.UI;
 public class KillBoard : MonoBehaviour
 {
     private PhotonView killLogView;
+    private TeamColorInfo teamColorInfo;
+    private Color teamColor;
 
     [Header("당사자용")]
     [SerializeField] private GameObject indiKillLog;
@@ -24,11 +26,12 @@ public class KillBoard : MonoBehaviour
     [SerializeField] private GameObject KillLogItemPrefab;
 
 
-
     private void Awake()
     {
         killLogView = GetComponent<PhotonView>();
         indiKillLog.SetActive(false);
+
+        teamColorInfo = FindObjectOfType<TeamColorInfo>();
     }
 
     public void KillLog(string text)
@@ -38,11 +41,13 @@ public class KillBoard : MonoBehaviour
         killText.text = text;
     }
 
+
     [PunRPC]
-    public void LogForAll(string killerName, string victimName, int causeNum)
+    public void LogForAll(string killerName, string victimName, int causeNum, int teamNum)
     {
         DeathCause cause = (DeathCause)causeNum;
         Sprite causeSprite = null;
+        //Team team = (Team)teamNum;
 
         switch (cause)
         {
@@ -74,10 +79,9 @@ public class KillBoard : MonoBehaviour
 
         KillLogItem item = killLogItem.GetComponent<KillLogItem>();
 
-        item.KillLogItemSet(killerName, victimName, causeSprite);
+        //teamColor = teamColorInfo.GetTeamColor(team);
+        item.KillLogItemSet(killerName, victimName, causeSprite, teamNum);
 
         Destroy(killLogItem, 5f);
-
     }
-
 }
