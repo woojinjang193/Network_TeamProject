@@ -49,7 +49,7 @@ public class MoveModule
         {
             if (!_controller.agent.pathPending && _controller.agent.remainingDistance < _controller.agent.stoppingDistance + 0.1f)
             {
-                _controller.IsMoving = false;
+                //_controller.IsMoving = false;
 
                 yield return new WaitForSeconds(1f); // 도착 후 대기 시간
 
@@ -87,28 +87,7 @@ public class MoveModule
 
         else
         {
-            _controller.IsMoving = false;
+            //_controller.IsMoving = false;
         }
         //_controller.IsMoving = !_controller.agent.pathPending && _controller.agent.remainingDistance > _controller.agent.stoppingDistance;
     }
-
-    public Vector3 GetDirection(Vector3 targetPos)
-    {
-        Vector3 direction = (targetPos - _controller.transform.position).normalized;
-        direction.y = 0;
-        return direction;
-    }
-
-    public void RotateToTarget(Vector3 direction)
-    {
-        if (direction != Vector3.zero)
-        {
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            _controller.transform.rotation = Quaternion.Slerp(
-                _controller.transform.rotation,
-                lookRotation,
-                Time.deltaTime * 5f
-            );
-        }
-    }
-}
