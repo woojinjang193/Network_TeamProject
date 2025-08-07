@@ -25,7 +25,6 @@ public class ChaseState : AIBaseState
         if(distance > _controller.detectRadius)
         {
             _controller.StateMachine.SetState(new IdleState(_controller));
-            _controller.FireModule.StopFire();
             _controller.DetectModule.Target = null;
         }
         else if (distance > 3f)
