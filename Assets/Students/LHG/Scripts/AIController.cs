@@ -163,6 +163,8 @@ public class AIController : BaseController
         IsDead = false;
 
         agent = GetComponent<NavMeshAgent>();
+        //agent.updatePosition = false;
+        //agent.updateRotation = false;
     }
 
     private void MineAnimationProcess()
@@ -430,5 +432,4 @@ public class AIController : BaseController
         rig.velocity = Vector3.zero;
         rig.angularVelocity = Vector3.zero;
     }
-
 }
