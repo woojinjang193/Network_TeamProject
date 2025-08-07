@@ -1,14 +1,15 @@
+using ExitGames.Client.Photon.StructWrapping;
 using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Photon.Realtime;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
-using ExitGames.Client.Photon.StructWrapping;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,8 +18,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float waitForOtherPlayersTime = 60f;
 
     private Dictionary<Collider, BaseController> playerDic = new();
-
-    private HashSet<Transform> usedSpawnPoints = new();
 
     [Header("팀별 스폰 위치")]
     [SerializeField] public Transform[] team1SpawnPoints;   // Team1 스폰 
@@ -55,7 +54,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         Debug.Log("=== [GameManager] Start ===");
-  
+
         if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botsRaw)) //봇 카운트
         {
             foreach (var obj in (object[])botsRaw)
@@ -69,7 +68,13 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator InitAfterPhotonReady()
     {
-        playerDic.Clear(); //딕셔너리 초기화
+        if (!SceneManager.GetActiveScene().name.StartsWith("Map"))
+        {
+            Debug.LogWarning("게임 맵이 아님. 플레이어 생성 로직 생략");
+            yield break;
+        }
+        playerDic.Clear(); // 딕셔너리 초기화  
+
         while (!PhotonNetwork.IsConnectedAndReady || PhotonNetwork.LocalPlayer == null || !PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("team"))
         {
             yield return null;
@@ -118,7 +123,7 @@ public class GameManager : MonoBehaviour
         int seconds = Mathf.FloorToInt(time % 60);
         timerText.text = $"{minutes:00}:{seconds:00}";
 
-        if(time < 11)
+        if (time < 11)
         {
             timerText.color = Color.red;
             timerAnimation.SetTrigger("signal");
@@ -127,12 +132,15 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator SpawnPlayerWithDelay()
     {
-        // team 프로퍼티가 들어올 때까지 대기
+        if (!SceneManager.GetActiveScene().name.StartsWith("Map"))
+        {
+            Debug.LogWarning("게임 맵이 아님. 플레이어 스폰 생략");
+            yield break;
+        }
         yield return new WaitUntil(() => PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("team"));
 
-        string team = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
-        int actorIndex = PhotonNetwork.LocalPlayer.ActorNumber; // 고유 번호로 spawn 위치를 결정
-        Transform[] spawnArray = team == "Team1" ? team1SpawnPoints : team2SpawnPoints;
+        string myTeam = PhotonNetwork.LocalPlayer.CustomProperties["team"].ToString();
+        Transform[] spawnArray = myTeam == "Team1" ? team1SpawnPoints : team2SpawnPoints;
 
         if (spawnArray.Length == 0)
         {
@@ -140,25 +148,25 @@ public class GameManager : MonoBehaviour
             yield break;
         }
 
-        // 겹치지 않도록 mod 연산 사용
-        Transform spawnPoint = GetAvailableSpawnPoint(spawnArray);
+        int myActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+        int myIndex = GetTeamIndex(myTeam, myActorNumber);
 
-        // 팀별 프리팹 이름 분기
-        string prefabName = team switch
+        if (myIndex >= spawnArray.Length)
+        {
+            Debug.LogWarning("스폰 포인트 부족, 0번으로 fallback");
+            myIndex = 0;
+        }
+
+        Transform spawnPoint = spawnArray[myIndex];
+
+        string prefabName = myTeam switch
         {
             "Team1" => "Player_Purple",
             "Team2" => "Player_Yellow",
             _ => null
         };
 
-        if (string.IsNullOrEmpty(prefabName))
-        {
-            Debug.LogError($"[SpawnPlayerWithDelay] 알 수 없는 팀: {team}");
-            yield break;
-        }
-
         PhotonNetwork.Instantiate(prefabName, spawnPoint.position, spawnPoint.rotation);
-        Debug.Log($"플레이어 생성 완료: {prefabName}, 위치: {spawnPoint.position}");
     }
 
     [PunRPC]
@@ -178,7 +186,7 @@ public class GameManager : MonoBehaviour
                 waitStartCoroutine = null;
             }
             photonView.RPC("OpenGameStartUITogether", RpcTarget.All);
-            photonView.RPC("SwitchBGMTogether",RpcTarget.All);
+            photonView.RPC("SwitchBGMTogether", RpcTarget.All);
             return;
         }
 
@@ -220,44 +228,25 @@ public class GameManager : MonoBehaviour
     private void SpawnBots()
     {
         if (!PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botsRaw))
-        {
-            Debug.Log("[SpawnBots] CustomProperties에 봇 정보 없음");
             return;
-        }
 
-        if (!(botsRaw is object[] bots))
+        object[] bots = botsRaw as object[];
+        if (bots == null || bots.Length == 0) return;
+
+        foreach (var botObj in bots)
         {
-            Debug.LogError($"[SpawnBots] 'bots'는 object[] 타입이 아닙니다: {botsRaw?.GetType()}");
-            return;
-        }
-
-        if (bots.Length == 0)
-        {
-            Debug.Log("[SpawnBots] 봇 리스트 비어있음");
-            return;
-        }
-
-        Debug.Log($"[SpawnBots] 봇 수: {bots.Length}");
-
-        for (int i = 0; i < bots.Length; i++)
-        {
-            if (!(bots[i] is ExitGames.Client.Photon.Hashtable botData))
-            {
-                Debug.LogWarning($"[SpawnBots] botData 캐스팅 실패: index {i}");
-                continue;
-            }
-
-            string team = (string)botData["team"];
-            string name = (string)botData["name"];
+            var bot = (ExitGames.Client.Photon.Hashtable)botObj;
+            string team = (string)bot["team"];
+            string name = (string)bot["name"];
 
             Transform[] spawnArray = team == "Team1" ? team1SpawnPoints : team2SpawnPoints;
-            if (spawnArray.Length == 0)
-            {
-                Debug.LogError("SpawnBots: 스폰 포인트 없음");
-                continue;
-            }
+            if (spawnArray.Length == 0) continue;
 
-            Transform spawnPoint = GetAvailableSpawnPoint(spawnArray);
+            int fakeActorNumber = GetBotFakeActorNumber(name);
+            int index = GetTeamIndex(team, fakeActorNumber);
+            if (index >= spawnArray.Length) index = 0;
+
+            Transform spawnPoint = spawnArray[index];
 
             string prefabName = team switch
             {
@@ -266,22 +255,17 @@ public class GameManager : MonoBehaviour
                 _ => null
             };
 
-            if (string.IsNullOrEmpty(prefabName))
-            {
-                Debug.LogError($"SpawnBots: 알 수 없는 팀 {team}");
-                continue;
-            }
-
             GameObject botGO = PhotonNetwork.Instantiate(prefabName, spawnPoint.position, spawnPoint.rotation);
 
             var ai = botGO.GetComponent<AIController>();
             if (ai != null)
             {
                 ai.MyTeam = team == "Team1" ? Team.Team1 : Team.Team2;
-                Debug.Log($"봇 생성 완료: {name}, 프리팹: {prefabName}, 팀: {ai.MyTeam}");
+                Debug.Log($"봇 생성 완료: {name}, 위치: {spawnPoint.position}");
             }
         }
     }
+
 
     private IEnumerator WaitForRoomManagerAndSpawnBots()
     {
@@ -343,7 +327,7 @@ public class GameManager : MonoBehaviour
         // 게임 종료 사운드 재생 및 브금 종료
         Manager.Audio.PlayEffect("GameSet");
         Manager.Audio.StopAllSounds();
-        
+
         Debug.Log("게임 엔드");
         photonView.RPC("RpcGameEnd", RpcTarget.All);
 
@@ -353,7 +337,7 @@ public class GameManager : MonoBehaviour
         //승리 팀 판단
         string winningTeam = Manager.Grid.GetWinningTeam();
 
-        
+
 
         Debug.Log($"내 팀: {myTeam}, 승리 팀: {winningTeam}");
 
@@ -384,6 +368,8 @@ public class GameManager : MonoBehaviour
 
     public void ChangeToLoginScene()
     {
+        PhotonNetwork.DestroyPlayerObjects(PhotonNetwork.LocalPlayer);
+
         AsyncOperation async = SceneManager.LoadSceneAsync("LoginScene");
         if (async != null)
             async.completed += (AsyncOperation op) =>
@@ -413,22 +399,42 @@ public class GameManager : MonoBehaviour
     {
         foreach (BaseController player in playerDic.Values)
         {
-            player.gameObject.SetActive(false);
+            if (player != null && player.gameObject != null)
+            {
+                player.gameObject.SetActive(false);
+            }
         }
     }
-    private Transform GetAvailableSpawnPoint(Transform[] spawnPoints)
+    private int GetTeamIndex(string team, int myActorNumber)
     {
-        foreach (var point in spawnPoints)
+        List<int> allActorNumbers = new();
+
+        // 플레이어 포함
+        foreach (var player in PhotonNetwork.PlayerList)
         {
-            if (!usedSpawnPoints.Contains(point))
+            if (player.CustomProperties.TryGetValue("team", out object t) && (string)t == team)
+                allActorNumbers.Add(player.ActorNumber);
+        }
+
+        // 봇 포함
+        if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("bots", out object botsRaw))
+        {
+            foreach (var botObj in (object[])botsRaw)
             {
-                usedSpawnPoints.Add(point);
-                return point;
+                var bot = (ExitGames.Client.Photon.Hashtable)botObj;
+                if ((string)bot["team"] == team)
+                    allActorNumbers.Add(GetBotFakeActorNumber(bot["name"].ToString()));
             }
         }
 
-        // 모든 포인트가 이미 사용됐을 경우, 가장 첫 번째 지점으로 fallback
-        Debug.LogWarning("모든 스폰 포인트가 사용됨. 첫 번째 포인트 사용");
-        return spawnPoints[0];
+        allActorNumbers.Sort(); // 항상 같은 순서
+        return allActorNumbers.IndexOf(myActorNumber);
+    }
+
+    // 봇 이름을 기반으로 고유 인덱스를 생성 (예: [BOT] Alpha1 → 9001)
+    private int GetBotFakeActorNumber(string botName)
+    {
+        string digits = System.Text.RegularExpressions.Regex.Match(botName, @"\d+").Value;
+        return 1000 + int.Parse(digits);
     }
 }
