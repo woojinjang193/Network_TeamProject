@@ -9,14 +9,14 @@ public class SettingUI : BaseUI
     [Header("카테고리")]
     [SerializeField] private Button soundTab;
     [SerializeField] private Button graphicsTab;
-    [SerializeField] private Button controlsTab;
+    //[SerializeField] private Button controlsTab;
     [SerializeField] private Button closeButton;
     [SerializeField] private Button exitButton;
 
     [Header("카테고리 패널")]
     [SerializeField] private GameObject graphicsContent;
     [SerializeField] private GameObject soundContent;
-    [SerializeField] private GameObject controlsContent;
+    //[SerializeField] private GameObject controlsContent;
 
     [Header("그래픽 UI 요소")]
     [SerializeField] private TMP_Dropdown resolutionDropdown;
@@ -40,7 +40,7 @@ public class SettingUI : BaseUI
         // 탭 버튼에 리스너 추가
         graphicsTab.onClick.AddListener(() => ChangeTab(graphicsContent));
         soundTab.onClick.AddListener(() => ChangeTab(soundContent));
-        controlsTab.onClick.AddListener(() => ChangeTab(controlsContent));
+        //controlsTab.onClick.AddListener(() => ChangeTab(controlsContent));
 
         // 닫기 버튼에 리스너 추가
         closeButton.onClick.AddListener(OnCloseButtonClicked);
@@ -98,7 +98,7 @@ public class SettingUI : BaseUI
     {
         graphicsContent.SetActive(false);
         soundContent.SetActive(false);
-        controlsContent.SetActive(false);
+        //controlsContent.SetActive(false);
 
         activeContent.SetActive(true);
     }
