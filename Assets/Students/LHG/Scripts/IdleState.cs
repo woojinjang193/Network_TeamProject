@@ -17,15 +17,19 @@ public class IdleState : AIBaseState
     {
         if (!_controller.canControl) return;//////////////
 
-        _controller.MoveModule.Wander();
+        _controller.MoveModule.StartPatrol(); //**여기**
         _controller.DetectModule.Update();
         _controller.FireModule.TryFireAt(_controller.DetectModule.Target);
 
         if(_controller.DetectModule.HasEnemy)
         {
-            Debug.Log($"파이어 시도 들어감{_controller.photonView.ViewID}");
-            _controller.MoveModule.StopWander();
+            _controller.MoveModule.StopPatrol();
             _controller.StateMachine.SetState(new ChaseState(_controller));
         }
+    }
+
+    public override void OnExit()
+    {
+        _controller.MoveModule.StopPatrol();
     }
 }

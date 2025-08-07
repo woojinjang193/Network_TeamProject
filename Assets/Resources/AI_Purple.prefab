@@ -2264,7 +2264,7 @@ MonoBehaviour:
   humanAnimator: {fileID: 0}
   squidAnimator: {fileID: 0}
   humanFace: {fileID: 0}
-  moveSpeed: 4
+  moveSpeed: 5
   inkParticleGun: {fileID: 8791985412425768307}
   weaponView: {fileID: 0}
   faceType: 0
@@ -2272,7 +2272,7 @@ MonoBehaviour:
   col: {fileID: 0}
   fireInterval: 1
   detectInterval: 3
-  detectRadius: 10
+  detectRadius: 21.92
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -2283,6 +2283,7 @@ MonoBehaviour:
   enemyInkSpeedModifier: 0.5
   canControl: 0
   botName: BotName
+  patrolPoints: []
 --- !u!54 &5467757474418972372
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2308,7 +2309,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!114 &5400148726782383323
 MonoBehaviour:
