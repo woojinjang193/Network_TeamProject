@@ -2198,7 +2198,7 @@ GameObject:
   - component: {fileID: 5467757474418972372}
   - component: {fileID: 5400148726782383323}
   - component: {fileID: 1233821734482484076}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: AI_Purple
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2272,7 +2272,7 @@ MonoBehaviour:
   col: {fileID: 0}
   fireInterval: 1
   detectInterval: 3
-  detectRadius: 10
+  detectRadius: 21.92
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -2282,6 +2282,7 @@ MonoBehaviour:
   inkColorThreshold: 1
   enemyInkSpeedModifier: 0.5
   canControl: 0
+  patrolPoints: []
 --- !u!54 &5467757474418972372
 Rigidbody:
   m_ObjectHideFlags: 0

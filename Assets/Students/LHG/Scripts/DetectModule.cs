@@ -58,11 +58,4 @@ public class DetectModule
         detectTimer = 0f;
         return true;
     }
-
-    private void DetectGrid()
-    {
-        //기본적으로 발사하고, 우리팀이면 안쏜다 
-
-        //TRYGETVALUE, GETCOMPONENT, COMPARETAG
-    }
 }

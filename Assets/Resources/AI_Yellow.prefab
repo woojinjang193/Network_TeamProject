@@ -7800,7 +7800,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 19
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &3250435259742704194
@@ -24451,7 +24451,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []
-  sceneViewId: 6
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &5562432649449006894
@@ -28654,7 +28654,7 @@ GameObject:
   - component: {fileID: 2172642898234870924}
   - component: {fileID: 8877593782652075405}
   - component: {fileID: 4010641483305805933}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: AI_Yellow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28728,7 +28728,7 @@ MonoBehaviour:
   col: {fileID: 0}
   fireInterval: 1
   detectInterval: 3
-  detectRadius: 10
+  detectRadius: 21.92
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -28738,6 +28738,7 @@ MonoBehaviour:
   inkColorThreshold: 1
   enemyInkSpeedModifier: 0.5
   canControl: 0
+  patrolPoints: []
 --- !u!54 &2172642898234870924
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -28785,7 +28786,7 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 4500529879281663229}
-  sceneViewId: 21
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!195 &4010641483305805933
@@ -29613,7 +29614,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5801186319289741356, guid: 32969ff5581b54d4084817f2c26a7fcf, type: 3}
       propertyPath: sceneViewId
-      value: 5
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -1,57 +1,64 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class MoveModule
 {
     private AIController _controller;
-    private Vector3 _randomPos;
-    private Coroutine _wanderRoutine;
-    private float _wanderTime = 3f;
+    private Coroutine _patrolRoutine;
+    private int _currentPatrolIndex = 0;
+
+    private List<Transform> _patrolPoints;
 
     public MoveModule(AIController controller)
     {
         _controller = controller;
     }
 
-    public void Wander()
+    
+    public void SetPatrolPoints(List<Transform> patrolPoints)
     {
-        if (_wanderRoutine == null)
+        _patrolPoints = patrolPoints;
+        _currentPatrolIndex = 0;
+    }
+
+    public void StartPatrol()
+    {
+        if (_patrolPoints == null || _patrolPoints.Count == 0) return;
+        if (_patrolRoutine == null)
         {
             _controller.FaceOff(FaceType.Idle);
-            _wanderRoutine = _controller.StartCoroutine(WanderRoutine());
+            _patrolRoutine = _controller.StartCoroutine(PatrolRoutine());
         }
     }
 
-    private IEnumerator WanderRoutine()
+    public void StopPatrol()
+    {
+        if (_patrolRoutine != null)
+        {
+            _controller.StopCoroutine(_patrolRoutine);
+            _patrolRoutine = null;
+            _controller.agent.ResetPath();
+        }
+    }
+
+    private IEnumerator PatrolRoutine()
     {
         while (true)
         {
-            float randomDistance = SetNewRandomTargetPosition();
-            if (randomDistance > 7f)
+            if (!_controller.agent.pathPending && _controller.agent.remainingDistance < _controller.agent.stoppingDistance + 0.1f)
             {
-                float elapsed = 0f;
+                _controller.IsMoving = false;
 
-                while (elapsed < _wanderTime)
-                {
-                    MoveTo(_randomPos);
-                    elapsed += Time.deltaTime;
+                yield return new WaitForSeconds(1f); // 도착 후 대기 시간
 
-                    float distance = Vector3.Distance(_controller.transform.position, _randomPos);
-                    _controller.IsMoving = distance > 0.1f;
-
-                    yield return null;
-                }
+                _currentPatrolIndex = (_currentPatrolIndex + 1) % _patrolPoints.Count;
+                MoveTo(_patrolPoints[_currentPatrolIndex].position);
             }
+
             yield return null;
         }
-    }
-
-    private float SetNewRandomTargetPosition()
-    {
-        Vector2 circle = Random.insideUnitCircle * Random.Range(5f, 12f);
-        _randomPos = _controller.transform.position + new Vector3(circle.x, 0, circle.y);
-        return Vector3.Distance(_controller.transform.position, _randomPos);
     }
 
     public void MoveTo(Vector3 targetPos)
@@ -65,62 +72,11 @@ public class MoveModule
 
         if (!_controller.agent.hasPath || _controller.agent.destination != targetPos)
         {
+            _controller.agent.speed = currentSpeed;
             _controller.agent.SetDestination(targetPos);
         }
 
-        if (_controller.agent.pathPending == false && _controller.agent.remainingDistance > _controller.agent.stoppingDistance)
-        {
-            Vector3 direction = (_controller.agent.steeringTarget - _controller.transform.position).normalized;
-            direction.y = 0;
-
-            _controller.transform.position += direction * (currentSpeed * Time.deltaTime);
-            RotateToTarget(direction);
-            _controller.IsMoving = true;
-        }
-        else
-        {
-            _controller.IsMoving = false;
-        }
-
-
-        //Vector3 direction = GetDirection(targetPos);
-        //_controller.transform.position += direction * (currentSpeed * Time.deltaTime);
-        //RotateToTarget(direction);
-    }
-
-    public void StopWander()
-    {
-        if (_wanderRoutine != null)
-        {
-            _controller.StopCoroutine(_wanderRoutine);
-            _wanderRoutine = null;
-        }
-    }
-
-    // 벽에 부딪히면 이동 중단하고 방향 재설정
-    public void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
-        {
-            Debug.Log("플레이어와 충돌: 무시됨");
-            return;
-        }
-
-        //int ignoreLayerMask = LayerMask.GetMask("Player", "AI");
-        //if ((ignoreLayerMask & (1<<collision.gameObject.layer)) != 0)
-        //{
-        //    return;
-        //}
-
-        ContactPoint contact = collision.contacts[0];
-        float angle = Vector3.Dot(contact.normal, -_controller.transform.forward);
-
-        if (angle > 0.5f) // 벽이라고 판단
-        {
-            Debug.Log("벽 충돌시 이동 중단 및 재설정");
-            StopWander();
-            Wander();
-        }
+        _controller.IsMoving = !_controller.agent.pathPending && _controller.agent.remainingDistance > _controller.agent.stoppingDistance;
     }
 
     public Vector3 GetDirection(Vector3 targetPos)
@@ -132,20 +88,14 @@ public class MoveModule
 
     public void RotateToTarget(Vector3 direction)
     {
-        if (Vector3.Dot(direction, _controller.transform.forward) > 0.98f)
-        // 거의 각도가 맞으니 return;
-        {
-            return;
-        }
-
         if (direction != Vector3.zero)
         {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
             _controller.transform.rotation = Quaternion.Slerp(
                 _controller.transform.rotation,
-                Quaternion.LookRotation(direction),
+                lookRotation,
                 Time.deltaTime * 5f
             );
         }
     }
 }
-
