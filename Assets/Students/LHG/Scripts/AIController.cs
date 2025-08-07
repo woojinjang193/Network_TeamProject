@@ -141,7 +141,7 @@ public class AIController : BaseController
     }
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
+        Gizmos.color = MyTeam ==Team.Team1 ? Color.magenta : Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectRadius);
     }
 

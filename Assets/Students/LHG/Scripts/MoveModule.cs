@@ -16,7 +16,7 @@ public class MoveModule
         _controller = controller;
     }
 
-    
+
     public void SetPatrolPoints(List<Transform> patrolPoints)
     {
         _patrolPoints = patrolPoints;
@@ -53,13 +53,21 @@ public class MoveModule
 
                 yield return new WaitForSeconds(1f); // 도착 후 대기 시간
 
-                _currentPatrolIndex = (_currentPatrolIndex + 1) % _patrolPoints.Count;
+                // 랜덤으로 다음 패트롤 포인트 선택
+                int nextIndex;
+                do
+                {
+                    nextIndex = Random.Range(0, _patrolPoints.Count);
+                } while (_patrolPoints.Count > 1 && nextIndex == _currentPatrolIndex); // 같은 곳 두 번 연속 방지
+
+                _currentPatrolIndex = nextIndex;
                 MoveTo(_patrolPoints[_currentPatrolIndex].position);
             }
 
             yield return null;
         }
     }
+
 
     public void MoveTo(Vector3 targetPos)
     {
@@ -74,9 +82,14 @@ public class MoveModule
         {
             _controller.agent.speed = currentSpeed;
             _controller.agent.SetDestination(targetPos);
+            _controller.IsMoving = true;
         }
 
-        _controller.IsMoving = !_controller.agent.pathPending && _controller.agent.remainingDistance > _controller.agent.stoppingDistance;
+        else
+        {
+            _controller.IsMoving = false;
+        }
+        //_controller.IsMoving = !_controller.agent.pathPending && _controller.agent.remainingDistance > _controller.agent.stoppingDistance;
     }
 
     public Vector3 GetDirection(Vector3 targetPos)

@@ -2264,7 +2264,7 @@ MonoBehaviour:
   humanAnimator: {fileID: 0}
   squidAnimator: {fileID: 0}
   humanFace: {fileID: 0}
-  moveSpeed: 4
+  moveSpeed: 5
   inkParticleGun: {fileID: 8791985412425768307}
   weaponView: {fileID: 0}
   faceType: 0

@@ -28720,7 +28720,7 @@ MonoBehaviour:
   humanAnimator: {fileID: 0}
   squidAnimator: {fileID: 0}
   humanFace: {fileID: 0}
-  moveSpeed: 4
+  moveSpeed: 5
   inkParticleGun: {fileID: 3949212785003392163}
   weaponView: {fileID: 0}
   faceType: 0
