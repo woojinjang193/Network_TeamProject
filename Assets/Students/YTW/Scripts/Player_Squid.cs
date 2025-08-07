@@ -52,7 +52,8 @@ public class Player_Squid : PlayerState
         // 잉크 회복 로직 추가
         if (player.inkParticleGun != null)
         {
-            player.inkParticleGun.RecoverInk();
+            player.inkParticleGun.RecoverInk(subStateMachine.CurrentState == lowStateDic[LowState.Move]);
+            Debug.Log($"움직임 여부{player.IsMoving}");
         }
 
         if (!player.input.IsSquidHeld && !player.IsOnWalkableWall)

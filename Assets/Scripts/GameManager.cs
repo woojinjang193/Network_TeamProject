@@ -178,6 +178,7 @@ public class GameManager : MonoBehaviour
                 waitStartCoroutine = null;
             }
             photonView.RPC("OpenGameStartUITogether", RpcTarget.All);
+            photonView.RPC("SwitchBGMTogether",RpcTarget.All);
             return;
         }
 
@@ -188,9 +189,24 @@ public class GameManager : MonoBehaviour
     }
 
     [PunRPC]
-    private void OpenGameStartUITogether()
+    private void OpenGameStartUITogether() //NotifyCharSpawned에서 수행
     {
         gameStartUI.openGameStartUI();
+    }
+
+    [PunRPC]
+    private void SwitchBGMTogether() //NotifyCharSpawned에서 수행
+    {
+        // 스테이지에 따라 음악 다르게 재생
+        string sceneName = SceneManager.GetActiveScene().name;
+        if (sceneName == "Map1")
+        {
+            Manager.Audio.SwitchBGM("Stage1");
+        }
+        else
+        {
+            Manager.Audio.SwitchBGM("Stage2");
+        }
     }
 
     private IEnumerator WaitAndStartGame() //참가자가 2분동안 꽉차지않으면 게임 그냥 실행
@@ -306,9 +322,7 @@ public class GameManager : MonoBehaviour
             photonView.RPC("SetStartTime", RpcTarget.All, start);
             photonView.RPC("RpcGameStart", RpcTarget.All);
         }
-        // 스테이지에 따라 음악 다르게 재생
-        Manager.Audio.SwitchBGM("Stage1");
-        //Manager.Audio.SwitchBGM("Stage2");
+
     }
 
     [PunRPC]
