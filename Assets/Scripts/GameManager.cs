@@ -46,6 +46,11 @@ public class GameManager : MonoBehaviour
     private int botCount = 0;
     private void Awake()
     {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            BotNameList.Reset(); //봇이름 리스트 초기화
+        }
+
         Manager.Game = this;
         photonView = GetComponent<PhotonView>();
         timerAnimation = GetComponentInChildren<Animator>();
