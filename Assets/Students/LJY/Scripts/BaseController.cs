@@ -1,8 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using Photon.Pun;
 using UnityEngine;
 
+public enum DeathCause ////// JWJ 추가
+{
+    PlayerAttack,
+    BotAttck,
+    Fall,
+    EnemyInk
+}
 public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
 {
     // 애니메이터 해시
@@ -116,6 +124,9 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
         set { isDeadState = value; }
     }
 
+    protected string killerName = "";  ////// JWJ 추가
+    protected DeathCause deathCause;   ////// JWJ 추가
+
     protected virtual void Awake()
     {
         humanFace = humanModel.GetComponent<HumanFace>();
@@ -145,6 +156,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
         gameManagerPhotonView.RPC("NotifyCharSpawned", RpcTarget.MasterClient); 
     }
     
+    public abstract void TakeDamage(float amount, PhotonMessageInfo info);
     public abstract void TakeDamage(float amount);
     public abstract void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info);
     

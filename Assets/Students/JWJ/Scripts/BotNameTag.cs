@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class BotNameTag : MonoBehaviour
 {
+    private AIController aIController;
+
     private static List<string> botNames = new List<string>
     {
         "이학권의 작품","황천의 AI","이름뿐인 팀장 장우진","피카소", "반 고흐","먹다남은 치킨", 
@@ -16,16 +18,22 @@ public class BotNameTag : MonoBehaviour
     private PhotonView photonView;
     Transform cam;
 
-    void Start()
+    private void Awake()
     {
+        aIController = GetComponentInParent<AIController>();
         botNameText = GetComponentInChildren<TMP_Text>();
         photonView = GetComponent<PhotonView>();
         cam = Camera.main.transform;
 
+    }
+
+    void Start()
+    {
         if (photonView.IsMine)
         {
             int i = Random.Range(0, botNames.Count);
             string botName = botNames[i];
+            aIController.botName = botName; ///
             botNames.RemoveAt(i);
 
             photonView.RPC("SetBotName", RpcTarget.All, botName);

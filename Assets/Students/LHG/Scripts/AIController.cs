@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.UI;
 using UnityEngine.AI;
+using System.Globalization;
 
 
 public class AIController : BaseController
@@ -34,12 +35,18 @@ public class AIController : BaseController
     public float enemyInkSpeedModifier = 0.5f;
 
     public bool canControl = false;/////////////
+    public string botName = "BotName";
+    private int killerActorNum;
+
+    private KillBoard killBoard;
 
     //네브매쉬관련
     public NavMeshAgent agent { get; private set; }
 
     protected override void Awake()
     {
+        killBoard = FindObjectOfType<KillBoard>();
+
         base.Awake();
 
         if (photonView.IsMine)
@@ -208,6 +215,14 @@ public class AIController : BaseController
     }
 
     [PunRPC]
+    public override void TakeDamage(float amount, PhotonMessageInfo info)
+    {
+        if (IsDead) return;
+
+        killerActorNum = info.Sender.ActorNumber;
+        TakeDamage(amount);
+    }
+
     public override void TakeDamage(float amount) // 무기에 의해서, 로컬만 호출됨
     {
         if (IsDead) return;
@@ -219,7 +234,7 @@ public class AIController : BaseController
             CurHp = 0;
             Debug.Log("AI 플레이어 죽음");
 
-            photonView.RPC("AiDie", RpcTarget.All);
+            photonView.RPC("AiDie", RpcTarget.All, killerActorNum);
         }
 
         Debug.Log($"현재 체력{CurHp}");
@@ -227,11 +242,19 @@ public class AIController : BaseController
     }
 
     [PunRPC]
-    public void AiDie() // 전체 클라이언트에 호출됨. TakeDamage에서 호출
+    public void AiDie(int killerActorNum) // 전체 클라이언트에 호출됨. TakeDamage에서 호출
     {
         IsDead = true;
         IsDeadState = true;
         Instantiate(dieParticle, transform);
+
+        if(PhotonNetwork.LocalPlayer.ActorNumber == killerActorNum)
+        {
+            killBoard.KillLog($"{botName}처치");
+            Debug.Log($"{botName}처치");
+        }
+            
+            
         if (photonView.IsMine)
         {
             if (CurHp <= 0)

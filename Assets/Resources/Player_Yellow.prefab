@@ -15506,7 +15506,7 @@ GameObject:
   - component: {fileID: 4876262181963258539}
   m_Layer: 0
   m_Name: ParticleGun
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -31055,7 +31055,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3352723284127586057, guid: 8550cf003e89e00488f4b709f5e6546f, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6991068380672727761, guid: 8550cf003e89e00488f4b709f5e6546f, type: 3}
       propertyPath: m_Pivot.x
