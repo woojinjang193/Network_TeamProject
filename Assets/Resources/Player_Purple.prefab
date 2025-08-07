@@ -1125,8 +1125,8 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 25
-      minScalar: 20
+      scalar: 60
+      minScalar: 40
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -1243,7 +1243,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.17
+      scalar: 0.25
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -1567,7 +1567,7 @@ ParticleSystem:
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 2.8
+      scalar: 4
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -12791,6 +12791,7 @@ Transform:
   - {fileID: 6872290711956153236}
   - {fileID: 1203939341960607898}
   - {fileID: 4089111819572804981}
+  - {fileID: 242800855719600735}
   m_Father: {fileID: 6782919561145420708}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2899727294284343437
@@ -13088,7 +13089,13 @@ SkinnedMeshRenderer:
   m_SkinnedMotionVectors: 1
   m_Mesh: {fileID: 2702065095120395984, guid: 207f23503b6a22448a7c7139ed5e8286, type: 3}
   m_Bones: []
-  m_BlendShapeWeights: []
+  m_BlendShapeWeights:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   m_RootBone: {fileID: 0}
   m_AABB:
     m_Center: {x: -0.11298007, y: 0.037612103, z: 0.000000044703484}
@@ -13500,7 +13507,6 @@ Transform:
   - {fileID: 2215168425306285175}
   - {fileID: 3359040118782243683}
   - {fileID: 6782919561145420708}
-  - {fileID: 242800855719600735}
   m_Father: {fileID: 6464388962982307054}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3939977745550236794
@@ -14549,7 +14555,7 @@ MonoBehaviour:
   particleCollision: {fileID: 6378129490139736997}
   maxInk: 100
   currentInk: 0
-  inkConsumptionRate: 15
+  inkConsumptionRate: 25
   inkRecoveryRate: 30
 --- !u!114 &4384510689121422848
 MonoBehaviour:
@@ -18852,7 +18858,12 @@ Animator:
   m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_WarningMessage: 
+  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
+    are already bound by a Humanoid avatar. These transforms can only be changed
+    by Humanoid clips.\n\tTransform 'Hand_R'\n\tTransform 'Upper_Arm_L'\n\tTransform
+    'Spine'\n\tTransform 'Lower_Arm_L'\n\tTransform 'Chest'\n\tTransform 'Upper_Arm_R'\n\tTransform
+    'Lower_Arm_R'\n\tTransform 'Hand_L'\n\tTransform 'Hand_R'\n\tTransform 'Upper_Arm_L'\n\tand
+    more ..."
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -30496,7 +30507,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1365028231105177621}
+    m_TransformParent: {fileID: 3026048294301389396}
     m_Modifications:
     - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
       propertyPath: m_LocalScale.x
@@ -30504,19 +30515,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.17499992
+      value: 0.17499994
       objectReference: {fileID: 0}
     - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.17499998
+      value: 0.175
       objectReference: {fileID: 0}
     - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.17239916
+      value: -0.0075149485
       objectReference: {fileID: 0}
     - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.28423187
+      value: -0.2447569
       objectReference: {fileID: 0}
     - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
       propertyPath: m_LocalPosition.z
@@ -30524,19 +30535,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.4998014
+      value: -0.5000009
       objectReference: {fileID: 0}
     - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.50019944
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.49979982
+      value: -0.49999934
       objectReference: {fileID: 0}
     - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.50019926
+      value: -0.4999998
       objectReference: {fileID: 0}
     - target: {fileID: 1789737304735611331, guid: 499fb0567bf048f469c0d40896635217, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
