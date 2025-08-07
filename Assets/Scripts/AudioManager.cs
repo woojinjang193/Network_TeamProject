@@ -73,7 +73,6 @@ public class AudioManager : Singleton<AudioManager>
         ambientSource = gameObject.AddComponent<AudioSource>();
         effectSource = gameObject.AddComponent<AudioSource>();
         clickSource = gameObject.AddComponent<AudioSource>();
-        clickSource.playOnAwake = false;
         
         // 오디오 소스와 믹서 연결
         bgmSource.outputAudioMixerGroup = bgmGroup;
@@ -91,6 +90,8 @@ public class AudioManager : Singleton<AudioManager>
     {
         // 사용자 설정 가져오기
         VolumeLoad();
+        // 클릭 소리 세팅
+        SetClickSound();
         // 기본 백색소음 재생
         SwitchAmbient("defaultAmbient",1f);
         // 기본 배경음악 재생
@@ -439,8 +440,16 @@ public class AudioManager : Singleton<AudioManager>
         player.fireSound = audio;
     }
 
+    private void SetClickSound()
+    {
+        clickSource.clip = clickClip.clipSource;
+        clickSource.volume = clickClip.volume;
+        clickSource.loop = false;
+        clickSource.playOnAwake = false;
+    }
     public void Click()
     {
+        clickSource.Stop();
         clickSource.Play();
     }
 

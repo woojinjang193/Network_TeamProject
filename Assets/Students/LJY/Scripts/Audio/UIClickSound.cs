@@ -14,7 +14,6 @@ public class UIClickSound : MonoBehaviour
         Button btn = gameObject.GetComponent<Button>();
         if (btn)
         {
-            btn.onClick.RemoveAllListeners();
             btn.onClick.AddListener(Manager.Audio.Click);
         }
     }
