@@ -64,6 +64,9 @@ MonoBehaviour:
   - RpcGameEnd
   - SwitchBGMTogether
   - SetBotName
+  - TakeDamageByBot
+  - TakeDamageFromBot
+  - LogForAll
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

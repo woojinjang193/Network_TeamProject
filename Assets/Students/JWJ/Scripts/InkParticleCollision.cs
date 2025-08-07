@@ -30,6 +30,9 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
     private Dictionary<int, PaintableObj> dicViewIDToPaintable = new();
     //Collider를 키로, PaintableObj를 값으로 딕셔너리 생성
 
+    private AIController aiController;
+    string shooterName;
+
     private void Awake()
     {
         //photonV = GetComponent<PhotonView>();
@@ -42,6 +45,8 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
 
         PaintableObj[] paintableObjs = FindObjectsOfType<PaintableObj>();
         // 모든 PaintableObj를 넣을 배열 생성 
+
+        aiController = GetComponentInParent<AIController>();
 
         //배열을 돌면서 PaintableObj 컴포넌트를 가진 객체 안에 콜라이더, 포톤뷰(딕셔너리 키)를 찾음
         for (int i = 0; i < paintableObjs.Length; i++)
@@ -225,17 +230,27 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
     {
         if (player.MyTeam == myTeam)
         {
-            Debug.Log("아군입니다.");
+            //Debug.Log("아군입니다.");
             return;
         }
-        if (player.MyTeam != myTeam)
+
+        if (aiController != null)
         {
-            Debug.Log("적 입니다.");
-            player.photonView.RPC("TakeDamage", player.photonView.Owner, 15f);
-            Manager.Audio.PlayClip("InkHit",player.transform.position);
-            Manager.Audio.PlayEffect("HitPlayer");
-            return;
+            player.photonView.RPC("TakeDamageFromBot", player.photonView.Owner, 15f, aiController.botName);
         }
-        Debug.Log("팀 이없습니다");
+        else if (PhotonNetwork.LocalPlayer != null)
+        {
+            player.photonView.RPC("TakeDamage", player.photonView.Owner, 15f);
+        }
+        else
+        {
+            Debug.Log("팀이 없습니다");
+        }
+
+        Manager.Audio.PlayClip("InkHit", player.transform.position);
+        Manager.Audio.PlayEffect("HitPlayer");
+
+        //Debug.Log("팀 이없습니다");
+        return;
     }
 }

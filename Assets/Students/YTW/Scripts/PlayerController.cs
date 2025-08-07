@@ -81,9 +81,15 @@ public class PlayerController : BaseController
     // 플레이어 루프 사운드
     public AudioSource squidSwim;
     public AudioSource squidSwimBubble;
-    
+
+    private KillBoard killBoard;
+    private PhotonView killLogView;
+
+
     protected override void Awake()
     {
+        killBoard = FindObjectOfType<KillBoard>();
+        killLogView = killBoard.gameObject.GetComponent<PhotonView>();
 
         base.Awake();
         squidAnimator = squidModel.GetComponentInChildren<Animator>();
@@ -582,7 +588,7 @@ public class PlayerController : BaseController
     }
 
     [PunRPC]
-    public override void TakeDamage(float amount) //InkParticleCollision에 의해서 들어옴 로컬만 수행
+    public override void TakeDamage(float amount, PhotonMessageInfo info) //InkParticleCollision에 의해서 들어옴 로컬만 수행, 플레이어끼리 데미지
     {
         if (IsDead) return;
 
@@ -590,19 +596,85 @@ public class PlayerController : BaseController
         hitRoutine ??= StartCoroutine(HitRoutine());
         Debug.Log($"현재 체력{CurHp}");
 
+        killerName = info.Sender.NickName;
+        deathCause = DeathCause.PlayerAttack; //봇도 플레이어에 포함
+
         if (CurHp <= 0)
         {
             CurHp = 0;
             IsDead = true;
             Debug.Log("플레이어 죽음");
 
-            photonView.RPC("PlayerDie", RpcTarget.All);
+            photonView.RPC("PlayerDie", RpcTarget.All, killerName, (int)deathCause); 
         }
     }
 
     [PunRPC]
-    public void PlayerDie() // TakeDamage의 조건에 따라서 들어옴. 전역 수행
+    public void TakeDamageFromBot(float amount, string botName) //봇에게 받는 데미지
     {
+        if (IsDead) return;
+
+        CurHp -= amount;
+        hitRoutine ??= StartCoroutine(HitRoutine());
+
+        killerName = botName;
+        deathCause = DeathCause.BotAttck; // 항상 PlayerAttack으로 처리
+
+        if (CurHp <= 0)
+            photonView.RPC("PlayerDie", RpcTarget.All, killerName, (int)deathCause);
+    }
+
+    public override void TakeDamage(float amount) //적 잉크나 낙사일때
+    {
+        if (IsDead) return;
+
+        CurHp -= amount;
+        hitRoutine ??= StartCoroutine(HitRoutine());
+    }
+
+    [PunRPC]
+    public void PlayerDie(string killerName, int cause) // TakeDamage의 조건에 따라서 들어옴. 전역 수행
+    {
+        deathCause = (DeathCause)cause; //int 를 다시 enum으로 바꿔줌
+        victimName = photonView.Owner.NickName;
+
+        if (photonView.IsMine)
+        {
+            switch (deathCause)
+            {
+                case DeathCause.PlayerAttack:
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
+                    killBoard.KillLog($"{killerName}에게 처치당함");
+                    Debug.Log($"{killerName}에게 처치당함");
+                    break;
+
+                case DeathCause.BotAttck:
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
+                    killBoard.KillLog($"{killerName}봇 에게 처치당함");
+                    Debug.Log($"{killerName}봇 에게 처치당함");
+                    break;
+
+                case DeathCause.Fall:
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
+                    killBoard.KillLog("낙사함");
+                    Debug.Log($"낙사");
+                    break;
+
+                case DeathCause.EnemyInk:
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
+                    killBoard.KillLog("적잉크때문에 죽음");
+                    Debug.Log("적잉크때문에 죽음");
+                    break;
+            }
+        }
+
+        if(PhotonNetwork.LocalPlayer.NickName == killerName)//호출한사람과 킬러의 이름이 같으면
+        {
+            killBoard.KillLog($"{photonView.Owner.NickName}처치");
+            Debug.Log($"{photonView.Owner.NickName}처치");
+        }
+       
+
         Manager.Audio.PlayClip("Dead",transform.position);
         Instantiate(dieParticle, transform);
         // 원격으로도 죽은 처리 해줘야 함
@@ -855,6 +927,11 @@ public class PlayerController : BaseController
                 {
                     Debug.Log($"적군 잉크 위에서 데미지를 입습니다");
                     TakeDamage(damagePerSecondOnEnemyInk * Time.deltaTime);
+
+                    if(CurHp <= 0 && !IsDead)
+                    {
+                        EnemyInkDeath();
+                    }
                 }
                 break;
 
@@ -904,5 +981,25 @@ public class PlayerController : BaseController
                 squidSwimBubble.Stop();
             }
         }
+    }
+
+    public void FallingDeath()
+    {
+        if (IsDead) return;
+
+        killerName = "낙사";
+        deathCause = DeathCause.Fall;
+
+        photonView.RPC("PlayerDie", RpcTarget.All, killerName, (int)deathCause);
+    }
+
+    public void EnemyInkDeath()
+    {
+        if(IsDead) return;
+
+        killerName = "적 잉크";
+        deathCause = DeathCause.EnemyInk;
+
+        photonView.RPC("PlayerDie", RpcTarget.All, killerName, (int)deathCause);
     }
 }

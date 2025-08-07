@@ -2198,9 +2198,9 @@ GameObject:
   - component: {fileID: 5467757474418972372}
   - component: {fileID: 5400148726782383323}
   - component: {fileID: 1233821734482484076}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: AI_Purple
-  m_TagString: Untagged
+  m_TagString: Bot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2282,6 +2282,7 @@ MonoBehaviour:
   inkColorThreshold: 1
   enemyInkSpeedModifier: 0.5
   canControl: 0
+  botName: BotName
 --- !u!54 &5467757474418972372
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2450,7 +2451,7 @@ GameObject:
   - component: {fileID: 380141616541136654}
   m_Layer: 0
   m_Name: ParticleGun_Purple_AI
-  m_TagString: Untagged
+  m_TagString: Bot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

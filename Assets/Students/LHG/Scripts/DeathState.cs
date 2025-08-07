@@ -18,7 +18,7 @@ public class DeathState : AIBaseState
         _timer = 0f;
         _controller.col.enabled = false;
         _controller.humanModel.SetActive(false);
-        Debug.Log("데쓰 온엔터");
+        //Debug.Log("데쓰 온엔터");
     }
 
     public override void OnUpdate()
@@ -28,7 +28,7 @@ public class DeathState : AIBaseState
         {
             _controller.Respawn();
         }
-        Debug.Log("데쓰 온업데이트");
+        //Debug.Log("데쓰 온업데이트");
     }
 
     public override void OnExit()

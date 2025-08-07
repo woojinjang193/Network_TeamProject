@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.UI;
 using UnityEngine.AI;
+using System.Globalization;
 
 
 public class AIController : BaseController
@@ -34,12 +35,19 @@ public class AIController : BaseController
     public float enemyInkSpeedModifier = 0.5f;
 
     public bool canControl = false;/////////////
+    public string botName = "BotName";
+
+    private KillBoard killBoard;
+    private PhotonView killLogView;
 
     //네브매쉬관련
     public NavMeshAgent agent { get; private set; }
 
     protected override void Awake()
     {
+        killBoard = FindObjectOfType<KillBoard>();
+        killLogView = killBoard.gameObject.GetComponent<PhotonView>();
+
         base.Awake();
 
         if (photonView.IsMine)
@@ -208,6 +216,27 @@ public class AIController : BaseController
     }
 
     [PunRPC]
+    public override void TakeDamage(float amount, PhotonMessageInfo info) //플레이어한테 공격받음
+    {
+        if (IsDead) return;
+
+        killerName = info.Sender.NickName;
+        deathCause = DeathCause.PlayerAttack;
+
+        TakeDamage(amount);
+    }
+
+    [PunRPC]
+    public void TakeDamageFromBot(float amount, string botName)
+    {
+        if (IsDead) return;
+
+        killerName = botName;
+        deathCause = DeathCause.BotAttck;
+
+        TakeDamage(amount);
+    }
+
     public override void TakeDamage(float amount) // 무기에 의해서, 로컬만 호출됨
     {
         if (IsDead) return;
@@ -219,7 +248,8 @@ public class AIController : BaseController
             CurHp = 0;
             Debug.Log("AI 플레이어 죽음");
 
-            photonView.RPC("AiDie", RpcTarget.All);
+            photonView.RPC("AiDie", RpcTarget.All, killerName, botName, (int)deathCause);
+
         }
 
         Debug.Log($"현재 체력{CurHp}");
@@ -227,11 +257,38 @@ public class AIController : BaseController
     }
 
     [PunRPC]
-    public void AiDie() // 전체 클라이언트에 호출됨. TakeDamage에서 호출
+    public void AiDie(string killerName, string botName, int cause) // 전체 클라이언트에 호출됨. TakeDamage에서 호출
     {
+        deathCause = (DeathCause)cause;
         IsDead = true;
         IsDeadState = true;
         Instantiate(dieParticle, transform);
+
+        switch(deathCause)
+        {
+            case DeathCause.PlayerAttack: 
+                if(PhotonNetwork.LocalPlayer.NickName == killerName) 
+                {
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, botName, (int)deathCause);
+                    killBoard.KillLog($"{botName} 처치");
+                }
+                break;
+
+            case DeathCause.BotAttck:
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, botName, (int)deathCause);
+                }
+                break;
+
+            case DeathCause.Fall:
+                if (photonView.IsMine)
+                {
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, botName, (int)deathCause);
+                }
+                break;
+        }
+            
         if (photonView.IsMine)
         {
             if (CurHp <= 0)
@@ -425,4 +482,10 @@ public class AIController : BaseController
         rig.angularVelocity = Vector3.zero;
     }
 
+    public void BotFallingDeath()
+    {
+        if (IsDead) return;
+        int deathCause = (int)DeathCause.Fall;
+        photonView.RPC("AiDie", RpcTarget.All, "낙사", botName, deathCause);
+    }
 }
