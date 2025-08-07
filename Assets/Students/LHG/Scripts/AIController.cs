@@ -98,6 +98,7 @@ public class AIController : BaseController
         if (photonView.IsMine)
         {
             StopAllActions();
+            humanAnimator.enabled = false;
         }
     }
 
