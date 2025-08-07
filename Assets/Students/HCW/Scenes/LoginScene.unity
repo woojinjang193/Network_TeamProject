@@ -367,6 +367,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1918557223}
     m_Modifications:
+    - target: {fileID: 1339540136267657276, guid: 3dd824693d92924498efaeae1d755550, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2648748653056649168, guid: 3dd824693d92924498efaeae1d755550, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3610844697198570193, guid: 3dd824693d92924498efaeae1d755550, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -447,9 +455,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6490831007033001039, guid: 3dd824693d92924498efaeae1d755550, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6668412265868988626, guid: 3dd824693d92924498efaeae1d755550, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7932450332376804376, guid: 3dd824693d92924498efaeae1d755550, type: 3}
       propertyPath: m_Name
       value: SettingPanel
+      objectReference: {fileID: 0}
+    - target: {fileID: 7932450332376804376, guid: 3dd824693d92924498efaeae1d755550, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8257172989676107892, guid: 3dd824693d92924498efaeae1d755550, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8525232104485515083, guid: 3dd824693d92924498efaeae1d755550, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -669,6 +697,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1918557223}
     m_Modifications:
+    - target: {fileID: 3524795776528831598, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3524795776528831598, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3900427881846080117, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3900427881846080117, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4478138902151971469, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
       propertyPath: m_Name
       value: Room Panel
@@ -677,6 +721,42 @@ PrefabInstance:
       propertyPath: roomManager
       value: 
       objectReference: {fileID: 1714392088}
+    - target: {fileID: 5249035565846336698, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5249035565846336698, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5788135039486895628, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5788135039486895628, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5788135039486895628, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5788135039486895628, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5811882012677587496, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6707470293483476030, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6707470293483476030, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8929793568498653224, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1273,6 +1353,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1918557223}
     m_Modifications:
+    - target: {fileID: 1116235036244486429, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.0000013209174
+      objectReference: {fileID: 0}
+    - target: {fileID: 1989109249476940675, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1989109249476940675, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3178824043108551030, guid: 4971232996f61084d8b67be78794e11c, type: 3}
       propertyPath: m_Name
       value: RoomListUI Panel
@@ -1355,6 +1447,46 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3310495620502268230, guid: 4971232996f61084d8b67be78794e11c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6816300312045215004, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6816300312045215004, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7727896346502914459, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7727896346502914459, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7844439510085183089, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7844439510085183089, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7844439510085183089, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7844439510085183089, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8582373040273733671, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8582373040273733671, guid: 4971232996f61084d8b67be78794e11c, type: 3}
+      propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1647,6 +1779,10 @@ PrefabInstance:
     - target: {fileID: 3722774243709746496, guid: 11aae6de18e153648b6c6d3fabdde4ee, type: 3}
       propertyPath: m_Name
       value: Loading Panel
+      objectReference: {fileID: 0}
+    - target: {fileID: 3722774243709746496, guid: 11aae6de18e153648b6c6d3fabdde4ee, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
