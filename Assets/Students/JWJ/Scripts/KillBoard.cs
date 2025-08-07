@@ -8,8 +8,11 @@ using UnityEngine.UI;
 public class KillBoard : MonoBehaviour
 {
     private PhotonView killLogView;
+    private TeamColorInfo teamColorInfo;
+    private Color teamColor;
 
     [Header("당사자용")]
+    [SerializeField] private GameObject indiKillLog;
     [SerializeField] private TMP_Text killText;
 
     [Header("모든 플레이어용 이미지")]
@@ -23,22 +26,28 @@ public class KillBoard : MonoBehaviour
     [SerializeField] private GameObject KillLogItemPrefab;
 
 
-
     private void Awake()
     {
         killLogView = GetComponent<PhotonView>();
+        indiKillLog.SetActive(false);
+
+        teamColorInfo = FindObjectOfType<TeamColorInfo>();
     }
 
     public void KillLog(string text)
     {
+        indiKillLog.SetActive(false);
+        indiKillLog.SetActive(true);
         killText.text = text;
     }
 
+
     [PunRPC]
-    public void LogForAll(string killerName, string victimName, int causeNum)
+    public void LogForAll(string killerName, string victimName, int causeNum, int teamNum)
     {
         DeathCause cause = (DeathCause)causeNum;
         Sprite causeSprite = null;
+        //Team team = (Team)teamNum;
 
         switch (cause)
         {
@@ -61,13 +70,18 @@ public class KillBoard : MonoBehaviour
                 break;
         }
 
+        if (killLogPanel.childCount >= 3)
+        {
+            Destroy(killLogPanel.GetChild(0).gameObject);
+        }
+
         GameObject killLogItem = Instantiate(KillLogItemPrefab, killLogPanel);
 
         KillLogItem item = killLogItem.GetComponent<KillLogItem>();
 
-        item.KillLogItemSet(killerName, victimName, causeSprite);
+        //teamColor = teamColorInfo.GetTeamColor(team);
+        item.KillLogItemSet(killerName, victimName, causeSprite, teamNum);
 
         Destroy(killLogItem, 5f);
     }
-
 }
