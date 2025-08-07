@@ -9,7 +9,8 @@ public class InkTank : MonoBehaviour
     public Renderer inkRenderer;
 
     [Header("색상 설정")]
-    [SerializeField] private Color inkColor = Color.white; // 인스펙터에서 설정할 색상
+    [SerializeField] private Color inkColor = Color.white;
+    [SerializeField] private Color topInkColor = Color.white;
 
     [Header("흔들림 세팅")]
     public float MaxWobble = 0.03f;
@@ -27,6 +28,7 @@ public class InkTank : MonoBehaviour
     private int wobbleZ_ID;
     private int fill_ID;
     private int color_ID;
+    private int topColor_ID;
 
     void Awake()
     {
@@ -41,8 +43,10 @@ public class InkTank : MonoBehaviour
         wobbleZ_ID = Shader.PropertyToID("_WobbleZ");
         fill_ID = Shader.PropertyToID("_FillAmount");
         color_ID = Shader.PropertyToID("_Colour"); // 셰이더의 색상 프로퍼티 이름 (Liquid 셰이더의 _Colour)
+        topColor_ID = Shader.PropertyToID("_TopColor"); 
 
         inkRenderer.material.SetColor(color_ID, inkColor);
+        inkRenderer.material.SetColor(topColor_ID, topInkColor);
     }
 
     private void Update()
