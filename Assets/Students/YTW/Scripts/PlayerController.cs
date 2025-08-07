@@ -140,16 +140,20 @@ public class PlayerController : BaseController
 
     private void DisableControl()///////////////
     {
-        canControl = false;
+        if (photonView.IsMine)
+        {
+            canControl = false;
 
-        rig.isKinematic = false;
-        rig.velocity = Vector3.zero;
-        rig.angularVelocity = Vector3.zero;
+            rig.isKinematic = false;
+            rig.velocity = Vector3.zero;
+            rig.angularVelocity = Vector3.zero;
 
-        inkParticleGun.FireParticle(MyTeam, false);
-        humanAnimator.SetBool(IsMove, false);
-        humanAnimator.SetFloat(MoveX, 0f);
-        humanAnimator.SetFloat(MoveY, 0f);
+            inkParticleGun.FireParticle(MyTeam, false);
+            humanAnimator.SetBool(IsMove, false);
+            humanAnimator.SetFloat(MoveX, 0f);
+            humanAnimator.SetFloat(MoveY, 0f);
+        }
+        
     }
 
     void FixedUpdate()

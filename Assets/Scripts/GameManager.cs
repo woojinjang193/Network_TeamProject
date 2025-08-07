@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
 
     private Dictionary<Collider, BaseController> playerDic = new();
 
+    private HashSet<Transform> usedSpawnPoints = new();
+
     [Header("팀별 스폰 위치")]
     [SerializeField] public Transform[] team1SpawnPoints;   // Team1 스폰 
     [SerializeField] public Transform[] team2SpawnPoints;   // Team2 스폰 
@@ -139,7 +141,7 @@ public class GameManager : MonoBehaviour
         }
 
         // 겹치지 않도록 mod 연산 사용
-        Transform spawnPoint = spawnArray[actorIndex % spawnArray.Length];
+        Transform spawnPoint = GetAvailableSpawnPoint(spawnArray);
 
         // 팀별 프리팹 이름 분기
         string prefabName = team switch
@@ -176,6 +178,7 @@ public class GameManager : MonoBehaviour
                 waitStartCoroutine = null;
             }
             photonView.RPC("OpenGameStartUITogether", RpcTarget.All);
+            photonView.RPC("SwitchBGMTogether",RpcTarget.All);
             return;
         }
 
@@ -186,9 +189,24 @@ public class GameManager : MonoBehaviour
     }
 
     [PunRPC]
-    private void OpenGameStartUITogether()
+    private void OpenGameStartUITogether() //NotifyCharSpawned에서 수행
     {
         gameStartUI.openGameStartUI();
+    }
+
+    [PunRPC]
+    private void SwitchBGMTogether() //NotifyCharSpawned에서 수행
+    {
+        // 스테이지에 따라 음악 다르게 재생
+        string sceneName = SceneManager.GetActiveScene().name;
+        if (sceneName == "Map1")
+        {
+            Manager.Audio.SwitchBGM("Stage1");
+        }
+        else
+        {
+            Manager.Audio.SwitchBGM("Stage2");
+        }
     }
 
     private IEnumerator WaitAndStartGame() //참가자가 2분동안 꽉차지않으면 게임 그냥 실행
@@ -239,7 +257,7 @@ public class GameManager : MonoBehaviour
                 continue;
             }
 
-            Transform spawnPoint = spawnArray[i % spawnArray.Length];
+            Transform spawnPoint = GetAvailableSpawnPoint(spawnArray);
 
             string prefabName = team switch
             {
@@ -280,7 +298,7 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
-        Debug.Log("[WaitForRoomManagerAndSpawnBots] RoomManager 찾음 → SpawnBots 실행");
+        Debug.Log("[WaitForRoomManagerAndSpawnBots] RoomManager 찾음, SpawnBots 실행");
         SpawnBots();
     }
     public void RegisterPlayer(Collider col, BaseController playerController)
@@ -304,9 +322,7 @@ public class GameManager : MonoBehaviour
             photonView.RPC("SetStartTime", RpcTarget.All, start);
             photonView.RPC("RpcGameStart", RpcTarget.All);
         }
-        // 스테이지에 따라 음악 다르게 재생
-        Manager.Audio.SwitchBGM("Stage1");
-        //Manager.Audio.SwitchBGM("Stage2");
+
     }
 
     [PunRPC]
@@ -399,5 +415,20 @@ public class GameManager : MonoBehaviour
         {
             player.gameObject.SetActive(false);
         }
+    }
+    private Transform GetAvailableSpawnPoint(Transform[] spawnPoints)
+    {
+        foreach (var point in spawnPoints)
+        {
+            if (!usedSpawnPoints.Contains(point))
+            {
+                usedSpawnPoints.Add(point);
+                return point;
+            }
+        }
+
+        // 모든 포인트가 이미 사용됐을 경우, 가장 첫 번째 지점으로 fallback
+        Debug.LogWarning("모든 스폰 포인트가 사용됨. 첫 번째 포인트 사용");
+        return spawnPoints[0];
     }
 }

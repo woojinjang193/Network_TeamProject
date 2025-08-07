@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clipName: ToSquid
   clipSource: {fileID: 8300000, guid: b80a5278c89885c40a34a41ec8f40906, type: 3}
-  volume: 0.515
+  volume: 0.4
   loop: 0
   mixerGroup: {fileID: 8063154892423865753, guid: e76f20a7c7b3a534b8bc98098cf2246b, type: 2}
