@@ -367,14 +367,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1918557223}
     m_Modifications:
-    - target: {fileID: 1339540136267657276, guid: 3dd824693d92924498efaeae1d755550, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2648748653056649168, guid: 3dd824693d92924498efaeae1d755550, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3610844697198570193, guid: 3dd824693d92924498efaeae1d755550, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -455,29 +447,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6490831007033001039, guid: 3dd824693d92924498efaeae1d755550, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6668412265868988626, guid: 3dd824693d92924498efaeae1d755550, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7932450332376804376, guid: 3dd824693d92924498efaeae1d755550, type: 3}
       propertyPath: m_Name
       value: SettingPanel
-      objectReference: {fileID: 0}
-    - target: {fileID: 7932450332376804376, guid: 3dd824693d92924498efaeae1d755550, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8257172989676107892, guid: 3dd824693d92924498efaeae1d755550, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8525232104485515083, guid: 3dd824693d92924498efaeae1d755550, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1495,10 +1467,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1918557223}
     m_Modifications:
-    - target: {fileID: 2074473152793871592, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6314621252777683434, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1582,14 +1550,6 @@ PrefabInstance:
     - target: {fileID: 7630863593620388068, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
       propertyPath: m_Name
       value: Login Panel
-      objectReference: {fileID: 0}
-    - target: {fileID: 7630863593620388068, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905689692514178721, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
