@@ -10,6 +10,7 @@ public class KillBoard : MonoBehaviour
     private PhotonView killLogView;
 
     [Header("당사자용")]
+    [SerializeField] private GameObject indiKillLog;
     [SerializeField] private TMP_Text killText;
 
     [Header("모든 플레이어용 이미지")]
@@ -27,10 +28,13 @@ public class KillBoard : MonoBehaviour
     private void Awake()
     {
         killLogView = GetComponent<PhotonView>();
+        indiKillLog.SetActive(false);
     }
 
     public void KillLog(string text)
     {
+        indiKillLog.SetActive(false);
+        indiKillLog.SetActive(true);
         killText.text = text;
     }
 
@@ -61,6 +65,11 @@ public class KillBoard : MonoBehaviour
                 break;
         }
 
+        if (killLogPanel.childCount >= 3)
+        {
+            Destroy(killLogPanel.GetChild(0).gameObject);
+        }
+
         GameObject killLogItem = Instantiate(KillLogItemPrefab, killLogPanel);
 
         KillLogItem item = killLogItem.GetComponent<KillLogItem>();
@@ -68,6 +77,7 @@ public class KillBoard : MonoBehaviour
         item.KillLogItemSet(killerName, victimName, causeSprite);
 
         Destroy(killLogItem, 5f);
+
     }
 
 }

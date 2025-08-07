@@ -644,25 +644,25 @@ public class PlayerController : BaseController
             {
                 case DeathCause.PlayerAttack:
                     killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
-                    killBoard.KillLog($"{killerName}에게 처치당함");
+                    killBoard.KillLog($"{killerName}에게\n<color=red>처치됨</color>");
                     Debug.Log($"{killerName}에게 처치당함");
                     break;
 
                 case DeathCause.BotAttck:
                     killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
-                    killBoard.KillLog($"{killerName}봇 에게 처치당함");
+                    killBoard.KillLog($"{killerName}에게\n<color=red>처치됨</color>");
                     Debug.Log($"{killerName}봇 에게 처치당함");
                     break;
 
                 case DeathCause.Fall:
                     killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
-                    killBoard.KillLog("낙사함");
+                    killBoard.KillLog("<color=red>낙사</color>");
                     Debug.Log($"낙사");
                     break;
 
                 case DeathCause.EnemyInk:
                     killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause);
-                    killBoard.KillLog("적잉크때문에 죽음");
+                    killBoard.KillLog("적팀 바닥은\n<color=red>아파요</color>");
                     Debug.Log("적잉크때문에 죽음");
                     break;
             }
@@ -670,7 +670,7 @@ public class PlayerController : BaseController
 
         if(PhotonNetwork.LocalPlayer.NickName == killerName)//호출한사람과 킬러의 이름이 같으면
         {
-            killBoard.KillLog($"{photonView.Owner.NickName}처치");
+            killBoard.KillLog($"{photonView.Owner.NickName}\n<color=red>처치</color>");
             Debug.Log($"{photonView.Owner.NickName}처치");
         }
        

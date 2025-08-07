@@ -270,7 +270,7 @@ public class AIController : BaseController
                 if(PhotonNetwork.LocalPlayer.NickName == killerName) 
                 {
                     killLogView.RPC("LogForAll", RpcTarget.All, killerName, botName, (int)deathCause);
-                    killBoard.KillLog($"{botName} 처치");
+                    killBoard.KillLog($"{botName}\n<color=red>처치</color>");
                 }
                 break;
 
