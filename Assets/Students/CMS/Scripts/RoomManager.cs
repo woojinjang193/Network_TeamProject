@@ -275,6 +275,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
         isLoading = false;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        PhotonNetwork.CurrentRoom.IsOpen = true;
+        PhotonNetwork.CurrentRoom.IsVisible = true;
     }
     public void ClearRoomData() // 방 정보 삭제
     {
