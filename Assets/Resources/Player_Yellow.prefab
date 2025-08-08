@@ -17150,7 +17150,7 @@ MonoBehaviour:
   maxSlopeAngle: 45
   humanJumpForce: 15
   squidJumpForce: 15
-  squidSpeed: 10
+  squidSpeed: 15
   gravityScale: 4
   fallingGravityScale: 7
   weaponFireEffect: {fileID: 6140524484781776323}

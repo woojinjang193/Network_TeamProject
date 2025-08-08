@@ -101,7 +101,7 @@ public class AudioManager : Singleton<AudioManager>
         settingUI.AudioInit();
     }
 
-    private void VolumeLoad() // 사용자 설정을 불러오기
+    public void VolumeLoad() // 사용자 설정을 불러오기
     {
         float value;
         if (PlayerPrefs.HasKey("MasterVolume"))

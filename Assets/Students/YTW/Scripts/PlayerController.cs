@@ -644,13 +644,13 @@ public class PlayerController : BaseController
             {
                 case DeathCause.PlayerAttack:
                     killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause, (int)MyTeam);
-                    killBoard.KillLog($"{killerName}에게\n<color=red>처치됨</color>");
-                    Debug.Log($"{killerName}에게 처치당함");
+                    killBoard.KillLog($"{killerName} 에게\n<color=red>처치됨</color>");
+                    Debug.Log($"{killerName} 에게 처치당함");
                     break;
 
                 case DeathCause.BotAttck:
                     killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause, (int)MyTeam);
-                    killBoard.KillLog($"{killerName}에게\n<color=red>처치됨</color>");
+                    killBoard.KillLog($"{killerName} 에게\n<color=red>처치됨</color>");
                     Debug.Log($"{killerName}봇 에게 처치당함");
                     break;
 
@@ -699,6 +699,8 @@ public class PlayerController : BaseController
     {
         // 체력 초기화
         CurHp = MaxHp;
+        // 잉크 초기화
+        inkParticleGun.currentInk = inkParticleGun.maxInk;
 
         if (!photonView.IsMine)
         {
