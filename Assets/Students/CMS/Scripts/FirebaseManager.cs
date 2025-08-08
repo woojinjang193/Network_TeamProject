@@ -80,9 +80,9 @@ public class FirebaseManager : Singleton<FirebaseManager>
                 // 기존 데이터가 있으면 값 읽어오기
                 if (snapshot.Exists)
                 {
-                    if (snapshot.Child("username").Exists)
+                    if (snapshot.Child("userName").Exists)
                     {
-                        userName = snapshot.Child("username").Value.ToString();
+                        userName = snapshot.Child("userName").Value.ToString();
                     }
                     if (snapshot.Child("wins").Exists)
                     {
