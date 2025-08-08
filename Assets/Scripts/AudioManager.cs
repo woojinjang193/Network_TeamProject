@@ -96,9 +96,9 @@ public class AudioManager : Singleton<AudioManager>
         SwitchAmbient("defaultAmbient",1f);
         // 기본 배경음악 재생
         SwitchBGM("defaultBGM",1f);
-        // 세팅 UI에 기능 할당
-        settingUI = FindObjectOfType<SettingUI>(true);
-        settingUI.AudioInit();
+        // // 세팅 UI에 기능 할당
+        // settingUI = FindObjectOfType<SettingUI>(true);
+        // settingUI.AudioInit();
     }
 
     public void VolumeLoad() // 사용자 설정을 불러오기
