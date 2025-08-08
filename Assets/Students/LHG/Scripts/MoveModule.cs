@@ -62,6 +62,11 @@ public class MoveModule
                 } while (_patrolPoints.Count > 1 && nextIndex == _currentPatrolIndex); // 같은 곳 두 번 연속 방지
 
                 _currentPatrolIndex = nextIndex;
+
+                //  같은 포인트라도 약간의 랜덤 오프셋 부여 
+                Vector3 targetPos = _patrolPoints[_currentPatrolIndex].position +
+                                    new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
+
                 MoveTo(_patrolPoints[_currentPatrolIndex].position);
             }
 
