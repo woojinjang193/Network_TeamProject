@@ -1,13 +1,14 @@
+using MK.Toon.Examples;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.InputSystem.XR;
-using UnityEngine.UI;
-using UnityEngine.AI;
 using System.Globalization;
+using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.InputSystem.XR;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 
 public class AIController : BaseController
@@ -114,13 +115,12 @@ public class AIController : BaseController
 
     private void Update()
     {
-        if (photonView.IsMine) 
+        if (photonView.IsMine)
         {
             StateMachine.Update();
             GroundAndInkCheck();
-            TestTeamSelection(); // TODO: 테스트코드 삭제할 것.
         }
-        
+
     }
 
     void Start()
@@ -149,11 +149,11 @@ public class AIController : BaseController
                 Debug.LogWarning($"[AIController] PatrolPointGroup 오브젝트를 찾을 수 없음 (이름: {groupName})");
             }
         }
-        
+
     }
     void OnDrawGizmos()
     {
-        Gizmos.color = MyTeam ==Team.Team1 ? Color.magenta : Color.yellow;
+        Gizmos.color = MyTeam == Team.Team1 ? Color.magenta : Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectRadius);
     }
 
@@ -282,10 +282,10 @@ public class AIController : BaseController
         IsDeadState = true;
         Instantiate(dieParticle, transform);
 
-        switch(deathCause)
+        switch (deathCause)
         {
-            case DeathCause.PlayerAttack: 
-                if(PhotonNetwork.LocalPlayer.NickName == killerName) 
+            case DeathCause.PlayerAttack:
+                if (PhotonNetwork.LocalPlayer.NickName == killerName)
                 {
                     killLogView.RPC("LogForAll", RpcTarget.All, killerName, botName, (int)deathCause, (int)MyTeam);
                     killBoard.KillLog($"{botName}\n<color=red>처치</color>");
@@ -306,7 +306,7 @@ public class AIController : BaseController
                 }
                 break;
         }
-            
+
         if (photonView.IsMine)
         {
             if (CurHp <= 0)
@@ -410,7 +410,7 @@ public class AIController : BaseController
         }
     }
 
-    
+
 
 
     private void GroundAndInkCheck()
@@ -504,4 +504,45 @@ public class AIController : BaseController
         int deathCause = (int)DeathCause.Fall;
         photonView.RPC("AiDie", RpcTarget.All, "낙사", botName, deathCause);
     }
+
+
+    //봇끼리 뭉쳐서 못움직이는 현상 방지
+
+    private bool _isYielding = false;
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+        {
+            // 이미 멈춘 상태면 무시
+            if (_isYielding) return;
+
+            AIController otherAI = collision.gameObject.GetComponent<AIController>();
+            if (otherAI != null)
+            {
+                // 간단한 우선순위: instanceID가 작은 쪽이 우선
+                if (this.photonView.GetInstanceID() > otherAI.photonView.GetInstanceID())
+                {
+                    StartCoroutine(YieldRoutine());
+                }
+            }
+        }
+    }
+
+    private IEnumerator YieldRoutine()
+    {
+        _isYielding = true;
+
+        if (agent.isOnNavMesh && agent.enabled)
+            agent.isStopped = true;
+
+        yield return new WaitForSeconds(Random.Range(0.8f, 1.6f)); // 멈추는 시간
+
+        if (agent.isOnNavMesh && agent.enabled)
+            agent.isStopped = false;
+
+        _isYielding = false;
+    }
+
+
 }
