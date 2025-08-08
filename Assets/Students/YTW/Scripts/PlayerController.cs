@@ -224,7 +224,7 @@ public class PlayerController : BaseController
             {
                 if (tpsCamera != null)
                 {
-                    tpsCamera.Recenter(transform.forward);
+                    tpsCamera.Recenter(ModelTransform.forward);
                 }
             }
         }
@@ -304,6 +304,7 @@ public class PlayerController : BaseController
         if (tpsCamera != null)
         {
             tpsCamera.followTransform = this.cameraPivot;
+            tpsCamera.playerInput = this.input;
         }
         else
         {
