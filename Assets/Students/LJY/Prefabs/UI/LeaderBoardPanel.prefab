@@ -165,7 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Content: {fileID: 6125868565467881191}
-  m_Horizontal: 1
+  m_Horizontal: 0
   m_Vertical: 1
   m_MovementType: 1
   m_Elasticity: 0.1
@@ -575,6 +575,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ranker: []
   userData: []
+  updateTime: 10
   scrollViewContent: {fileID: 6125868565467881191}
   numberOne: {fileID: 6648898151315452850, guid: c929630a67af3c5469d8e35d95334dc8, type: 3}
   numberTwo: {fileID: 41148039872816510, guid: 15a471c1cfb6f204394c405be370429e, type: 3}
