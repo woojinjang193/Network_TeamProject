@@ -996,6 +996,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: HUD Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 5573460989039745291, guid: 51d1738ad99fd1c4fa5b8b8d330e9aa8, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5573460989039745291, guid: 51d1738ad99fd1c4fa5b8b8d330e9aa8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7455187017563032721, guid: 51d1738ad99fd1c4fa5b8b8d330e9aa8, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -1556,6 +1564,26 @@ PrefabInstance:
     - target: {fileID: 7630863593620388068, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9081137205543789143, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.99999994
+      objectReference: {fileID: 0}
+    - target: {fileID: 9081137205543789143, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9081137205543789143, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9081137205543789143, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.00034529547
+      objectReference: {fileID: 0}
+    - target: {fileID: 9081137205543789143, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0.04
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
