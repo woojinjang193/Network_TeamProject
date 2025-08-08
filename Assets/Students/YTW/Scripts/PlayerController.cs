@@ -30,6 +30,7 @@ public class PlayerController : BaseController
     [Header("플레이어 설정")]
     [SerializeField] public Transform ModelTransform;
     public LayerMask groundLayer;
+    public LayerMask manholeLayer;
     public float maxSlopeAngle = 45f;
     public float humanJumpForce = 15f;
     public float squidJumpForce = 15f;
@@ -218,7 +219,7 @@ public class PlayerController : BaseController
                 stateMachine.Update();
             }
 
-            HandleTeamSelection();
+            // HandleTeamSelection();
 
             if (input.IsRecenterPressed && recenterCooldownTimer <= 0f)
             {
@@ -304,6 +305,7 @@ public class PlayerController : BaseController
         if (tpsCamera != null)
         {
             tpsCamera.followTransform = this.cameraPivot;
+            tpsCamera.playerInput = this.input;
         }
         else
         {
@@ -439,15 +441,35 @@ public class PlayerController : BaseController
     private void GroundAndInkCheck()
     {
         // 바닥 체크 ray
-        LayerMask combinedLayer = groundLayer | inkableLayer;
+        LayerMask combinedLayer =0;
+        if (stateMachine.CurrentState == highStateDic[HighState.HumanForm])
+        {
+            //Debug.Log("지금 인간 폼임");
+             combinedLayer= groundLayer | inkableLayer | manholeLayer;
+        }
+        else if (stateMachine.CurrentState == highStateDic[HighState.SquidForm])
+        {
+            //Debug.Log("지금 스퀴드 폼임");
+            combinedLayer = groundLayer | inkableLayer;
+        }
         Vector3 groundRayStart = transform.position + Vector3.up * 0.1f;
         float groundRayDistance = 0.6f; // Raycast 길이를 안정적으로 수정
 
-        Debug.DrawRay(groundRayStart, Vector3.down * groundRayDistance, Color.red);
+        // LayerMask combinedLayer = groundLayer | inkableLayer;
+        // Vector3 groundRayStart = transform.position + Vector3.up * 0.1f;
+        // float groundRayDistance = 0.6f; // Raycast 길이를 안정적으로 수정
+        // LayerMask groundRaycastMask = combinedLayer;
+        //
+        // if (gameObject.layer == LayerMask.NameToLayer("Invincible"))
+        // {
+        //     int manholeLayer = LayerMask.NameToLayer("Manhole");
+        //     groundRaycastMask &= ~(1 << manholeLayer);
+        // }
 
         // 바닥 체크
         if (Physics.Raycast(groundRayStart, Vector3.down, out RaycastHit groundHit, groundRayDistance, combinedLayer))
         {
+            //Debug.Log("땅인식 됐음");
             IsGrounded = true;
             GroundNormal = groundHit.normal;
             if (groundHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
@@ -462,20 +484,39 @@ public class PlayerController : BaseController
         }
         else
         {
+            //Debug.Log("땅인식 안됐음");
             IsGrounded = false;
             GroundNormal = Vector3.up;
             CurrentGroundInkStatus = InkStatus.NONE;
         }
 
-        Vector3 wallDirection = ModelTransform.forward;
+        Vector3 moveInputDirection = new Vector3(input.MoveInput.x, 0, input.MoveInput.y).normalized;
+        Quaternion cameraYaw = Quaternion.Euler(0, mainCamera.transform.eulerAngles.y, 0);
+        Vector3 wallDirection = cameraYaw * moveInputDirection;
+
+        if (wallDirection.sqrMagnitude < 0.01f)
+        {
+            wallDirection = ModelTransform.forward;
+        }
         Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
         Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
         float wallRayDistance = 1.2f;
+        // Vector3 wallDirection = ModelTransform.forward;
+        // Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
+        // Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
+        // float wallRayDistance = 1.2f;
+        // LayerMask wallRaycastMask = inkableLayer; // 벽 체크에 사용할 레이어 마스크
+        // if (gameObject.layer == LayerMask.NameToLayer("Invincible"))
+        // {
+        //     int manholeLayer = LayerMask.NameToLayer("Manhole");
+        //     wallRaycastMask &= ~(1 << manholeLayer); // 오징어 상태일 때만 'Manhole' 레이어 제외
+        // }
         Debug.DrawRay(wallRayStart, wallDirection * wallRayDistance, Color.blue);
 
         // 벽 체크 ray
         if (Physics.Raycast(wallRayStart, wallDirection, out RaycastHit wallHit, wallRayDistance, inkableLayer))
         {
+            //Debug.Log("벽체크 됐음");
             // 부딪힌 표면의 경사각을 계산
             float surfaceAngle = Vector3.Angle(Vector3.up, wallHit.normal);
 
@@ -513,6 +554,7 @@ public class PlayerController : BaseController
         }
         else 
         {
+            //Debug.Log("벽체크 안됐음");
             WallNormal = Vector3.zero;
             CurrentWallInkStatus = InkStatus.NONE;
             IsOnWalkableWall = false;
@@ -572,20 +614,19 @@ public class PlayerController : BaseController
     //    transform.eulerAngles = playerRotation;
     //}
 
-    // TODO : test용
-    private void HandleTeamSelection()
-    {
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            MyTeam = Team.Team1;
-            Debug.Log($"팀 변경: {MyTeam}");
-        }
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            MyTeam = Team.Team2;
-            Debug.Log($"팀 변경: {MyTeam}");
-        }
-    }
+    // private void HandleTeamSelection()
+    // {
+    //     if (Input.GetKeyDown(KeyCode.Z))
+    //     {
+    //         MyTeam = Team.Team1;
+    //         Debug.Log($"팀 변경: {MyTeam}");
+    //     }
+    //     if (Input.GetKeyDown(KeyCode.X))
+    //     {
+    //         MyTeam = Team.Team2;
+    //         Debug.Log($"팀 변경: {MyTeam}");
+    //     }
+    // }
 
     [PunRPC]
     public override void TakeDamage(float amount, PhotonMessageInfo info) //InkParticleCollision에 의해서 들어옴 로컬만 수행, 플레이어끼리 데미지

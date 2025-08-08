@@ -32,7 +32,7 @@ public class Player_Squid : PlayerState
 
 
         player.col.direction = 2;
-        player.col.height = 0.5f;
+        player.col.height = 1f;
         player.col.radius = 0.45f;
         player.col.center = colCenter;
         player.IsVaulting = false;
@@ -65,7 +65,7 @@ public class Player_Squid : PlayerState
 
         if (player.WallNormal != Vector3.zero && !player.IsGrounded && player.CurrentWallInkStatus != InkStatus.OUR_TEAM)
         {
-            player.rig.AddForce(player.WallNormal * 5f, ForceMode.Impulse);
+            //player.rig.AddForce(player.WallNormal * 5f, ForceMode.Impulse);
             
             subStateMachine.CurrentState.Exit();
             stateMachine.ChangeState(player.highStateDic[HighState.HumanForm]);

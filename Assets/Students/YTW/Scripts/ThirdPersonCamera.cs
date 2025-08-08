@@ -1,10 +1,11 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ThirdPersonCamera : MonoBehaviour
 {
     public Transform cameraTransform;
     public Transform followTransform;
-
+    public PlayerInput playerInput;
     protected float _offsetX, _offsetY;
 
     [Header("카메라 설정")]
@@ -19,9 +20,13 @@ public class ThirdPersonCamera : MonoBehaviour
 
     [Header("카메라 감도")]
     [SerializeField]
-    protected float xSensitivity = 1.0f;
+    protected float mouseXSensitivity = 0.2f;
     [SerializeField]
-    protected float ySensitivity = 1.0f;
+    protected float mouseYSensitivity = 0.2f;
+    [SerializeField]
+    protected float gamepadXSensitivity = 2.0f; // 게임패드 X 감도
+    [SerializeField]
+    protected float gamepadYSensitivity = 2.0f; // 게임패드 Y 감도
     [SerializeField]
     protected bool invertY = false;
 
@@ -38,7 +43,10 @@ public class ThirdPersonCamera : MonoBehaviour
     {
         if (cameraTransform == null) cameraTransform = transform;
         if (followTransform == null) return;
-
+        if (playerInput == null)
+        {
+            playerInput = followTransform.GetComponent<PlayerInput>();
+        }
         Vector3 targetPosition = followTransform.position + Vector3.up * heightOffset;
         cameraTransform.position = targetPosition + (followTransform.forward * -followDistance);
         cameraTransform.LookAt(targetPosition);
@@ -48,8 +56,27 @@ public class ThirdPersonCamera : MonoBehaviour
     {
         if (followTransform == null) return;
 
-        _offsetX += mouseX * xSensitivity;
-        _offsetY -= (invertY ? -mouseY : mouseY) * ySensitivity;
+        float currentXSensitivity = mouseXSensitivity;
+        float currentYSensitivity = mouseYSensitivity;
+
+        var lastUsedControl = playerInput.CameraAction.activeControl;
+
+        // 해당 컨트롤이 속한 장치가 게임패드인지 확인
+        if (lastUsedControl != null && lastUsedControl.device is Gamepad)
+        {
+            // 게임패드라면 게임패드 감도를 사용
+            currentXSensitivity = gamepadXSensitivity;
+            currentYSensitivity = gamepadYSensitivity;
+        }
+        else
+        {
+            // 그 외의 경우는 마우스 감도를 사용
+            currentXSensitivity = mouseXSensitivity;
+            currentYSensitivity = mouseYSensitivity;
+        }
+
+        _offsetX += mouseX * currentXSensitivity;
+        _offsetY -= (invertY ? -mouseY : mouseY) * currentYSensitivity;
         _offsetY = Mathf.Clamp(_offsetY, yMin, yMax);
 
         Vector3 targetPosition = followTransform.position + Vector3.up * heightOffset;

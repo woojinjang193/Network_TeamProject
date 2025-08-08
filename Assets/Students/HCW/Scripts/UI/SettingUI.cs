@@ -88,7 +88,7 @@ public class SettingUI : BaseUI
     
     private void OnEnable() //로비로 돌아왔을 때, 전역적으로 다시 활성화 되는 것이 룸매니저 뿐임
     {
-        if(Manager.Audio) Manager.Audio.VolumeLoad(); // 오디오 설정값을 불러와서 슬라이더 값 최신화
+        AudioInit();
     }
     
     public void AudioInit()
