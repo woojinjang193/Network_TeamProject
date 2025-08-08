@@ -57,6 +57,11 @@ public class RoomUI : BaseUI
         mapDropdown.options.Add(new TMP_Dropdown.OptionData("Map1"));
         mapDropdown.options.Add(new TMP_Dropdown.OptionData("Map2"));
         mapDropdown.onValueChanged.AddListener(OnMapSelectionChanged);
+        
+        // 방장 권한 설정
+        clearBotsButton.interactable = PhotonNetwork.IsMasterClient;
+        addTeam1BotButton.interactable = PhotonNetwork.IsMasterClient;
+        addTeam2BotButton.interactable = PhotonNetwork.IsMasterClient;
     }
 
 

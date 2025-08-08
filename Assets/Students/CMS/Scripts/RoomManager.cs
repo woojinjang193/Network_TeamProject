@@ -262,6 +262,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
         Manager.UI.Reinitialize();
         Manager.UI.ReplaceUI(typeof(RoomUI));
+        
+        // 오디오 세팅 재설정
+        Manager.Audio.SettingAudioInit();
 
         roomUI = FindObjectOfType<RoomUI>();
         roomUI?.Open();
@@ -277,6 +280,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
         PhotonNetwork.CurrentRoom.IsOpen = true;
         PhotonNetwork.CurrentRoom.IsVisible = true;
+        
     }
     public void ClearRoomData() // 방 정보 삭제
     {

@@ -86,11 +86,6 @@ public class SettingUI : BaseUI
         SetDefaultSettings();
     }
     
-    private void OnEnable() //로비로 돌아왔을 때, 전역적으로 다시 활성화 되는 것이 룸매니저 뿐임
-    {
-        AudioInit();
-    }
-    
     public void AudioInit()
     {
         // 슬라이더에 이벤트 추가
