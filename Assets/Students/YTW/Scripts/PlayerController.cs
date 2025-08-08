@@ -219,7 +219,7 @@ public class PlayerController : BaseController
                 stateMachine.Update();
             }
 
-            HandleTeamSelection();
+            // HandleTeamSelection();
 
             if (input.IsRecenterPressed && recenterCooldownTimer <= 0f)
             {
@@ -614,20 +614,19 @@ public class PlayerController : BaseController
     //    transform.eulerAngles = playerRotation;
     //}
 
-    // TODO : test용
-    private void HandleTeamSelection()
-    {
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            MyTeam = Team.Team1;
-            Debug.Log($"팀 변경: {MyTeam}");
-        }
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            MyTeam = Team.Team2;
-            Debug.Log($"팀 변경: {MyTeam}");
-        }
-    }
+    // private void HandleTeamSelection()
+    // {
+    //     if (Input.GetKeyDown(KeyCode.Z))
+    //     {
+    //         MyTeam = Team.Team1;
+    //         Debug.Log($"팀 변경: {MyTeam}");
+    //     }
+    //     if (Input.GetKeyDown(KeyCode.X))
+    //     {
+    //         MyTeam = Team.Team2;
+    //         Debug.Log($"팀 변경: {MyTeam}");
+    //     }
+    // }
 
     [PunRPC]
     public override void TakeDamage(float amount, PhotonMessageInfo info) //InkParticleCollision에 의해서 들어옴 로컬만 수행, 플레이어끼리 데미지

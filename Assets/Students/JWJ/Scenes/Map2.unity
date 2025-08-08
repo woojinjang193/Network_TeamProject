@@ -69920,9 +69920,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1975977177056294301, guid: 0dbfc79e44a2abd47b8f7e23e8edd794, type: 3}
+      propertyPath: sceneViewId
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3793200947470339713, guid: 0dbfc79e44a2abd47b8f7e23e8edd794, type: 3}
+      propertyPath: sceneViewId
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4127924335144742466, guid: 0dbfc79e44a2abd47b8f7e23e8edd794, type: 3}
       propertyPath: m_Name
       value: Map2_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5221574022344580180, guid: 0dbfc79e44a2abd47b8f7e23e8edd794, type: 3}
+      propertyPath: sceneViewId
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 8687384135696097925, guid: 0dbfc79e44a2abd47b8f7e23e8edd794, type: 3}
       propertyPath: m_LocalPosition.x
