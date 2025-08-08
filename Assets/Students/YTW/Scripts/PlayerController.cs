@@ -490,10 +490,21 @@ public class PlayerController : BaseController
             CurrentGroundInkStatus = InkStatus.NONE;
         }
 
-        Vector3 wallDirection = ModelTransform.forward;
+        Vector3 moveInputDirection = new Vector3(input.MoveInput.x, 0, input.MoveInput.y).normalized;
+        Quaternion cameraYaw = Quaternion.Euler(0, mainCamera.transform.eulerAngles.y, 0);
+        Vector3 wallDirection = cameraYaw * moveInputDirection;
+
+        if (wallDirection.sqrMagnitude < 0.01f)
+        {
+            wallDirection = ModelTransform.forward;
+        }
         Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
         Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
         float wallRayDistance = 1.2f;
+        // Vector3 wallDirection = ModelTransform.forward;
+        // Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
+        // Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
+        // float wallRayDistance = 1.2f;
         // LayerMask wallRaycastMask = inkableLayer; // 벽 체크에 사용할 레이어 마스크
         // if (gameObject.layer == LayerMask.NameToLayer("Invincible"))
         // {
