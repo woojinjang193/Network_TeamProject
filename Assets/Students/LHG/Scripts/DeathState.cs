@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class DeathState : AIBaseState
 {
-    private float _deathTime = 3f;
+    private float _deathTime = 10f;
     private float _timer;
 
     public DeathState(AIController controller) : base(controller) { }

@@ -150,9 +150,9 @@ public class PlayerController : BaseController
         {
             canControl = false;
 
-            rig.isKinematic = false;
             rig.velocity = Vector3.zero;
             rig.angularVelocity = Vector3.zero;
+            rig.isKinematic = false;
 
             inkParticleGun.FireParticle(MyTeam, false);
             humanAnimator.SetBool(IsMove, false);
