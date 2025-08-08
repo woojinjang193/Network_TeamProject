@@ -124,6 +124,11 @@ public class SignUpUI : BaseUI
             SetMessage("닉네임은 12글자 이하로 해주세요");
             canName = false;
         }
+        else if (str.Contains(" "))
+        {
+            SetMessage("닉네임은 공백을 포함할 수 없습니다");
+            canName = false;
+        }
         else
         {
             SetMessage("");
