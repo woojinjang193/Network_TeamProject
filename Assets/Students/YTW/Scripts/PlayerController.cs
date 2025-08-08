@@ -304,6 +304,7 @@ public class PlayerController : BaseController
         if (tpsCamera != null)
         {
             tpsCamera.followTransform = this.cameraPivot;
+            tpsCamera.playerInput = this.input;
         }
         else
         {
