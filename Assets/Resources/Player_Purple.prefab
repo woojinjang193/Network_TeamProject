@@ -6554,6 +6554,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  manholeLayer:
+    serializedVersion: 2
+    m_Bits: 1024
   maxSlopeAngle: 45
   humanJumpForce: 15
   squidJumpForce: 15
@@ -17836,12 +17839,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 5468956639388823655}
   followTransform: {fileID: 7939963060270691941}
+  playerInput: {fileID: 0}
   followDistance: 5
   heightOffset: 1.2
   yMax: 70
   yMin: -25
-  xSensitivity: 0.2
-  ySensitivity: 0.2
+  mouseXSensitivity: 0.2
+  mouseYSensitivity: 0.2
+  gamepadXSensitivity: 2
+  gamepadYSensitivity: 2
   invertY: 0
   collisionLayer:
     serializedVersion: 2

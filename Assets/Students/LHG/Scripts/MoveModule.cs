@@ -79,7 +79,7 @@ public class MoveModule
             currentSpeed *= _controller.enemyInkSpeedModifier;
         }
 
-        if (!_controller.agent.hasPath || _controller.agent.destination != targetPos)
+        if (!_controller.agent.isActiveAndEnabled||!_controller.agent.hasPath || _controller.agent.destination != targetPos)
         {
             _controller.agent.speed = currentSpeed;
             _controller.agent.SetDestination(targetPos);

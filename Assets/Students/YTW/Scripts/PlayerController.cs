@@ -30,6 +30,7 @@ public class PlayerController : BaseController
     [Header("플레이어 설정")]
     [SerializeField] public Transform ModelTransform;
     public LayerMask groundLayer;
+    public LayerMask manholeLayer;
     public float maxSlopeAngle = 45f;
     public float humanJumpForce = 15f;
     public float squidJumpForce = 15f;
@@ -440,15 +441,35 @@ public class PlayerController : BaseController
     private void GroundAndInkCheck()
     {
         // 바닥 체크 ray
-        LayerMask combinedLayer = groundLayer | inkableLayer;
+        LayerMask combinedLayer =0;
+        if (stateMachine.CurrentState == highStateDic[HighState.HumanForm])
+        {
+            //Debug.Log("지금 인간 폼임");
+             combinedLayer= groundLayer | inkableLayer | manholeLayer;
+        }
+        else if (stateMachine.CurrentState == highStateDic[HighState.SquidForm])
+        {
+            //Debug.Log("지금 스퀴드 폼임");
+            combinedLayer = groundLayer | inkableLayer;
+        }
         Vector3 groundRayStart = transform.position + Vector3.up * 0.1f;
         float groundRayDistance = 0.6f; // Raycast 길이를 안정적으로 수정
 
-        Debug.DrawRay(groundRayStart, Vector3.down * groundRayDistance, Color.red);
+        // LayerMask combinedLayer = groundLayer | inkableLayer;
+        // Vector3 groundRayStart = transform.position + Vector3.up * 0.1f;
+        // float groundRayDistance = 0.6f; // Raycast 길이를 안정적으로 수정
+        // LayerMask groundRaycastMask = combinedLayer;
+        //
+        // if (gameObject.layer == LayerMask.NameToLayer("Invincible"))
+        // {
+        //     int manholeLayer = LayerMask.NameToLayer("Manhole");
+        //     groundRaycastMask &= ~(1 << manholeLayer);
+        // }
 
         // 바닥 체크
         if (Physics.Raycast(groundRayStart, Vector3.down, out RaycastHit groundHit, groundRayDistance, combinedLayer))
         {
+            //Debug.Log("땅인식 됐음");
             IsGrounded = true;
             GroundNormal = groundHit.normal;
             if (groundHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
@@ -463,6 +484,7 @@ public class PlayerController : BaseController
         }
         else
         {
+            //Debug.Log("땅인식 안됐음");
             IsGrounded = false;
             GroundNormal = Vector3.up;
             CurrentGroundInkStatus = InkStatus.NONE;
@@ -472,11 +494,18 @@ public class PlayerController : BaseController
         Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
         Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
         float wallRayDistance = 1.2f;
+        // LayerMask wallRaycastMask = inkableLayer; // 벽 체크에 사용할 레이어 마스크
+        // if (gameObject.layer == LayerMask.NameToLayer("Invincible"))
+        // {
+        //     int manholeLayer = LayerMask.NameToLayer("Manhole");
+        //     wallRaycastMask &= ~(1 << manholeLayer); // 오징어 상태일 때만 'Manhole' 레이어 제외
+        // }
         Debug.DrawRay(wallRayStart, wallDirection * wallRayDistance, Color.blue);
 
         // 벽 체크 ray
         if (Physics.Raycast(wallRayStart, wallDirection, out RaycastHit wallHit, wallRayDistance, inkableLayer))
         {
+            //Debug.Log("벽체크 됐음");
             // 부딪힌 표면의 경사각을 계산
             float surfaceAngle = Vector3.Angle(Vector3.up, wallHit.normal);
 
@@ -514,6 +543,7 @@ public class PlayerController : BaseController
         }
         else 
         {
+            //Debug.Log("벽체크 안됐음");
             WallNormal = Vector3.zero;
             CurrentWallInkStatus = InkStatus.NONE;
             IsOnWalkableWall = false;
