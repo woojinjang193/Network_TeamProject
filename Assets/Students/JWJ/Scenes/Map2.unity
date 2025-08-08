@@ -13778,7 +13778,7 @@ MonoBehaviour:
   gameStartUI: {fileID: 42313819}
   gameResultUI: {fileID: 333567117}
   inkGauge: {fileID: 1478340027}
-  matchDuration: 180
+  matchDuration: 10
   timerText: {fileID: 345321101}
   timerPanel: {fileID: 2126148755}
 --- !u!4 &611587127
