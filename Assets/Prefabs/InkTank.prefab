@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 6036162968116956848}
   - component: {fileID: 4315454063018225093}
   - component: {fileID: 6023377602211532232}
-  - component: {fileID: 3462409266744178851}
   m_Layer: 0
   m_Name: InkTank
   m_TagString: Untagged
@@ -28,14 +27,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3286366742647364446}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.008536084, y: 0.0017727269, z: -0.20372821, w: 0.97898865}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 0.4}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7210180356351890263}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0.999, y: 0, z: -23.511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6036162968116956848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49,11 +48,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inkRenderer: {fileID: 5438607243771093610}
-  MaxWobble: 0.03
-  WobbleSpeed: 5
+  inkColor: {r: 1, g: 1, b: 1, a: 1}
+  topInkColor: {r: 1, g: 1, b: 1, a: 1}
+  MaxWobble: 0.02
+  WobbleSpeed: 3
   RecoveryRate: 1
-  FillAmount_Full: 0
-  FillAmount_Empty: 1
 --- !u!33 &4315454063018225093
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -104,29 +103,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &3462409266744178851
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3286366742647364446}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4756061484528950205
 GameObject:
   m_ObjectHideFlags: 0
@@ -138,7 +114,6 @@ GameObject:
   - component: {fileID: 7210180356351890263}
   - component: {fileID: 9221926835435700201}
   - component: {fileID: 5438607243771093610}
-  - component: {fileID: 894155106982280454}
   m_Layer: 0
   m_Name: Ink
   m_TagString: Untagged
@@ -211,26 +186,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &894155106982280454
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4756061484528950205}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
