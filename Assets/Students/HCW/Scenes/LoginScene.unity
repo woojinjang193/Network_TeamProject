@@ -722,13 +722,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Room Panel
       objectReference: {fileID: 0}
+    - target: {fileID: 4478138902151971469, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5100838763746672253, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
       propertyPath: roomManager
       value: 
       objectReference: {fileID: 1714392088}
     - target: {fileID: 5811882012677587496, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 8929793568498653224, guid: aad0e260bec49fe47b78561ff87cf771, type: 3}
       propertyPath: m_Pivot.x
@@ -836,6 +840,18 @@ PrefabInstance:
     - target: {fileID: 6109025761353011646, guid: fb2d1fb2b351b40448a1b5244242e754, type: 3}
       propertyPath: m_Name
       value: Lobby Panel
+      objectReference: {fileID: 0}
+    - target: {fileID: 6109025761353011646, guid: fb2d1fb2b351b40448a1b5244242e754, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6391585982549188809, guid: fb2d1fb2b351b40448a1b5244242e754, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6391585982549188809, guid: fb2d1fb2b351b40448a1b5244242e754, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7860286898481996323, guid: fb2d1fb2b351b40448a1b5244242e754, type: 3}
       propertyPath: m_Pivot.x
@@ -1200,7 +1216,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1116235036244486429, guid: 4971232996f61084d8b67be78794e11c, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 3.2074237
+      value: 0.033969667
       objectReference: {fileID: 0}
     - target: {fileID: 1989109249476940675, guid: 4971232996f61084d8b67be78794e11c, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1208,7 +1224,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1989109249476940675, guid: 4971232996f61084d8b67be78794e11c, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.69008267
+      value: 0.999956
       objectReference: {fileID: 0}
     - target: {fileID: 3178824043108551030, guid: 4971232996f61084d8b67be78794e11c, type: 3}
       propertyPath: m_Name
@@ -1503,6 +1519,10 @@ PrefabInstance:
     - target: {fileID: 7630863593620388068, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
       propertyPath: m_Name
       value: Login Panel
+      objectReference: {fileID: 0}
+    - target: {fileID: 7630863593620388068, guid: ef9f3b307f9b6f34dabed66635b367be, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
