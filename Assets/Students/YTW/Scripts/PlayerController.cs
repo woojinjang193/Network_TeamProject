@@ -224,7 +224,7 @@ public class PlayerController : BaseController
             {
                 if (tpsCamera != null)
                 {
-                    tpsCamera.Recenter(transform.forward);
+                    tpsCamera.Recenter(ModelTransform.forward);
                 }
             }
         }
