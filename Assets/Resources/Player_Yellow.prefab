@@ -118,7 +118,7 @@ MonoBehaviour:
   invertY: 0
   collisionLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 65
   clipOffset: 0.2
 --- !u!1 &61547733238701209
 GameObject:

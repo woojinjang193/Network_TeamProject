@@ -309,7 +309,8 @@ public class AIController : BaseController
             {
                 //TODO hit애니메이션 + 딜레이
                 StateMachine.SetState(new DeathState(this));
-
+                agent.enabled = false;////
+                FireModule.StopFire();/////
                 Debug.Log("AI 사망");
             }
         }
@@ -322,6 +323,7 @@ public class AIController : BaseController
 
     public void Respawn() // DeathState 상태에서 호출됨. 본인만 수행
     {
+        agent.enabled = true;////
         humanModel.SetActive(true);
         col.enabled = true;
 
@@ -485,9 +487,11 @@ public class AIController : BaseController
     {
         MoveModule.StopPatrol();
         FireModule.StopFire();
-        rig.isKinematic = true;
+        agent.enabled = false;
+
         rig.velocity = Vector3.zero;
         rig.angularVelocity = Vector3.zero;
+        rig.isKinematic = true;
     }
 
     public void BotFallingDeath()

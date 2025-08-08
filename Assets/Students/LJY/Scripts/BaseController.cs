@@ -35,7 +35,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     
     [Header("값 설정")]
     [SerializeField] public float moveSpeed = 5;
-    public const float RESPAWN_TIME = 3.0f; // 리스폰까지 걸리는 시간
+    public const float RESPAWN_TIME = 10.0f; // 리스폰까지 걸리는 시간
     
     [Header("팀 설정")]
     protected TeamColorInfo teamColorInfo;
