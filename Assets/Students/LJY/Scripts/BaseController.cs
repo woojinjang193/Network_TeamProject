@@ -144,7 +144,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
         Manager.Audio.SetFireSound(this);
         if (!photonView.IsMine)
         {
-            fireSound.volume = 0.5f;
+            fireSound.volume = 0.75f;
         }
     }
 
