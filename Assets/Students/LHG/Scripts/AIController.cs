@@ -127,25 +127,29 @@ public class AIController : BaseController
     {
         ReadyToPlay();
 
-        // 무브모듈수정관련
-        string sceneName = SceneManager.GetActiveScene().name;
-        string groupName = $"PatrolPointGroup_{sceneName}";
-        GameObject patrolGroup = GameObject.Find(groupName);
+        if (photonView.IsMine)
+        {
+            // 무브모듈수정관련
+            string sceneName = SceneManager.GetActiveScene().name;
+            string groupName = $"PatrolPointGroup_{sceneName}";
+            GameObject patrolGroup = GameObject.Find(groupName);
 
-        if (patrolGroup != null)
-        {
-            patrolPoints.Clear(); // 필드 리스트 초기화
-            foreach (Transform child in patrolGroup.transform)
+            if (patrolGroup != null)
             {
-                patrolPoints.Add(child);
+                patrolPoints.Clear(); // 필드 리스트 초기화
+                foreach (Transform child in patrolGroup.transform)
+                {
+                    patrolPoints.Add(child);
+                }
+                MoveModule.SetPatrolPoints(patrolPoints);
+                Debug.Log($"[AIController] 패트롤포인트 {patrolPoints.Count}개 설정됨 (씬: {sceneName})");
             }
-            MoveModule.SetPatrolPoints(patrolPoints);
-            Debug.Log($"[AIController] 패트롤포인트 {patrolPoints.Count}개 설정됨 (씬: {sceneName})");
+            else
+            {
+                Debug.LogWarning($"[AIController] PatrolPointGroup 오브젝트를 찾을 수 없음 (이름: {groupName})");
+            }
         }
-        else
-        {
-            Debug.LogWarning($"[AIController] PatrolPointGroup 오브젝트를 찾을 수 없음 (이름: {groupName})");
-        }
+        
     }
     void OnDrawGizmos()
     {
