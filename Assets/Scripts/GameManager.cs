@@ -347,20 +347,24 @@ public class GameManager : MonoBehaviour
         Debug.Log($"내 팀: {myTeam}, 승리 팀: {winningTeam}");
 
         //팀이 이긴 경우
-        bool isWin;
+        bool isWin = false;
         switch (winningTeam)
         {
             case "Purple":
-            case "Yellow":
                 if (myTeam == "Team1")
                 {
                     isWin = true;
                     Debug.Log($"우리팀이 승리함 {myTeam} {winningTeam}");
                 }
-                else isWin = false;
+                break;
+            case "Yellow":
+                if (myTeam == "Team2")
+                {
+                    isWin = true;
+                    Debug.Log($"우리팀이 승리함 {myTeam} {winningTeam}");
+                }
                 break;
             default:
-                isWin = false;
                 Debug.Log($"승리팀 입력에 제대로 되지 않음 승리 팀 : {winningTeam} 내 팀: {myTeam} ");
                 break;
         }
