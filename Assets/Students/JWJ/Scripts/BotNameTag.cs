@@ -15,27 +15,28 @@ public class BotNameTag : MonoBehaviour
     {
         aIController = GetComponentInParent<AIController>();
         botNameText = GetComponentInChildren<TMP_Text>();
-        photonView = GetComponent<PhotonView>();
+        photonView = GetComponentInParent<PhotonView>();
         cam = Camera.main.transform;
 
     }
 
     void Start()
     {
-        if (photonView.IsMine)
+        if (PhotonNetwork.IsMasterClient)
         {
             int i = Random.Range(0, BotNameList.botNames.Count);
             string botName = BotNameList.botNames[i];
             aIController.botName = botName;
             BotNameList.botNames.RemoveAt(i);
 
-            photonView.RPC("SetBotName", RpcTarget.All, botName);
+            photonView.RPC("SetBotName", RpcTarget.AllBufferedViaServer, botName);
         }
     }
 
     [PunRPC]
     void SetBotName(string botName)
     {
+        aIController.botName = botName;
         botNameText.text = botName;
     }
 

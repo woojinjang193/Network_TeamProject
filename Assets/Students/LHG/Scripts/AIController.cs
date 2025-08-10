@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
-public class AIController : BaseController
+public class AIController : BaseController, IInRoomCallbacks
 {
     public MoveModule MoveModule { get; private set; }
     public FireModule FireModule { get; private set; }
@@ -123,6 +123,7 @@ public class AIController : BaseController
     {
         if (photonView.IsMine)
         {
+            if (StateMachine == null) return;
             StateMachine.Update();
             GroundAndInkCheck();
         }
@@ -132,29 +133,7 @@ public class AIController : BaseController
     void Start()
     {
         ReadyToPlay();
-
-        if (photonView.IsMine)
-        {
-            // 무브모듈수정관련
-            string sceneName = SceneManager.GetActiveScene().name;
-            string groupName = $"PatrolPointGroup_{sceneName}";
-            GameObject patrolGroup = GameObject.Find(groupName);
-
-            if (patrolGroup != null)
-            {
-                patrolPoints.Clear(); // 필드 리스트 초기화
-                foreach (Transform child in patrolGroup.transform)
-                {
-                    patrolPoints.Add(child);
-                }
-                MoveModule.SetPatrolPoints(patrolPoints);
-                Debug.Log($"[AIController] 패트롤포인트 {patrolPoints.Count}개 설정됨 (씬: {sceneName})");
-            }
-            else
-            {
-                Debug.LogWarning($"[AIController] PatrolPointGroup 오브젝트를 찾을 수 없음 (이름: {groupName})");
-            }
-        }
+        SetPatrolPoint();
 
     }
     void OnDrawGizmos()
@@ -176,7 +155,7 @@ public class AIController : BaseController
         StateMachine.SetState(new IdleState(this));
 
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
-
+        agent.enabled = true;
         CurHp = MaxHp;
         IsDead = false;
 
@@ -561,5 +540,62 @@ public class AIController : BaseController
         _isYielding = false;
     }
 
+    private void SetPatrolPoint()
+    {
+        if (photonView.IsMine)
+        {
+            // 무브모듈수정관련
+            string sceneName = SceneManager.GetActiveScene().name;
+            string groupName = $"PatrolPointGroup_{sceneName}";
+            GameObject patrolGroup = GameObject.Find(groupName);
 
+            if (patrolGroup != null)
+            {
+                patrolPoints.Clear(); // 필드 리스트 초기화
+                foreach (Transform child in patrolGroup.transform)
+                {
+                    patrolPoints.Add(child);
+                }
+                MoveModule.SetPatrolPoints(patrolPoints);
+                Debug.Log($"[AIController] 패트롤포인트 {patrolPoints.Count}개 설정됨 (씬: {sceneName})");
+            }
+            else
+            {
+                Debug.LogWarning($"[AIController] PatrolPointGroup 오브젝트를 찾을 수 없음 (이름: {groupName})");
+            }
+        }
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        if (photonView.IsMine)
+        {
+            rig.isKinematic = false;
+
+            if (!agent.enabled)
+            {
+                agent.enabled = true;
+            }
+
+            if (StateMachine == null)
+            {
+                MineInit();
+            }
+
+            GameManager.OnGameStarted -= EnableControl; 
+            GameManager.OnGameEnded -= DisableControl;  
+            GameManager.OnGameStarted += EnableControl; 
+            GameManager.OnGameEnded += DisableControl;
+
+            if (Manager.Game.isGameOnGoing)
+            {
+                EnableControl();
+            }
+            SetPatrolPoint();
+        }
+        else
+        {
+            //StopAllActions();
+        }
+    }
 }
