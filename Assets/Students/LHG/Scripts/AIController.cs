@@ -48,8 +48,14 @@ public class AIController : BaseController
 
     protected override void Awake()
     {
+        agent = GetComponent<NavMeshAgent>();
         killBoard = FindObjectOfType<KillBoard>();
         killLogView = killBoard.gameObject.GetComponent<PhotonView>();
+
+        if(!PhotonNetwork.IsMasterClient)
+        {
+            agent.enabled = false;
+        }
 
         base.Awake();
 
@@ -174,7 +180,7 @@ public class AIController : BaseController
         CurHp = MaxHp;
         IsDead = false;
 
-        agent = GetComponent<NavMeshAgent>();
+        
         //agent.updatePosition = false;
         //agent.updateRotation = false;
     }
@@ -327,10 +333,8 @@ public class AIController : BaseController
 
     public void Respawn() // DeathState 상태에서 호출됨. 본인만 수행
     {
-        agent.enabled = true;////
-        humanModel.SetActive(true);
-        col.enabled = true;
-
+        agent.enabled = true;
+        
         //AI 리셋
         CurHp = MaxHp;
         IsDead = false;
@@ -338,12 +342,25 @@ public class AIController : BaseController
 
         //리스폰 위치버그조치
         Transform[] spawnArray = MyTeam == Team.Team1 ? Manager.Game.team1SpawnPoints : Manager.Game.team2SpawnPoints;
-        transform.position = spawnArray[0].position; //TODO 스폰어레이 0번에 넣는거..조금불안하긴함
-        transform.rotation = spawnArray[0].rotation;
+        Vector3 spawnPos = spawnArray[0].position;  //TODO 스폰어레이 0번에 넣는거..조금불안하긴함
+        Quaternion spawnRot = spawnArray[0].rotation;
+
+        agent.Warp(spawnPos);
+        transform.rotation = spawnRot;
+
+        networkPos = spawnPos;
+        networkRot = spawnRot;
+
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            agent.enabled = true;
+        }
 
         rig.velocity = Vector3.zero;
         rig.angularVelocity = Vector3.zero;
 
+        humanModel.SetActive(true);
+        col.enabled = true;
         Manager.Audio.PlayClip("Respawn", transform.position);
 
         Debug.Log("봇 리스폰 완료");

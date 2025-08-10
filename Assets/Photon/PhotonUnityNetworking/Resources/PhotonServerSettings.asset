@@ -67,6 +67,9 @@ MonoBehaviour:
   - TakeDamageByBot
   - TakeDamageFromBot
   - LogForAll
+  - RpcSnap
+  - SyncPos
+  - RpcTeleport
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
