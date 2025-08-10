@@ -213,6 +213,7 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     {
         Debug.Log("OnLeftRoom 호출됨");
 
+        Manager.Net.roomManager?.ClearRoomData();
         if (Manager.UI.CurrentUI != null)
         {
             Debug.Log($"현재 UI 타입: {Manager.UI.CurrentUI.GetType().Name}");
