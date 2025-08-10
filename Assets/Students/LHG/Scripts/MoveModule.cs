@@ -8,9 +8,9 @@ public class MoveModule
 {
     private AIController _controller;
     private Coroutine _patrolRoutine;
-    private int _currentPatrolIndex = 0;
+    public int _currentPatrolIndex = 0;
 
-    private List<Transform> _patrolPoints;
+    public List<Transform> _patrolPoints;
 
     public MoveModule(AIController controller)
     {

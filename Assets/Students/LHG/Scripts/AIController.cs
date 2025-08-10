@@ -339,16 +339,17 @@ public class AIController : BaseController, IInRoomCallbacks
     public void Respawn() // DeathState 상태에서 호출됨. 본인만 수행
     {
         agent.enabled = true;
-        
-        //AI 리셋
+
+        // AI 리셋
         CurHp = MaxHp;
         IsDead = false;
         StateMachine.SetState(new IdleState(this));
 
-        //리스폰 위치버그조치
+        // 랜덤 스폰 위치 선택
         Transform[] spawnArray = MyTeam == Team.Team1 ? Manager.Game.team1SpawnPoints : Manager.Game.team2SpawnPoints;
-        Vector3 spawnPos = spawnArray[0].position;  //TODO 스폰어레이 0번에 넣는거..조금불안하긴함
-        Quaternion spawnRot = spawnArray[0].rotation;
+        int randomIndex = Random.Range(0, spawnArray.Length); // 0 ~ Length-1
+        Vector3 spawnPos = spawnArray[randomIndex].position;
+        Quaternion spawnRot = spawnArray[randomIndex].rotation;
 
         agent.Warp(spawnPos);
         transform.rotation = spawnRot;
@@ -368,8 +369,9 @@ public class AIController : BaseController, IInRoomCallbacks
         col.enabled = true;
         Manager.Audio.PlayClip("Respawn", transform.position);
 
-        Debug.Log("봇 리스폰 완료");
+        Debug.Log($"봇 리스폰 완료 - {randomIndex}번 위치");
     }
+
 
     // TODO: 테스트 종료 후 삭제
     private void TestTeamSelection()
@@ -528,29 +530,69 @@ public class AIController : BaseController, IInRoomCallbacks
     }
 
 
-    //봇끼리 뭉쳐서 못움직이는 현상 방지
-
-    private bool _isYielding = false;
+    //아군 봇끼리 뭉쳐서 못움직이는 현상 방지
+    // 1.5초 이상 충돌이 지속되면 패트롤 경로를 재지정
+    private float collisionTimer = 0f;
+    public float collisionThreshold = 1.5f; // 1.5초 이상 비비면 경로 변경
+    private bool isCollidingWithSameTeam = false;
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            // 이미 멈춘 상태면 무시
-            if (_isYielding) return;
-
             AIController otherAI = collision.gameObject.GetComponent<AIController>();
-            if (otherAI != null)
+            if (otherAI != null && otherAI.MyTeam == MyTeam)
             {
-                // 간단한 우선순위: instanceID가 작은 쪽이 우선
-                if (this.photonView.GetInstanceID() > otherAI.photonView.GetInstanceID())
-                {
-                    StartCoroutine(YieldRoutine());
-                }
+                isCollidingWithSameTeam = true;
+                collisionTimer = 0f; // 타이머 리셋
             }
         }
     }
 
+    private void OnCollisionStay(Collision collision)
+    {
+        if (isCollidingWithSameTeam)
+        {
+            collisionTimer += Time.deltaTime;
+
+            if (collisionTimer >= collisionThreshold)
+            {
+                // 경로 재지정
+                if (MoveModule != null && MoveModule._patrolPoints != null && MoveModule._patrolPoints.Count > 0)
+                {
+                    int newIndex;
+                    do
+                    {
+                        newIndex = Random.Range(0, MoveModule._patrolPoints.Count);
+                    }
+                    while (MoveModule._patrolPoints.Count > 1 && newIndex == MoveModule._currentPatrolIndex);
+
+                    MoveModule._currentPatrolIndex = newIndex;
+                    MoveModule.MoveTo(MoveModule._patrolPoints[newIndex].position);
+                }
+
+                // 재지정 후 즉시 타이머 리셋 & 중복 실행 방지
+                collisionTimer = 0f;
+                isCollidingWithSameTeam = false;
+            }
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+        {
+            AIController otherAI = collision.gameObject.GetComponent<AIController>();
+            if (otherAI != null && otherAI.MyTeam == MyTeam)
+            {
+                isCollidingWithSameTeam = false;
+                collisionTimer = 0f;
+            }
+        }
+    }
+
+
+    private bool _isYielding = false;
     private IEnumerator YieldRoutine()
     {
         _isYielding = true;
