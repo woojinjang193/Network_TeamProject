@@ -335,16 +335,17 @@ public class AIController : BaseController
     public void Respawn() // DeathState 상태에서 호출됨. 본인만 수행
     {
         agent.enabled = true;
-        
-        //AI 리셋
+
+        // AI 리셋
         CurHp = MaxHp;
         IsDead = false;
         StateMachine.SetState(new IdleState(this));
 
-        //리스폰 위치버그조치
+        // 랜덤 스폰 위치 선택
         Transform[] spawnArray = MyTeam == Team.Team1 ? Manager.Game.team1SpawnPoints : Manager.Game.team2SpawnPoints;
-        Vector3 spawnPos = spawnArray[0].position;  //TODO 스폰어레이 0번에 넣는거..조금불안하긴함
-        Quaternion spawnRot = spawnArray[0].rotation;
+        int randomIndex = Random.Range(0, spawnArray.Length); // 0 ~ Length-1
+        Vector3 spawnPos = spawnArray[randomIndex].position;
+        Quaternion spawnRot = spawnArray[randomIndex].rotation;
 
         agent.Warp(spawnPos);
         transform.rotation = spawnRot;
@@ -364,8 +365,9 @@ public class AIController : BaseController
         col.enabled = true;
         Manager.Audio.PlayClip("Respawn", transform.position);
 
-        Debug.Log("봇 리스폰 완료");
+        Debug.Log($"봇 리스폰 완료 - {randomIndex}번 위치");
     }
+
 
     // TODO: 테스트 종료 후 삭제
     private void TestTeamSelection()
