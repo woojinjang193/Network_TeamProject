@@ -62,6 +62,15 @@ public class AIController : BaseController
             rig.isKinematic = true;
         }
     }
+    void Start()
+    {
+        ReadyToPlay();
+    }
+    void OnDrawGizmos()
+    {
+        Gizmos.color = MyTeam == Team.Team1 ? Color.magenta : Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectRadius);
+    }
 
     private void FixedUpdate()
     {
@@ -74,16 +83,17 @@ public class AIController : BaseController
             OtherClientProcess();
         }
     }
-
-    public override void OnEnable()/////////////////
+    
+    private void Update()
     {
-        base.OnEnable();
         if (photonView.IsMine)
         {
-            GameManager.OnGameStarted += EnableControl;
-            GameManager.OnGameEnded += DisableControl;
+            StateMachine.Update();
+            GroundAndInkCheck();
         }
+
     }
+    
     public override void OnDisable()///////////////
     {
         base.OnDisable();
@@ -94,6 +104,16 @@ public class AIController : BaseController
         }
     }
 
+    public override void OnMasterClientSwitched(Player newMaster)
+    {
+        MineInit();
+        agent.enabled = true;
+        MoveModule.SetPatrolPoints(patrolPoints);
+        EnableControl();
+        Debug.Log("MineInit 재수행");
+    }
+    
+    
     private void EnableControl()///////////////
     {
         canControl = true;
@@ -113,52 +133,12 @@ public class AIController : BaseController
         }
     }
 
-    private void Update()
-    {
-        if (photonView.IsMine)
-        {
-            StateMachine.Update();
-            GroundAndInkCheck();
-        }
 
-    }
-
-    void Start()
-    {
-        ReadyToPlay();
-
-        if (photonView.IsMine)
-        {
-            // 무브모듈수정관련
-            string sceneName = SceneManager.GetActiveScene().name;
-            string groupName = $"PatrolPointGroup_{sceneName}";
-            GameObject patrolGroup = GameObject.Find(groupName);
-
-            if (patrolGroup != null)
-            {
-                patrolPoints.Clear(); // 필드 리스트 초기화
-                foreach (Transform child in patrolGroup.transform)
-                {
-                    patrolPoints.Add(child);
-                }
-                MoveModule.SetPatrolPoints(patrolPoints);
-                Debug.Log($"[AIController] 패트롤포인트 {patrolPoints.Count}개 설정됨 (씬: {sceneName})");
-            }
-            else
-            {
-                Debug.LogWarning($"[AIController] PatrolPointGroup 오브젝트를 찾을 수 없음 (이름: {groupName})");
-            }
-        }
-
-    }
-    void OnDrawGizmos()
-    {
-        Gizmos.color = MyTeam == Team.Team1 ? Color.magenta : Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectRadius);
-    }
 
     private void MineInit() //포톤뷰가 본인일 때만 수행
     {
+        rig.isKinematic = false;
+        
         //statedic대신 모듈화한 개별 스크립트로 관리
         MoveModule = new MoveModule(this);
         FireModule = new FireModule(this, weaponView);
@@ -175,8 +155,35 @@ public class AIController : BaseController
         IsDead = false;
 
         agent = GetComponent<NavMeshAgent>();
+        if (!agent.enabled)
+        {
+            agent.enabled = true;
+        }
         //agent.updatePosition = false;
         //agent.updateRotation = false;
+        
+        // 무브모듈수정관련
+        string sceneName = SceneManager.GetActiveScene().name;
+        string groupName = $"PatrolPointGroup_{sceneName}";
+        GameObject patrolGroup = GameObject.Find(groupName);
+
+        if (patrolGroup != null)
+        {
+            patrolPoints.Clear(); // 필드 리스트 초기화
+            foreach (Transform child in patrolGroup.transform)
+            {
+                patrolPoints.Add(child);
+            }
+            MoveModule.SetPatrolPoints(patrolPoints);
+            Debug.Log($"[AIController] 패트롤포인트 {patrolPoints.Count}개 설정됨 (씬: {sceneName})");
+        }
+        else
+        {
+            Debug.LogWarning($"[AIController] PatrolPointGroup 오브젝트를 찾을 수 없음 (이름: {groupName})");
+        }
+        
+        GameManager.OnGameStarted += EnableControl;
+        GameManager.OnGameEnded += DisableControl;
     }
 
     private void MineAnimationProcess()

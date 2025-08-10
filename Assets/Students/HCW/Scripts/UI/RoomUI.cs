@@ -98,13 +98,13 @@ public class RoomUI : BaseUI
         roomManager?.PlayerPanelSpawnAll();
     }
 
-    public void SetMaster()
+    private void SetMaster()
     {
         startGameButton.interactable = PhotonNetwork.IsMasterClient;
         addTeam1BotButton.interactable = PhotonNetwork.IsMasterClient;
         addTeam2BotButton.interactable = PhotonNetwork.IsMasterClient;
         mapDropdown.interactable = PhotonNetwork.IsMasterClient;
-        //clearBotsButton.interactable = PhotonNetwork.IsMasterClient;
+        clearBotsButton.interactable = PhotonNetwork.IsMasterClient;
     }
     public override void Close()
     {

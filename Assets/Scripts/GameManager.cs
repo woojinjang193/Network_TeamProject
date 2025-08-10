@@ -13,7 +13,7 @@ using Debug = UnityEngine.Debug;
 
 public class GameManager : MonoBehaviour
 {
-    public bool IsGameEnd { get; private set; }
+    public bool IsGameEnd { get; set; }
 
     [SerializeField] private float waitForOtherPlayersTime = 60f;
 
@@ -260,7 +260,7 @@ public class GameManager : MonoBehaviour
                 _ => null
             };
 
-            GameObject botGO = PhotonNetwork.Instantiate(prefabName, spawnPoint.position, spawnPoint.rotation);
+            GameObject botGO = PhotonNetwork.InstantiateRoomObject(prefabName, spawnPoint.position, spawnPoint.rotation);
 
             var ai = botGO.GetComponent<AIController>();
             if (ai != null)
@@ -305,6 +305,7 @@ public class GameManager : MonoBehaviour
     public void GameStart()
     {
         Debug.Log("게임 스타트");
+        IsGameEnd = false;
         if (PhotonNetwork.IsMasterClient)
         {
             double start = PhotonNetwork.Time;
@@ -329,6 +330,7 @@ public class GameManager : MonoBehaviour
 
     private void GameEnd()
     {
+        IsGameEnd = true;
         // 게임 종료 사운드 재생 및 브금 종료
         Manager.Audio.PlayEffect("GameSet");
         Manager.Audio.StopAllSounds();

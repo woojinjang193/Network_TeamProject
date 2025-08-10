@@ -195,13 +195,17 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     }
     public override void OnPlayerLeftRoom(Player otherPlayer) // 현재 방에서 다른 플레이어가 떠났을 때 호출
     {
-        roomManager?.PlayerPanelRemove(otherPlayer);
-        if (PhotonNetwork.IsMasterClient)
+        if (Manager.Game.IsGameEnd)
         {
-            roomManager?.CheckPlayerCount();
-            StartCoroutine(roomManager?.SetCountProperty());
+            roomManager?.PlayerPanelRemove(otherPlayer);
+            if (PhotonNetwork.IsMasterClient)
+            {
+                roomManager?.CheckPlayerCount();
+                StartCoroutine(roomManager?.SetCountProperty());
+            }
         }
     }
+
     #endregion
     
     #region 방 나갈 때
@@ -263,6 +267,24 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     {
         Debug.LogWarning($"JoinRoom 실패: {message}");
     }
+    #endregion
+
+    #region 게임 중
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        if (Manager.Game != null && !Manager.Game.IsGameEnd)
+        {
+            foreach (var view in FindObjectsOfType<PhotonView>())
+            {
+                if (view.Owner == null && view.OwnershipTransfer == OwnershipOption.Takeover)
+                {
+                    view.TransferOwnership(newMasterClient);
+                }
+            }
+        }
+    }
+
     #endregion
     // public void QuickJoinRoom(string desiredName) // 빠른 참가
     // {
