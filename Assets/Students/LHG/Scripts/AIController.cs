@@ -68,10 +68,7 @@ public class AIController : BaseController, IInRoomCallbacks
             rig.isKinematic = true;
         }
     }
-    void Start()
-    {
-        ReadyToPlay();
-    }
+
     void OnDrawGizmos()
     {
         Gizmos.color = MyTeam == Team.Team1 ? Color.magenta : Color.yellow;
@@ -90,16 +87,6 @@ public class AIController : BaseController, IInRoomCallbacks
         }
     }
     
-    private void Update()
-    {
-        if (photonView.IsMine)
-        {
-            StateMachine.Update();
-            GroundAndInkCheck();
-        }
-
-    }
-    
     public override void OnDisable()///////////////
     {
         base.OnDisable();
@@ -108,15 +95,6 @@ public class AIController : BaseController, IInRoomCallbacks
             GameManager.OnGameStarted -= EnableControl;
             GameManager.OnGameEnded -= DisableControl;
         }
-    }
-
-    public override void OnMasterClientSwitched(Player newMaster)
-    {
-        MineInit();
-        agent.enabled = true;
-        MoveModule.SetPatrolPoints(patrolPoints);
-        EnableControl();
-        Debug.Log("MineInit 재수행");
     }
     
     
@@ -154,13 +132,12 @@ public class AIController : BaseController, IInRoomCallbacks
     {
         ReadyToPlay();
         SetPatrolPoint();
-
     }
-    void OnDrawGizmos()
-    {
-        Gizmos.color = MyTeam == Team.Team1 ? Color.magenta : Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectRadius);
-    }
+    //void OnDrawGizmos()
+    //{
+    //    Gizmos.color = MyTeam == Team.Team1 ? Color.magenta : Color.yellow;
+    //    Gizmos.DrawWireSphere(transform.position, detectRadius);
+    //}
 
     private void MineInit() //포톤뷰가 본인일 때만 수행
     {
@@ -647,4 +624,13 @@ public class AIController : BaseController, IInRoomCallbacks
             //StopAllActions();
         }
     }
+
+    //public override void OnMasterClientSwitched(Player newMaster)
+    //{
+    //    MineInit();
+    //    agent.enabled = true;
+    //    MoveModule.SetPatrolPoints(patrolPoints);
+    //    EnableControl();
+    //    Debug.Log("MineInit 재수행");
+    //}
 }
