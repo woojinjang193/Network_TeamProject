@@ -161,6 +161,7 @@ public class AIController : BaseController
     {
         Gizmos.color = MyTeam == Team.Team1 ? Color.magenta : Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectRadius);
+        Gizmos.DrawLine(transform.position, MoveModule._patrolPoints[MoveModule._currentPatrolIndex].transform.position);
     }
 
     private void MineInit() //포톤뷰가 본인일 때만 수행
@@ -523,29 +524,69 @@ public class AIController : BaseController
     }
 
 
-    //봇끼리 뭉쳐서 못움직이는 현상 방지
-
-    private bool _isYielding = false;
+    //아군 봇끼리 뭉쳐서 못움직이는 현상 방지
+    // 1.5초 이상 충돌이 지속되면 패트롤 경로를 재지정
+    private float collisionTimer = 0f;
+    public float collisionThreshold = 1.5f; // 1.5초 이상 비비면 경로 변경
+    private bool isCollidingWithSameTeam = false;
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            // 이미 멈춘 상태면 무시
-            if (_isYielding) return;
-
             AIController otherAI = collision.gameObject.GetComponent<AIController>();
-            if (otherAI != null)
+            if (otherAI != null && otherAI.MyTeam == MyTeam)
             {
-                // 간단한 우선순위: instanceID가 작은 쪽이 우선
-                if (this.photonView.GetInstanceID() > otherAI.photonView.GetInstanceID())
-                {
-                    StartCoroutine(YieldRoutine());
-                }
+                isCollidingWithSameTeam = true;
+                collisionTimer = 0f; // 타이머 리셋
             }
         }
     }
 
+    private void OnCollisionStay(Collision collision)
+    {
+        if (isCollidingWithSameTeam)
+        {
+            collisionTimer += Time.deltaTime;
+
+            if (collisionTimer >= collisionThreshold)
+            {
+                // 경로 재지정
+                if (MoveModule != null && MoveModule._patrolPoints != null && MoveModule._patrolPoints.Count > 0)
+                {
+                    int newIndex;
+                    do
+                    {
+                        newIndex = Random.Range(0, MoveModule._patrolPoints.Count);
+                    }
+                    while (MoveModule._patrolPoints.Count > 1 && newIndex == MoveModule._currentPatrolIndex);
+
+                    MoveModule._currentPatrolIndex = newIndex;
+                    MoveModule.MoveTo(MoveModule._patrolPoints[newIndex].position);
+                }
+
+                // 재지정 후 즉시 타이머 리셋 & 중복 실행 방지
+                collisionTimer = 0f;
+                isCollidingWithSameTeam = false;
+            }
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+        {
+            AIController otherAI = collision.gameObject.GetComponent<AIController>();
+            if (otherAI != null && otherAI.MyTeam == MyTeam)
+            {
+                isCollidingWithSameTeam = false;
+                collisionTimer = 0f;
+            }
+        }
+    }
+
+
+    private bool _isYielding = false;
     private IEnumerator YieldRoutine()
     {
         _isYielding = true;
@@ -560,6 +601,4 @@ public class AIController : BaseController
 
         _isYielding = false;
     }
-
-
 }
