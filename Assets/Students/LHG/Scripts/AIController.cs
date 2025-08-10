@@ -592,21 +592,21 @@ public class AIController : BaseController, IInRoomCallbacks
     }
 
 
-    private bool _isYielding = false;
-    private IEnumerator YieldRoutine()
-    {
-        _isYielding = true;
-
-        if (agent.isOnNavMesh && agent.enabled)
-            agent.isStopped = true;
-
-        yield return new WaitForSeconds(Random.Range(0.8f, 1.6f)); // 멈추는 시간
-
-        if (agent.isOnNavMesh && agent.enabled)
-            agent.isStopped = false;
-
-        _isYielding = false;
-    }
+    //private bool _isYielding = false;
+    //private IEnumerator YieldRoutine()
+    //{
+    //    _isYielding = true;
+    //
+    //    if (agent.isOnNavMesh && agent.enabled)
+    //        agent.isStopped = true;
+    //
+    //    yield return new WaitForSeconds(Random.Range(0.8f, 1.6f)); // 멈추는 시간
+    //
+    //    if (agent.isOnNavMesh && agent.enabled)
+    //        agent.isStopped = false;
+    //
+    //    _isYielding = false;
+    //}
 
     private void SetPatrolPoint()
     {
