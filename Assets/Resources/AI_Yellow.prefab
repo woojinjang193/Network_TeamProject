@@ -28740,6 +28740,7 @@ MonoBehaviour:
   canControl: 0
   botName: BotName
   patrolPoints: []
+  collisionThreshold: 1.5
 --- !u!54 &2172642898234870924
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -359,8 +359,9 @@ public class AIController : BaseController, IInRoomCallbacks
 
         if (!PhotonNetwork.IsMasterClient)
         {
-            agent.enabled = true;
+            agent.enabled = false;
         }
+
 
         rig.velocity = Vector3.zero;
         rig.angularVelocity = Vector3.zero;
