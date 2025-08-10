@@ -241,14 +241,13 @@ public class InkParticleCollision : MonoBehaviourPun //파티클 충돌을 관�
         else if (PhotonNetwork.LocalPlayer != null)
         {
             player.photonView.RPC("TakeDamage", player.photonView.Owner, 15f);
+            Manager.Audio.PlayClip("InkHit", player.transform.position);
+            Manager.Audio.PlayEffect("HitPlayer");
         }
         else
         {
             Debug.Log("팀이 없습니다");
         }
-
-        Manager.Audio.PlayClip("InkHit", player.transform.position);
-        Manager.Audio.PlayEffect("HitPlayer");
 
         //Debug.Log("팀 이없습니다");
         return;

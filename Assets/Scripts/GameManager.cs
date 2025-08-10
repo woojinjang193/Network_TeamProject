@@ -305,6 +305,7 @@ public class GameManager : MonoBehaviour
     public void GameStart()
     {
         Debug.Log("게임 스타트");
+        Manager.Audio.PlayEffect("GameSet");
         if (PhotonNetwork.IsMasterClient)
         {
             double start = PhotonNetwork.Time;
