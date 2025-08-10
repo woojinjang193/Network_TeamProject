@@ -286,7 +286,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
         PhotonNetwork.CurrentRoom.IsOpen = true;
         PhotonNetwork.CurrentRoom.IsVisible = true;
-        
+        CheckAllReady();
     }
     public void ClearRoomData() // 방 정보 삭제
     {

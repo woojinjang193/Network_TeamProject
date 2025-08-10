@@ -308,6 +308,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("게임 스타트");
         Manager.Audio.PlayEffect("GameSet");
+        IsGameEnd = false;
         if (PhotonNetwork.IsMasterClient)
         {
             
@@ -334,6 +335,7 @@ public class GameManager : MonoBehaviour
     private void GameEnd()
     {
         isGameOnGoing = false;
+        IsGameEnd = true;
         // 게임 종료 사운드 재생 및 브금 종료
         Manager.Audio.PlayEffect("GameSet");
         Manager.Audio.StopAllSounds();
