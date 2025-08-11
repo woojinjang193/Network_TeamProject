@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
-public class AIController : BaseController
+public class AIController : BaseController, IInRoomCallbacks
 {
     public MoveModule MoveModule { get; private set; }
     public FireModule FireModule { get; private set; }
@@ -48,8 +48,14 @@ public class AIController : BaseController
 
     protected override void Awake()
     {
+        agent = GetComponent<NavMeshAgent>();
         killBoard = FindObjectOfType<KillBoard>();
         killLogView = killBoard.gameObject.GetComponent<PhotonView>();
+
+        if(!PhotonNetwork.IsMasterClient)
+        {
+            agent.enabled = false;
+        }
 
         base.Awake();
 
@@ -63,6 +69,12 @@ public class AIController : BaseController
         }
     }
 
+    void OnDrawGizmos()
+    {
+        Gizmos.color = MyTeam == Team.Team1 ? Color.magenta : Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectRadius);
+    }
+
     private void FixedUpdate()
     {
         if (photonView.IsMine)
@@ -74,16 +86,7 @@ public class AIController : BaseController
             OtherClientProcess();
         }
     }
-
-    public override void OnEnable()/////////////////
-    {
-        base.OnEnable();
-        if (photonView.IsMine)
-        {
-            GameManager.OnGameStarted += EnableControl;
-            GameManager.OnGameEnded += DisableControl;
-        }
-    }
+    
     public override void OnDisable()///////////////
     {
         base.OnDisable();
@@ -93,7 +96,8 @@ public class AIController : BaseController
             GameManager.OnGameEnded -= DisableControl;
         }
     }
-
+    
+    
     private void EnableControl()///////////////
     {
         canControl = true;
@@ -117,6 +121,7 @@ public class AIController : BaseController
     {
         if (photonView.IsMine)
         {
+            if (StateMachine == null) return;
             StateMachine.Update();
             GroundAndInkCheck();
         }
@@ -126,39 +131,18 @@ public class AIController : BaseController
     void Start()
     {
         ReadyToPlay();
-
-        if (photonView.IsMine)
-        {
-            // 무브모듈수정관련
-            string sceneName = SceneManager.GetActiveScene().name;
-            string groupName = $"PatrolPointGroup_{sceneName}";
-            GameObject patrolGroup = GameObject.Find(groupName);
-
-            if (patrolGroup != null)
-            {
-                patrolPoints.Clear(); // 필드 리스트 초기화
-                foreach (Transform child in patrolGroup.transform)
-                {
-                    patrolPoints.Add(child);
-                }
-                MoveModule.SetPatrolPoints(patrolPoints);
-                Debug.Log($"[AIController] 패트롤포인트 {patrolPoints.Count}개 설정됨 (씬: {sceneName})");
-            }
-            else
-            {
-                Debug.LogWarning($"[AIController] PatrolPointGroup 오브젝트를 찾을 수 없음 (이름: {groupName})");
-            }
-        }
-
+        SetPatrolPoint();
     }
-    void OnDrawGizmos()
-    {
-        Gizmos.color = MyTeam == Team.Team1 ? Color.magenta : Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectRadius);
-    }
+    //void OnDrawGizmos()
+    //{
+    //    Gizmos.color = MyTeam == Team.Team1 ? Color.magenta : Color.yellow;
+    //    Gizmos.DrawWireSphere(transform.position, detectRadius);
+    //}
 
     private void MineInit() //포톤뷰가 본인일 때만 수행
     {
+        rig.isKinematic = false;
+        
         //statedic대신 모듈화한 개별 스크립트로 관리
         MoveModule = new MoveModule(this);
         FireModule = new FireModule(this, weaponView);
@@ -170,13 +154,40 @@ public class AIController : BaseController
         StateMachine.SetState(new IdleState(this));
 
         teamColorInfo = FindObjectOfType<TeamColorInfo>();
-
+        agent.enabled = true;
         CurHp = MaxHp;
         IsDead = false;
 
         agent = GetComponent<NavMeshAgent>();
+        if (!agent.enabled)
+        {
+            agent.enabled = true;
+        }
         //agent.updatePosition = false;
         //agent.updateRotation = false;
+        
+        // 무브모듈수정관련
+        string sceneName = SceneManager.GetActiveScene().name;
+        string groupName = $"PatrolPointGroup_{sceneName}";
+        GameObject patrolGroup = GameObject.Find(groupName);
+
+        if (patrolGroup != null)
+        {
+            patrolPoints.Clear(); // 필드 리스트 초기화
+            foreach (Transform child in patrolGroup.transform)
+            {
+                patrolPoints.Add(child);
+            }
+            MoveModule.SetPatrolPoints(patrolPoints);
+            Debug.Log($"[AIController] 패트롤포인트 {patrolPoints.Count}개 설정됨 (씬: {sceneName})");
+        }
+        else
+        {
+            Debug.LogWarning($"[AIController] PatrolPointGroup 오브젝트를 찾을 수 없음 (이름: {groupName})");
+        }
+        
+        GameManager.OnGameStarted += EnableControl;
+        GameManager.OnGameEnded += DisableControl;
     }
 
     private void MineAnimationProcess()
@@ -327,27 +338,41 @@ public class AIController : BaseController
 
     public void Respawn() // DeathState 상태에서 호출됨. 본인만 수행
     {
-        agent.enabled = true;////
-        humanModel.SetActive(true);
-        col.enabled = true;
+        agent.enabled = true;
 
-        //AI 리셋
+        // AI 리셋
         CurHp = MaxHp;
         IsDead = false;
         StateMachine.SetState(new IdleState(this));
 
-        //리스폰 위치버그조치
+        // 랜덤 스폰 위치 선택
         Transform[] spawnArray = MyTeam == Team.Team1 ? Manager.Game.team1SpawnPoints : Manager.Game.team2SpawnPoints;
-        transform.position = spawnArray[0].position; //TODO 스폰어레이 0번에 넣는거..조금불안하긴함
-        transform.rotation = spawnArray[0].rotation;
+        int randomIndex = Random.Range(0, spawnArray.Length); // 0 ~ Length-1
+        Vector3 spawnPos = spawnArray[randomIndex].position;
+        Quaternion spawnRot = spawnArray[randomIndex].rotation;
+
+        agent.Warp(spawnPos);
+        transform.rotation = spawnRot;
+
+        networkPos = spawnPos;
+        networkRot = spawnRot;
+
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            agent.enabled = false;
+        }
+
 
         rig.velocity = Vector3.zero;
         rig.angularVelocity = Vector3.zero;
 
+        humanModel.SetActive(true);
+        col.enabled = true;
         Manager.Audio.PlayClip("Respawn", transform.position);
 
-        Debug.Log("봇 리스폰 완료");
+        Debug.Log($"봇 리스폰 완료 - {randomIndex}번 위치");
     }
+
 
     // TODO: 테스트 종료 후 삭제
     private void TestTeamSelection()
@@ -506,43 +531,149 @@ public class AIController : BaseController
     }
 
 
-    //봇끼리 뭉쳐서 못움직이는 현상 방지
-
-    private bool _isYielding = false;
+    //아군 봇끼리 뭉쳐서 못움직이는 현상 방지
+    // 1.5초 이상 충돌이 지속되면 패트롤 경로를 재지정
+    private float collisionTimer = 0f;
+    public float collisionThreshold = 1.5f; // 1.5초 이상 비비면 경로 변경
+    private bool isCollidingWithSameTeam = false;
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            // 이미 멈춘 상태면 무시
-            if (_isYielding) return;
-
             AIController otherAI = collision.gameObject.GetComponent<AIController>();
-            if (otherAI != null)
+            if (otherAI != null && otherAI.MyTeam == MyTeam)
             {
-                // 간단한 우선순위: instanceID가 작은 쪽이 우선
-                if (this.photonView.GetInstanceID() > otherAI.photonView.GetInstanceID())
-                {
-                    StartCoroutine(YieldRoutine());
-                }
+                isCollidingWithSameTeam = true;
+                collisionTimer = 0f; // 타이머 리셋
             }
         }
     }
 
-    private IEnumerator YieldRoutine()
+    private void OnCollisionStay(Collision collision)
     {
-        _isYielding = true;
+        if (isCollidingWithSameTeam)
+        {
+            collisionTimer += Time.deltaTime;
 
-        if (agent.isOnNavMesh && agent.enabled)
-            agent.isStopped = true;
+            if (collisionTimer >= collisionThreshold)
+            {
+                // 경로 재지정
+                if (MoveModule != null && MoveModule._patrolPoints != null && MoveModule._patrolPoints.Count > 0)
+                {
+                    int newIndex;
+                    do
+                    {
+                        newIndex = Random.Range(0, MoveModule._patrolPoints.Count);
+                    }
+                    while (MoveModule._patrolPoints.Count > 1 && newIndex == MoveModule._currentPatrolIndex);
 
-        yield return new WaitForSeconds(Random.Range(0.8f, 1.6f)); // 멈추는 시간
+                    MoveModule._currentPatrolIndex = newIndex;
+                    MoveModule.MoveTo(MoveModule._patrolPoints[newIndex].position);
+                }
 
-        if (agent.isOnNavMesh && agent.enabled)
-            agent.isStopped = false;
+                // 재지정 후 즉시 타이머 리셋 & 중복 실행 방지
+                collisionTimer = 0f;
+                isCollidingWithSameTeam = false;
+            }
+        }
+    }
 
-        _isYielding = false;
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+        {
+            AIController otherAI = collision.gameObject.GetComponent<AIController>();
+            if (otherAI != null && otherAI.MyTeam == MyTeam)
+            {
+                isCollidingWithSameTeam = false;
+                collisionTimer = 0f;
+            }
+        }
     }
 
 
+    //private bool _isYielding = false;
+    //private IEnumerator YieldRoutine()
+    //{
+    //    _isYielding = true;
+    //
+    //    if (agent.isOnNavMesh && agent.enabled)
+    //        agent.isStopped = true;
+    //
+    //    yield return new WaitForSeconds(Random.Range(0.8f, 1.6f)); // 멈추는 시간
+    //
+    //    if (agent.isOnNavMesh && agent.enabled)
+    //        agent.isStopped = false;
+    //
+    //    _isYielding = false;
+    //}
+
+    private void SetPatrolPoint()
+    {
+        if (photonView.IsMine)
+        {
+            // 무브모듈수정관련
+            string sceneName = SceneManager.GetActiveScene().name;
+            string groupName = $"PatrolPointGroup_{sceneName}";
+            GameObject patrolGroup = GameObject.Find(groupName);
+
+            if (patrolGroup != null)
+            {
+                patrolPoints.Clear(); // 필드 리스트 초기화
+                foreach (Transform child in patrolGroup.transform)
+                {
+                    patrolPoints.Add(child);
+                }
+                MoveModule.SetPatrolPoints(patrolPoints);
+                Debug.Log($"[AIController] 패트롤포인트 {patrolPoints.Count}개 설정됨 (씬: {sceneName})");
+            }
+            else
+            {
+                Debug.LogWarning($"[AIController] PatrolPointGroup 오브젝트를 찾을 수 없음 (이름: {groupName})");
+            }
+        }
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        if (photonView.IsMine)
+        {
+            rig.isKinematic = false;
+
+            if (!agent.enabled)
+            {
+                agent.enabled = true;
+            }
+
+            if (StateMachine == null)
+            {
+                MineInit();
+            }
+
+            GameManager.OnGameStarted -= EnableControl; 
+            GameManager.OnGameEnded -= DisableControl;  
+            GameManager.OnGameStarted += EnableControl; 
+            GameManager.OnGameEnded += DisableControl;
+
+            if (Manager.Game.isGameOnGoing)
+            {
+                EnableControl();
+            }
+            SetPatrolPoint();
+        }
+        else
+        {
+            //StopAllActions();
+        }
+    }
+
+    //public override void OnMasterClientSwitched(Player newMaster)
+    //{
+    //    MineInit();
+    //    agent.enabled = true;
+    //    MoveModule.SetPatrolPoints(patrolPoints);
+    //    EnableControl();
+    //    Debug.Log("MineInit 재수행");
+    //}
 }

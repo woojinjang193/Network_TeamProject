@@ -24,6 +24,7 @@ public class LeaderBoard : MonoBehaviour
     // UI 최신화 코루틴
     private Coroutine UpdateUIRoutine;
     private WaitForSecondsRealtime updateReturn;
+    
     private void OnEnable()
     {
         if (Manager.FB != null)
@@ -54,8 +55,11 @@ public class LeaderBoard : MonoBehaviour
 
     private IEnumerator StartUIUpdate()
     {
-        yield return updateReturn;
-        Manager.FB.GetLeaderBoard();
+        while (true)
+        {
+            yield return updateReturn;
+            Manager.FB.GetLeaderBoard();
+        }
     }
 
     private IEnumerator WaitFireManager()

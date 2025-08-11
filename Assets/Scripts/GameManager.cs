@@ -14,6 +14,7 @@ using Debug = UnityEngine.Debug;
 public class GameManager : MonoBehaviour
 {
     public bool IsGameEnd { get; private set; }
+    public bool isGameOnGoing { get; private set; }
 
     [SerializeField] private float waitForOtherPlayersTime = 60f;
 
@@ -105,6 +106,7 @@ public class GameManager : MonoBehaviour
     [PunRPC]
     private void SetStartTime(double start)
     {
+        isGameOnGoing = true;
         startTime = start;
         StartCoroutine(GameTimer());
     }
@@ -260,7 +262,7 @@ public class GameManager : MonoBehaviour
                 _ => null
             };
 
-            GameObject botGO = PhotonNetwork.Instantiate(prefabName, spawnPoint.position, spawnPoint.rotation);
+            GameObject botGO = PhotonNetwork.InstantiateRoomObject(prefabName, spawnPoint.position, spawnPoint.rotation);
 
             var ai = botGO.GetComponent<AIController>();
             if (ai != null)
@@ -305,8 +307,11 @@ public class GameManager : MonoBehaviour
     public void GameStart()
     {
         Debug.Log("게임 스타트");
+        Manager.Audio.PlayEffect("GameSet");
+        IsGameEnd = false;
         if (PhotonNetwork.IsMasterClient)
         {
+            
             double start = PhotonNetwork.Time;
             photonView.RPC("SetStartTime", RpcTarget.All, start);
             photonView.RPC("RpcGameStart", RpcTarget.All);
@@ -329,6 +334,8 @@ public class GameManager : MonoBehaviour
 
     private void GameEnd()
     {
+        isGameOnGoing = false;
+        IsGameEnd = true;
         // 게임 종료 사운드 재생 및 브금 종료
         Manager.Audio.PlayEffect("GameSet");
         Manager.Audio.StopAllSounds();

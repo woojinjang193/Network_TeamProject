@@ -634,11 +634,19 @@ public class PlayerController : BaseController
         if (IsDead) return;
 
         CurHp -= amount;
-        hitRoutine ??= StartCoroutine(HitRoutine());
+        //hitRoutine ??= StartCoroutine(HitRoutine());
+
+        if (hitRoutine == null)
+        {
+            hitRoutine = StartCoroutine(HitRoutine());
+            Manager.Audio.PlayEffect("TakeDamage");
+            Debug.Log("플레이어한테 맞아서 아야 소리남");
+        }
+
         Debug.Log($"현재 체력{CurHp}");
 
         killerName = info.Sender.NickName;
-        deathCause = DeathCause.PlayerAttack; //봇도 플레이어에 포함
+        deathCause = DeathCause.PlayerAttack;
 
         if (CurHp <= 0)
         {
@@ -656,7 +664,12 @@ public class PlayerController : BaseController
         if (IsDead) return;
 
         CurHp -= amount;
-        hitRoutine ??= StartCoroutine(HitRoutine());
+        if (hitRoutine == null)
+        {
+            hitRoutine = StartCoroutine(HitRoutine());
+            Manager.Audio.PlayEffect("TakeDamage");
+            Debug.Log("봇한테 맞아서 아야 소리남");
+        }
 
         killerName = botName;
         deathCause = DeathCause.BotAttck; // 항상 PlayerAttack으로 처리
@@ -670,7 +683,12 @@ public class PlayerController : BaseController
         if (IsDead) return;
 
         CurHp -= amount;
-        hitRoutine ??= StartCoroutine(HitRoutine());
+        if (hitRoutine == null)
+        {
+            hitRoutine = StartCoroutine(HitRoutine());
+            Manager.Audio.PlayEffect("TakeDamage");
+            Debug.Log("잉크가 아파서 아야 소리남");
+        }
     }
 
     [PunRPC]
@@ -959,7 +977,7 @@ public class PlayerController : BaseController
                     // 체력이 실제로 회복되었을 때만 로그를 출력
                     if (CurHp > oldHp)
                     {
-                        Debug.Log($"아군 잉크 위에서 체력 회복 HP: {CurHp:F1}");
+                        //Debug.Log($"아군 잉크 위에서 체력 회복 HP: {CurHp:F1}");
                     }
                 }
                 break;
@@ -968,7 +986,7 @@ public class PlayerController : BaseController
                 // 데미지
                 if (stateMachine.CurrentState == highStateDic[HighState.HumanForm] && CurHp > 0)
                 {
-                    Debug.Log($"적군 잉크 위에서 데미지를 입습니다");
+                    //Debug.Log($"적군 잉크 위에서 데미지를 입습니다");
                     TakeDamage(damagePerSecondOnEnemyInk * Time.deltaTime);
 
                     if(CurHp <= 0 && !IsDead)

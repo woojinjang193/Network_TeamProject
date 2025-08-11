@@ -9,9 +9,18 @@ public class PlayerNameTag : MonoBehaviourPun
     private TMP_Text nameText;
     Transform cam;
 
-    private void Start()
+    private void Awake()
     {
-        nameText = GetComponentInChildren<TMP_Text>();
+        nameText = GetComponentInChildren<TMP_Text>(true);
+    }
+
+    private IEnumerator Start()
+    {
+        while(Camera.main == null)
+        {
+            yield return null;
+        }
+
         cam = Camera.main.transform;
         nameText.text = photonView.Owner.NickName;
 

@@ -18,10 +18,9 @@ public class RankItem : MonoBehaviour
     }
     public void SetRankerInfo(string name, int wins, float rate,int rank)
     {
-        if (rank > 3) rankerName.text = $"{rank}위 {name}";
-        else rankerName.text = name;
+        rankerName.text = rank > 3 ? $"{rank}위 {name}" : name;
         
         rankerWinsText.text = wins.ToString();
-        rankerWinRateText.text = (rate*100).ToString("F");
+        rankerWinRateText.text = $"{rate*100:F}%";
     }
 }

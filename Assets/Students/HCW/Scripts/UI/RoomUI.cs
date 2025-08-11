@@ -57,6 +57,11 @@ public class RoomUI : BaseUI
         mapDropdown.options.Add(new TMP_Dropdown.OptionData("Map1"));
         mapDropdown.options.Add(new TMP_Dropdown.OptionData("Map2"));
         mapDropdown.onValueChanged.AddListener(OnMapSelectionChanged);
+        
+        // 방장 권한 설정
+        clearBotsButton.interactable = PhotonNetwork.IsMasterClient;
+        addTeam1BotButton.interactable = PhotonNetwork.IsMasterClient;
+        addTeam2BotButton.interactable = PhotonNetwork.IsMasterClient;
     }
 
 
@@ -93,13 +98,13 @@ public class RoomUI : BaseUI
         roomManager?.PlayerPanelSpawnAll();
     }
 
-    public void SetMaster()
+    private void SetMaster()
     {
         startGameButton.interactable = PhotonNetwork.IsMasterClient;
         addTeam1BotButton.interactable = PhotonNetwork.IsMasterClient;
         addTeam2BotButton.interactable = PhotonNetwork.IsMasterClient;
         mapDropdown.interactable = PhotonNetwork.IsMasterClient;
-        //clearBotsButton.interactable = PhotonNetwork.IsMasterClient;
+        clearBotsButton.interactable = PhotonNetwork.IsMasterClient;
     }
     public override void Close()
     {
@@ -161,8 +166,18 @@ public class RoomUI : BaseUI
         //     { "Ready", false }
         // };
         // PhotonNetwork.LocalPlayer.SetCustomProperties(resetProps);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // 방을 닫음 (새로운 플레이어 입장 불가)
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+            PhotonNetwork.CurrentRoom.IsVisible = false;
+
+            // 커스텀 속성에 "폭파" 상태 저장
+            ExitGames.Client.Photon.Hashtable roomProps = new ExitGames.Client.Photon.Hashtable();
+            roomProps["Shutdown"] = true;
+            PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
+        }
         
-        Manager.Net.roomManager?.ClearRoomData();
         Manager.Net.LeaveRoom();
     }
 
