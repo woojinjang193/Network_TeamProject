@@ -22,32 +22,35 @@ public class ChaseState : AIBaseState
         }
 
         float distance = Vector3.Distance(_controller.transform.position, target.position);
-        if(distance > _controller.detectRadius)
+        if (_controller.agent.isOnNavMesh)
         {
-            _controller.StateMachine.SetState(new IdleState(_controller));
-            _controller.FireModule.StopFire();
-            _controller.DetectModule.Target = null;
-        }
-        else if (distance > 3f)
-        {
-            if (closeTimer > 0f)
+            if(distance > _controller.detectRadius)
             {
-                closeTimer -= Time.deltaTime;
+                _controller.StateMachine.SetState(new IdleState(_controller));
+                _controller.DetectModule.Target = null;
+            }
+            else if (distance > 3f)
+            {
+                if (closeTimer > 0f)
+                {
+                    closeTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    _controller.FaceOff(FaceType.Upset);
+                    _controller.IsMoving = true;
+                    _controller.MoveModule.MoveTo(target.position);
+                }
             }
             else
             {
-                _controller.FaceOff(FaceType.Upset);
-                _controller.IsMoving = true;
-                _controller.MoveModule.MoveTo(target.position);
+                closeTimer  = resetTime;
+                direction = _controller.MoveModule.GetDirection(target.position);
+                _controller.MoveModule.RotateToTarget(direction);
+                _controller.IsMoving = false;
             }
         }
-        else
-        {
-            closeTimer  = resetTime;
-            direction = _controller.MoveModule.GetDirection(target.position);
-            _controller.MoveModule.RotateToTarget(direction);
-            _controller.IsMoving = false;
-        }
+
         _controller.FireModule.TryFireAt(target);
     }
 }

@@ -13,8 +13,7 @@ public class AudioManager : Singleton<AudioManager>
 {
     // 오디오 데이터를 모아놓은 데이터베이스
     private AudioDataBase audioDB;
-
-
+    
     // 기본음 세팅
     private AudioData defaultBGM; // 별도의 명령이 없을 경우 재생하는 배경음악
     private AudioData defaultAmbient; // '' 백색소음
@@ -26,26 +25,33 @@ public class AudioManager : Singleton<AudioManager>
     private AudioMixerGroup bgmGroup;
     private AudioMixerGroup sfxGroup;
     
+    // 오디오 소스
     private AudioSource bgmSource; // 배경음악 오디오 소스
     private AudioSource ambientSource; // 게임에서 백색소음에 해당하는 오디오 소스
     private AudioSource effectSource; // 효과음 오디오 소스
     private AudioSource clickSource;
     
-    
+    // 페이드 코루틴
     private Coroutine bgmFadeRoutine;
     private Coroutine ambFadeRoutine;
     private Coroutine stopRoutine;
     private Coroutine startBgmRoutine;
     private Coroutine startAmbRoutine;
     
+    // 오디오 데이터베이스 기반 오디오데이터의 딕셔너리
     private Dictionary<string, AudioData> audioDict = new();
 
-    // 테스트 볼륨
-    [Header("Set UI Ref")] 
-    [SerializeField] private Slider masterSlider;
-    [SerializeField] private Slider bgmSlider;
-    [SerializeField] private Slider sfxSlider;
 
+    // 오디오 설정 불러온 값을 필드로 저장 - SettingUI와 연결
+    public float masterVolume;
+    public bool hasMasterVolume = false;
+    public float bgmVolume;
+    public bool hasBgmVolume = false;
+    public float sfxVolume;
+    public bool hasSfxVolume = false;
+    
+    // Setting UI
+    private SettingUI settingUI;
     protected override void Awake()
     {
         base.Awake();
@@ -67,7 +73,6 @@ public class AudioManager : Singleton<AudioManager>
         ambientSource = gameObject.AddComponent<AudioSource>();
         effectSource = gameObject.AddComponent<AudioSource>();
         clickSource = gameObject.AddComponent<AudioSource>();
-        clickSource.playOnAwake = false;
         
         // 오디오 소스와 믹서 연결
         bgmSource.outputAudioMixerGroup = bgmGroup;
@@ -83,33 +88,52 @@ public class AudioManager : Singleton<AudioManager>
     
     private void Start()
     {
-        // 사용자 설정 가져오기
-        VolumeLoad();
+
+        // 오디오 설정 세팅
+        SettingAudioInit();
+        // 클릭 소리 세팅
+        SetClickSound();
         // 기본 백색소음 재생
         SwitchAmbient("defaultAmbient",1f);
         // 기본 배경음악 재생
         SwitchBGM("defaultBGM",1f);
+
     }
 
-    private void VolumeLoad() // 사용자 설정을 불러오기
+    public void SettingAudioInit()
+    {
+        // 사용자 설정 가져오기
+        VolumeLoad();
+        // 세팅 UI에 기능 할당
+        settingUI = FindObjectOfType<SettingUI>(true);
+        settingUI.AudioInit();
+    }
+
+    public void VolumeLoad() // 사용자 설정을 불러오기
     {
         float value;
         if (PlayerPrefs.HasKey("MasterVolume"))
         {
-            value = PlayerPrefs.GetFloat("MasterVolume");
-            mixer.SetFloat("MasterVolume", Mathf.Log10(Mathf.Clamp(value,0.0001f,1f))*20);
+            hasMasterVolume = true;
+            masterVolume = PlayerPrefs.GetFloat("MasterVolume");
+            value = Mathf.Log10(Mathf.Clamp(masterVolume, 0.0001f, 1f)) * 20;
+            mixer.SetFloat("MasterVolume", value);
         }
 
         if (PlayerPrefs.HasKey("BGMVolume"))
         {
-            value = PlayerPrefs.GetFloat("BGMVolume");
-            mixer.SetFloat("BGMVolume", Mathf.Log10(Mathf.Clamp(value,0.0001f,1f))*20);
+            hasBgmVolume = true;
+            bgmVolume = PlayerPrefs.GetFloat("BGMVolume");
+            value = Mathf.Log10(Mathf.Clamp(bgmVolume, 0.0001f, 1f)) * 20;
+            mixer.SetFloat("BGMVolume", value);
         }
 
         if (PlayerPrefs.HasKey("SFXVolume"))
         {
-            value = PlayerPrefs.GetFloat("SFXVolume");
-            mixer.SetFloat("SFXVolume", Mathf.Log10(Mathf.Clamp(value,0.0001f,1f))*20);
+            hasSfxVolume = true;
+            sfxVolume = PlayerPrefs.GetFloat("SFXVolume");
+            value = Mathf.Log10(Mathf.Clamp(sfxVolume, 0.0001f, 1f)) * 20;
+            mixer.SetFloat("SFXVolume", value);
         }
     }
     
@@ -349,27 +373,23 @@ public class AudioManager : Singleton<AudioManager>
         effectSource.Play();
     }
 
-    public void SetAudioVolume(MixerType type, float volume) // 마스터 볼륨 설정. 0~1 사이의 값이 들어온다.
+    public void SetMasterVolume(float volume) // 마스터 볼륨 설정. 0~1 사이의 값이 들어온다.
     {
-        switch (type)
-        {
-            case MixerType.Master:
-                mixer.SetFloat("MasterVolume", Mathf.Log10(Mathf.Clamp(volume,0.0001f,1f))*20);
-                PlayerPrefs.SetFloat("MasterVolume", volume);
-                break;
-            case MixerType.BGM:
-                mixer.SetFloat("BGMVolume", Mathf.Log10(Mathf.Clamp(volume,0.0001f,1f))*20);
-                PlayerPrefs.SetFloat("BGMVolume", volume);
-                break;
-            case MixerType.SFX:
-                mixer.SetFloat("SFXVolume", Mathf.Log10(Mathf.Clamp(volume,0.0001f,1f))*20);
-                PlayerPrefs.SetFloat("SFXVolume", volume);
-                break;
-            default:
-                Debug.LogWarning($"믹서 타입이 잘못들어옴{type}");
-                return;
-        }
-        
+        mixer.SetFloat("MasterVolume", Mathf.Log10(Mathf.Clamp(volume,0.0001f,1f))*20);
+        PlayerPrefs.SetFloat("MasterVolume", volume);
+        PlayerPrefs.Save();
+    }
+    public void SetBGMVolume(float volume) // BGM 볼륨 설정. 0~1 사이의 값이 들어온다.
+    {
+        mixer.SetFloat("BGMVolume", Mathf.Log10(Mathf.Clamp(volume,0.0001f,1f))*20);
+        PlayerPrefs.SetFloat("BGMVolume", volume);
+        PlayerPrefs.Save();
+    }
+    public void SetSFXVolume(float volume) // SFX 볼륨 설정. 0~1 사이의 값이 들어온다.
+    {
+        mixer.SetFloat("SFXVolume", Mathf.Log10(Mathf.Clamp(volume,0.0001f,1f))*20);
+        PlayerPrefs.SetFloat("SFXVolume", volume);
+        PlayerPrefs.Save();
     }
 
     public void StopAllSounds()
@@ -428,8 +448,16 @@ public class AudioManager : Singleton<AudioManager>
         player.fireSound = audio;
     }
 
+    private void SetClickSound()
+    {
+        clickSource.clip = clickClip.clipSource;
+        clickSource.volume = clickClip.volume;
+        clickSource.loop = false;
+        clickSource.playOnAwake = false;
+    }
     public void Click()
     {
+        clickSource.Stop();
         clickSource.Play();
     }
 

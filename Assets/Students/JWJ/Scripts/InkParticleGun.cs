@@ -113,11 +113,13 @@ public class InkParticleGun : MonoBehaviourPun
     }
 
     // 잉크 회복 (PlayerController에서 호출)
-    public void RecoverInk()
+    public void RecoverInk(bool isMoving)
     {
+        float recoveryInk = isMoving ? inkRecoveryRate * Time.deltaTime * 2.5f : inkRecoveryRate * Time.deltaTime;
+        
         if (currentInk < maxInk)
         {
-            currentInk += inkRecoveryRate * Time.deltaTime;
+            currentInk += recoveryInk;
             currentInk = Mathf.Min(currentInk, maxInk); // 최대치를 넘지 않도록
         }
     }

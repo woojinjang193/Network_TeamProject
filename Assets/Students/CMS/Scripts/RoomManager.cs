@@ -26,21 +26,26 @@ public class RoomManager : MonoBehaviourPunCallbacks
     private void Awake(){}
 
     // 플레이어의 출입으로 패널 생성, 삭제 자동으로 되어 있음
-    
     #region 콜백
     // 방 커스텀프로퍼티 변경 시 호출. 봇 생성, 맵 설정 때 호출 됨
     public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) 
     {
-        if (propertiesThatChanged.TryGetValue("map", out object mapName))
+        if (propertiesThatChanged.ContainsKey("Shutdown") && (bool)propertiesThatChanged["Shutdown"])
+        {
+            Manager.Net.LeaveRoom(); // 방장이 나가면, 다른 클라이언트들도 스스로 방을 나감
+        }
+        
+        else if (propertiesThatChanged.TryGetValue("map", out object mapName))
         {
             selectedMapName = (string)mapName;
             roomUI?.UpdateMapSelectionUI(selectedMapName); // 현재 맵 이름 기준으로 드롭다운 UI 최신화
+            CheckAllReady();
         }
-        if (propertiesThatChanged.ContainsKey("bots")) // 봇 키를 가지고 있을 경우
+        else if (propertiesThatChanged.ContainsKey("bots")) // 봇 키를 가지고 있을 경우
         {
             roomUI?.UpdatePlayerList(PhotonNetwork.PlayerList.ToList()); // 모든 플레이어의 패널을 업데이트(파괴 후 재생성)함
+            CheckAllReady();
         }
-        CheckAllReady();
     }
     
     // 플레이어 프로퍼티 변경 시 호출. 레디 상태 변경에 호출됨
@@ -81,7 +86,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public IEnumerator SetCountProperty()
     // CheckAllReady의 팀 카운트 결과 값을 커스텀 프로퍼티로 저장함
     {
-        if (PhotonNetwork.IsMasterClient) // 외부에서도 보이도록 커스텀 프로퍼티 설정함
+        if (PhotonNetwork.IsMasterClient && PhotonNetwork.InRoom) // 외부에서도 보이도록 커스텀 프로퍼티 설정함
         {
             yield return null;
             CheckPlayerCount();
@@ -263,6 +268,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
         Manager.UI.Reinitialize();
         Manager.UI.ReplaceUI(typeof(RoomUI));
+        
+        // 오디오 세팅 재설정
+        Manager.Audio.SettingAudioInit();
 
         roomUI = FindObjectOfType<RoomUI>();
         roomUI?.Open();
@@ -275,6 +283,10 @@ public class RoomManager : MonoBehaviourPunCallbacks
         isLoading = false;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        PhotonNetwork.CurrentRoom.IsOpen = true;
+        PhotonNetwork.CurrentRoom.IsVisible = true;
+        CheckAllReady();
     }
     public void ClearRoomData() // 방 정보 삭제
     {

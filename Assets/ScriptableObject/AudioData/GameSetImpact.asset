@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: GameSetImpact
   m_EditorClassIdentifier: 
   clipName: Impact
-  clipSource: {fileID: 8300000, guid: 5ce9e19c1ed3f02418e7dc77844dcfda, type: 3}
+  clipSource: {fileID: 8300000, guid: f0bf279bd62abd9419f3652e5c0378e3, type: 3}
   volume: 0.7
   loop: 0
   mixerGroup: {fileID: 8063154892423865753, guid: e76f20a7c7b3a534b8bc98098cf2246b, type: 2}

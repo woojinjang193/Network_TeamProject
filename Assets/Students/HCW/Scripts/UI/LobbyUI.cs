@@ -74,7 +74,15 @@ public class LobbyUI : BaseUI
     {
         Debug.Log("로그아웃 버튼 클릭됨");
         Firebase.Auth.FirebaseAuth.DefaultInstance.SignOut(); // Firebase 로그아웃 처리
-        Manager.UI.ReplaceUI(typeof(LoginUI)); // 로그인 화면으로 돌아가기
+        //Manager.UI.ReplaceUI(typeof(LoginUI)); // 로그인 화면으로 돌아가기
+        if (PhotonNetwork.NetworkClientState == ClientState.JoinedLobby)
+        {
+            Manager.Net.LeaveLobby();
+        }
+        else
+        {
+            Debug.Log("플레이어가 현재 로비 상태가 아님.");
+        }
     }
 
     

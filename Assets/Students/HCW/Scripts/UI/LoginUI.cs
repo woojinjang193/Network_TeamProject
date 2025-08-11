@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using Firebase.Auth;
 using Firebase.Extensions;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class LoginUI : BaseUI
 {
@@ -55,17 +56,21 @@ public class LoginUI : BaseUI
             }
 
             // Photon 닉네임 설정
-            Photon.Pun.PhotonNetwork.NickName = user.DisplayName;
+            PhotonNetwork.NickName = user.DisplayName;
             Debug.Log($"Photon 닉네임 설정 완료: {user.DisplayName}");
 
             // Photon 서버 연결 및 로비 이동
-            while (!Photon.Pun.PhotonNetwork.IsConnected)
+            if (PhotonNetwork.NetworkClientState == ClientState.ConnectedToMasterServer)
+            {
+                PhotonNetwork.JoinLobby();
+            }
+            while (!PhotonNetwork.IsConnected)
             {
                 loginTimer += Time.deltaTime;
                 if (loginTimer >= 2f)
                 {
                     Debug.Log("Photon 서버에 연결되지 않음. 연결 시도 중...");
-                    Photon.Pun.PhotonNetwork.ConnectUsingSettings();
+                    PhotonNetwork.ConnectUsingSettings();
                     loginTimer = 0f;
                 }
             }

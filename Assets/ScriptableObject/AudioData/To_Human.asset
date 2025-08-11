@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clipName: ToHuman
   clipSource: {fileID: 8300000, guid: 4f05751c5c95f3c4ebd95749029a6be4, type: 3}
-  volume: 0.515
+  volume: 0.4
   loop: 0
   mixerGroup: {fileID: 8063154892423865753, guid: e76f20a7c7b3a534b8bc98098cf2246b, type: 2}

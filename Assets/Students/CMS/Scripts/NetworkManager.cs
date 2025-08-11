@@ -60,10 +60,21 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     #endregion
     
     #region 로비 연결, 방목록
+    public void LeaveLobby() // 로비를 떠날 때. 로그아웃 버튼을 누르면 수행됨
+    {
+        PhotonNetwork.LeaveLobby();
+    }
+    
     public override void OnJoinedLobby() //로비에 들어갔을 때
     {
         Debug.Log("로비 입장 완료");
         Manager.UI.ReplaceUI(typeof(LobbyUI)); // 로비 UI 띄움
+    }
+
+    public override void OnLeftLobby()
+    {
+        base.OnLeftLobby();
+        Manager.UI.ReplaceUI(typeof(LoginUI));
     }
     
     public override void OnRoomListUpdate(List<RoomInfo> roomList) // 방 목록 정보에 변경이 있었을 때
@@ -82,7 +93,8 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
             Debug.Log($"방 이름 확인: {room.Name}");
         }
     }
-    
+
+
     // public void RequestRoomListUpdate() // 로비 다시 참가 요청
     // {
     //     if (PhotonNetwork.NetworkClientState == ClientState.JoinedLobby) // 로비 상태일 때만 사용
@@ -183,13 +195,17 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     }
     public override void OnPlayerLeftRoom(Player otherPlayer) // 현재 방에서 다른 플레이어가 떠났을 때 호출
     {
-        roomManager?.PlayerPanelRemove(otherPlayer);
-        if (PhotonNetwork.IsMasterClient)
+        if (Manager.Game == null || Manager.Game.IsGameEnd)
         {
-            roomManager?.CheckPlayerCount();
-            StartCoroutine(roomManager?.SetCountProperty());
+            roomManager?.PlayerPanelRemove(otherPlayer);
+            if (PhotonNetwork.IsMasterClient)
+            {
+                roomManager?.CheckPlayerCount();
+                StartCoroutine(roomManager?.SetCountProperty());
+            }
         }
     }
+
     #endregion
     
     #region 방 나갈 때
@@ -201,6 +217,7 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     {
         Debug.Log("OnLeftRoom 호출됨");
 
+        Manager.Net.roomManager?.ClearRoomData();
         if (Manager.UI.CurrentUI != null)
         {
             Debug.Log($"현재 UI 타입: {Manager.UI.CurrentUI.GetType().Name}");
@@ -250,6 +267,24 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     {
         Debug.LogWarning($"JoinRoom 실패: {message}");
     }
+    #endregion
+
+    #region 게임 중
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        if (Manager.Game != null && !Manager.Game.IsGameEnd)
+        {
+            foreach (var view in FindObjectsOfType<PhotonView>())
+            {
+                if (view.Owner == null && view.OwnershipTransfer == OwnershipOption.Takeover)
+                {
+                    view.TransferOwnership(newMasterClient);
+                }
+            }
+        }
+    }
+
     #endregion
     // public void QuickJoinRoom(string desiredName) // 빠른 참가
     // {

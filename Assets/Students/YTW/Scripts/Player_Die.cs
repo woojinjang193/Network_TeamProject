@@ -8,14 +8,17 @@ using Cinemachine;
 public class Player_Die : PlayerState
 {
     private CinemachineVirtualCamera _vcamSpectator;
+    private CinemachineVirtualCamera vcamFrom;
     private CinemachineBrain _cinemachineBrain;
     private Camera _myPlayerCamera;
+    private YieldInstruction waitSec = new WaitForSeconds(0.1f);
 
     // '가짜 출발지 VCam'을 담을 임시 게임 오브젝트
     private GameObject _dummyFromCameraObject;
 
     public Player_Die(PlayerController player, StateMachine stateMachine) : base(player, stateMachine) { }
 
+    
     public override void Enter()
     {
         Debug.Log("사망 상태 진입");
@@ -27,33 +30,42 @@ public class Player_Die : PlayerState
 
         if (player.photonView.IsMine)
         {
+            Debug.Log("일단 내 포톤뷰 맞음");
+            // 1. 플레이어 카메라 찾기
+            if (player.playerCameraObject != null)
+            {
+                _myPlayerCamera = player.playerCameraObject.GetComponentInChildren<Camera>();
+            }
+            else
+            {
+                Debug.LogError("Player Camera Object를 찾을 수 없습니다.");
+            }
+            
+            // 2. 현재 카메라 위치에 '가짜 출발지 VCam'을 생성 또는 이동
+            if (_dummyFromCameraObject == null)
+            {
+                _dummyFromCameraObject = new GameObject("Temp_From_VCam");
+                vcamFrom = _dummyFromCameraObject.GetOrAddComponent<CinemachineVirtualCamera>();
+
+            }
+            _dummyFromCameraObject.transform.position = _myPlayerCamera.transform.position;
+            _dummyFromCameraObject.transform.rotation = _myPlayerCamera.transform.rotation;
+
+            vcamFrom.gameObject.SetActive(true);
+            vcamFrom.enabled = true;
+            vcamFrom.Priority = 11; // 현재 가장 높은 우선순위로 설정
+
             player.StartCoroutine(SwitchToSpectatorCamera());
             player.StartCoroutine(RespawnCoroutine());
         }
+        
     }
 
     private IEnumerator SwitchToSpectatorCamera()
     {
-        // 1. 플레이어 카메라 찾기
-        if (player.playerCameraObject != null)
-        {
-            _myPlayerCamera = player.playerCameraObject.GetComponentInChildren<Camera>();
-        }
-        else
-        {
-            Debug.LogError("Player Camera Object를 찾을 수 없습니다.");
-            yield break;
-        }
-
-        // 2. 현재 카메라 위치에 '가짜 출발지 VCam'을 생성
-        _dummyFromCameraObject = new GameObject("Temp_From_VCam");
-        _dummyFromCameraObject.transform.position = _myPlayerCamera.transform.position;
-        _dummyFromCameraObject.transform.rotation = _myPlayerCamera.transform.rotation;
-        var vcamFrom = _dummyFromCameraObject.AddComponent<CinemachineVirtualCamera>();
-        vcamFrom.Priority = 11; // 현재 가장 높은 우선순위로 설정
-
+        Debug.Log(" 카메라 교체 코루틴 들어왔음");
         // 3. '내 카메라'에 CinemachineBrain을 추가하고 블렌딩을 설정
-        _cinemachineBrain = _myPlayerCamera.gameObject.AddComponent<CinemachineBrain>();
+        _cinemachineBrain = _myPlayerCamera.gameObject.GetOrAddComponent<CinemachineBrain>();
         _cinemachineBrain.m_DefaultBlend.m_Style = CinemachineBlendDefinition.Style.EaseInOut;
         _cinemachineBrain.m_DefaultBlend.m_Time = 1.5f; // n초 동안 부드럽게 전환
 
@@ -64,20 +76,24 @@ public class Player_Die : PlayerState
         }
 
         // 5. Brain이 '가짜 출발지 VCam'을 인식할 때까지 한 프레임 대기
-        yield return null;
+        yield return waitSec;
 
         // 6. 진짜 '목적지 VCam'을 찾아서 더 높은 우선순위로 활성화
-        CinemachineVirtualCamera[] vcams = Resources.FindObjectsOfTypeAll<CinemachineVirtualCamera>();
-        foreach (var vcam in vcams)
+        if (_vcamSpectator == null)
         {
-            if (vcam.gameObject.name == "VCam_Spectator")
+            CinemachineVirtualCamera[] vcams = Object.FindObjectsOfType<CinemachineVirtualCamera>(true);
+            foreach (var vcam in vcams)
             {
-                _vcamSpectator = vcam;
-                _vcamSpectator.gameObject.SetActive(true);
-                _vcamSpectator.Priority = 12; // '가짜 출발지'보다 높게 설정하여 전환을 유발
-                break;
+                if (vcam.gameObject.name == "VCam_Spectator")
+                {
+                    _vcamSpectator = vcam;
+                    break;
+                }
             }
         }
+        
+        _vcamSpectator.gameObject.SetActive(true);
+        _vcamSpectator.Priority = 12; // '가짜 출발지'보다 높게 설정하여 전환을 유발
     }
 
     public override void Exit()
@@ -102,7 +118,7 @@ public class Player_Die : PlayerState
             }
             if (_dummyFromCameraObject != null)
             {
-                Object.Destroy(_dummyFromCameraObject);
+                _dummyFromCameraObject.SetActive(false);
             }
             if (player.tpsCamera != null)
             {

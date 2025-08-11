@@ -12,6 +12,7 @@ public class Manager : Singleton<Manager>
     public static AudioManager Audio;
     public static GridManager Grid;
 
+    [RuntimeInitializeOnLoadMethod]
     protected override void Awake()
     {
         base.Awake();

@@ -134,8 +134,8 @@ public class GridManager : MonoBehaviour, IInRoomCallbacks
         int total = gridDic.Count;
         Team1Rate = countTeam1 / (float)total * 100f;
         Team2Rate = countTeam2 / (float)total * 100f;
-        teamRateText.text = $"Team1 : {Team1Rate.ToString("F2")}%    Team2 : {Team2Rate.ToString("F2")}%";
-        //teamRateText.text = "";
+        //teamRateText.text = $"Team1 : {Team1Rate.ToString("F2")}%    Team2 : {Team2Rate.ToString("F2")}%"; //테스트용 실시간 유아이
+        teamRateText.text = "";
 
         //photonView.RPC("SyncCoverageUI", RpcTarget.Others, Team1Rate, Team2Rate);//
    

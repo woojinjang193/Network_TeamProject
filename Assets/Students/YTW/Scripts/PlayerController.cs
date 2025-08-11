@@ -30,6 +30,7 @@ public class PlayerController : BaseController
     [Header("플레이어 설정")]
     [SerializeField] public Transform ModelTransform;
     public LayerMask groundLayer;
+    public LayerMask manholeLayer;
     public float maxSlopeAngle = 45f;
     public float humanJumpForce = 15f;
     public float squidJumpForce = 15f;
@@ -81,9 +82,15 @@ public class PlayerController : BaseController
     // 플레이어 루프 사운드
     public AudioSource squidSwim;
     public AudioSource squidSwimBubble;
-    
+
+    private KillBoard killBoard;
+    private PhotonView killLogView;
+
+
     protected override void Awake()
     {
+        killBoard = FindObjectOfType<KillBoard>();
+        killLogView = killBoard.gameObject.GetComponent<PhotonView>();
 
         base.Awake();
         squidAnimator = squidModel.GetComponentInChildren<Animator>();
@@ -140,16 +147,20 @@ public class PlayerController : BaseController
 
     private void DisableControl()///////////////
     {
-        canControl = false;
+        if (photonView.IsMine)
+        {
+            canControl = false;
 
-        rig.isKinematic = false;
-        rig.velocity = Vector3.zero;
-        rig.angularVelocity = Vector3.zero;
+            rig.velocity = Vector3.zero;
+            rig.angularVelocity = Vector3.zero;
+            rig.isKinematic = false;
 
-        inkParticleGun.FireParticle(MyTeam, false);
-        humanAnimator.SetBool(IsMove, false);
-        humanAnimator.SetFloat(MoveX, 0f);
-        humanAnimator.SetFloat(MoveY, 0f);
+            inkParticleGun.FireParticle(MyTeam, false);
+            humanAnimator.SetBool(IsMove, false);
+            humanAnimator.SetFloat(MoveX, 0f);
+            humanAnimator.SetFloat(MoveY, 0f);
+        }
+        
     }
 
     void FixedUpdate()
@@ -208,13 +219,13 @@ public class PlayerController : BaseController
                 stateMachine.Update();
             }
 
-            HandleTeamSelection();
+            // HandleTeamSelection();
 
             if (input.IsRecenterPressed && recenterCooldownTimer <= 0f)
             {
                 if (tpsCamera != null)
                 {
-                    tpsCamera.Recenter(transform.forward);
+                    tpsCamera.Recenter(ModelTransform.forward);
                 }
             }
         }
@@ -294,6 +305,7 @@ public class PlayerController : BaseController
         if (tpsCamera != null)
         {
             tpsCamera.followTransform = this.cameraPivot;
+            tpsCamera.playerInput = this.input;
         }
         else
         {
@@ -429,15 +441,35 @@ public class PlayerController : BaseController
     private void GroundAndInkCheck()
     {
         // 바닥 체크 ray
-        LayerMask combinedLayer = groundLayer | inkableLayer;
+        LayerMask combinedLayer =0;
+        if (stateMachine.CurrentState == highStateDic[HighState.HumanForm])
+        {
+            //Debug.Log("지금 인간 폼임");
+             combinedLayer= groundLayer | inkableLayer | manholeLayer;
+        }
+        else if (stateMachine.CurrentState == highStateDic[HighState.SquidForm])
+        {
+            //Debug.Log("지금 스퀴드 폼임");
+            combinedLayer = groundLayer | inkableLayer;
+        }
         Vector3 groundRayStart = transform.position + Vector3.up * 0.1f;
         float groundRayDistance = 0.6f; // Raycast 길이를 안정적으로 수정
 
-        Debug.DrawRay(groundRayStart, Vector3.down * groundRayDistance, Color.red);
+        // LayerMask combinedLayer = groundLayer | inkableLayer;
+        // Vector3 groundRayStart = transform.position + Vector3.up * 0.1f;
+        // float groundRayDistance = 0.6f; // Raycast 길이를 안정적으로 수정
+        // LayerMask groundRaycastMask = combinedLayer;
+        //
+        // if (gameObject.layer == LayerMask.NameToLayer("Invincible"))
+        // {
+        //     int manholeLayer = LayerMask.NameToLayer("Manhole");
+        //     groundRaycastMask &= ~(1 << manholeLayer);
+        // }
 
         // 바닥 체크
         if (Physics.Raycast(groundRayStart, Vector3.down, out RaycastHit groundHit, groundRayDistance, combinedLayer))
         {
+            //Debug.Log("땅인식 됐음");
             IsGrounded = true;
             GroundNormal = groundHit.normal;
             if (groundHit.collider.TryGetComponent<PaintableObj>(out var paintableObj))
@@ -452,20 +484,39 @@ public class PlayerController : BaseController
         }
         else
         {
+            //Debug.Log("땅인식 안됐음");
             IsGrounded = false;
             GroundNormal = Vector3.up;
             CurrentGroundInkStatus = InkStatus.NONE;
         }
 
-        Vector3 wallDirection = ModelTransform.forward;
+        Vector3 moveInputDirection = new Vector3(input.MoveInput.x, 0, input.MoveInput.y).normalized;
+        Quaternion cameraYaw = Quaternion.Euler(0, mainCamera.transform.eulerAngles.y, 0);
+        Vector3 wallDirection = cameraYaw * moveInputDirection;
+
+        if (wallDirection.sqrMagnitude < 0.01f)
+        {
+            wallDirection = ModelTransform.forward;
+        }
         Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
         Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
         float wallRayDistance = 1.2f;
+        // Vector3 wallDirection = ModelTransform.forward;
+        // Vector3 wallRayStart = transform.position + transform.up * (col.height / 2);
+        // Vector3 edgeRayStart = transform.position + transform.up * (col.height - 0.1f);
+        // float wallRayDistance = 1.2f;
+        // LayerMask wallRaycastMask = inkableLayer; // 벽 체크에 사용할 레이어 마스크
+        // if (gameObject.layer == LayerMask.NameToLayer("Invincible"))
+        // {
+        //     int manholeLayer = LayerMask.NameToLayer("Manhole");
+        //     wallRaycastMask &= ~(1 << manholeLayer); // 오징어 상태일 때만 'Manhole' 레이어 제외
+        // }
         Debug.DrawRay(wallRayStart, wallDirection * wallRayDistance, Color.blue);
 
         // 벽 체크 ray
         if (Physics.Raycast(wallRayStart, wallDirection, out RaycastHit wallHit, wallRayDistance, inkableLayer))
         {
+            //Debug.Log("벽체크 됐음");
             // 부딪힌 표면의 경사각을 계산
             float surfaceAngle = Vector3.Angle(Vector3.up, wallHit.normal);
 
@@ -503,6 +554,7 @@ public class PlayerController : BaseController
         }
         else 
         {
+            //Debug.Log("벽체크 안됐음");
             WallNormal = Vector3.zero;
             CurrentWallInkStatus = InkStatus.NONE;
             IsOnWalkableWall = false;
@@ -562,29 +614,39 @@ public class PlayerController : BaseController
     //    transform.eulerAngles = playerRotation;
     //}
 
-    // TODO : test용
-    private void HandleTeamSelection()
-    {
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            MyTeam = Team.Team1;
-            Debug.Log($"팀 변경: {MyTeam}");
-        }
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            MyTeam = Team.Team2;
-            Debug.Log($"팀 변경: {MyTeam}");
-        }
-    }
+    // private void HandleTeamSelection()
+    // {
+    //     if (Input.GetKeyDown(KeyCode.Z))
+    //     {
+    //         MyTeam = Team.Team1;
+    //         Debug.Log($"팀 변경: {MyTeam}");
+    //     }
+    //     if (Input.GetKeyDown(KeyCode.X))
+    //     {
+    //         MyTeam = Team.Team2;
+    //         Debug.Log($"팀 변경: {MyTeam}");
+    //     }
+    // }
 
     [PunRPC]
-    public override void TakeDamage(float amount) //InkParticleCollision에 의해서 들어옴 로컬만 수행
+    public override void TakeDamage(float amount, PhotonMessageInfo info) //InkParticleCollision에 의해서 들어옴 로컬만 수행, 플레이어끼리 데미지
     {
         if (IsDead) return;
 
         CurHp -= amount;
-        hitRoutine ??= StartCoroutine(HitRoutine());
+        //hitRoutine ??= StartCoroutine(HitRoutine());
+
+        if (hitRoutine == null)
+        {
+            hitRoutine = StartCoroutine(HitRoutine());
+            Manager.Audio.PlayEffect("TakeDamage");
+            Debug.Log("플레이어한테 맞아서 아야 소리남");
+        }
+
         Debug.Log($"현재 체력{CurHp}");
+
+        killerName = info.Sender.NickName;
+        deathCause = DeathCause.PlayerAttack;
 
         if (CurHp <= 0)
         {
@@ -592,13 +654,86 @@ public class PlayerController : BaseController
             IsDead = true;
             Debug.Log("플레이어 죽음");
 
-            photonView.RPC("PlayerDie", RpcTarget.All);
+            photonView.RPC("PlayerDie", RpcTarget.All, killerName, (int)deathCause); 
         }
     }
 
     [PunRPC]
-    public void PlayerDie() // TakeDamage의 조건에 따라서 들어옴. 전역 수행
+    public void TakeDamageFromBot(float amount, string botName) //봇에게 받는 데미지
     {
+        if (IsDead) return;
+
+        CurHp -= amount;
+        if (hitRoutine == null)
+        {
+            hitRoutine = StartCoroutine(HitRoutine());
+            Manager.Audio.PlayEffect("TakeDamage");
+            Debug.Log("봇한테 맞아서 아야 소리남");
+        }
+
+        killerName = botName;
+        deathCause = DeathCause.BotAttck; // 항상 PlayerAttack으로 처리
+
+        if (CurHp <= 0)
+            photonView.RPC("PlayerDie", RpcTarget.All, killerName, (int)deathCause);
+    }
+
+    public override void TakeDamage(float amount) //적 잉크나 낙사일때
+    {
+        if (IsDead) return;
+
+        CurHp -= amount;
+        if (hitRoutine == null)
+        {
+            hitRoutine = StartCoroutine(HitRoutine());
+            Manager.Audio.PlayEffect("TakeDamage");
+            Debug.Log("잉크가 아파서 아야 소리남");
+        }
+    }
+
+    [PunRPC]
+    public void PlayerDie(string killerName, int cause) // TakeDamage의 조건에 따라서 들어옴. 전역 수행
+    {
+        deathCause = (DeathCause)cause; //int 를 다시 enum으로 바꿔줌
+        victimName = photonView.Owner.NickName;
+
+        if (photonView.IsMine)
+        {
+            switch (deathCause)
+            {
+                case DeathCause.PlayerAttack:
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause, (int)MyTeam);
+                    killBoard.KillLog($"{killerName} 에게\n<color=red>처치됨</color>");
+                    Debug.Log($"{killerName} 에게 처치당함");
+                    break;
+
+                case DeathCause.BotAttck:
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause, (int)MyTeam);
+                    killBoard.KillLog($"{killerName} 에게\n<color=red>처치됨</color>");
+                    Debug.Log($"{killerName}봇 에게 처치당함");
+                    break;
+
+                case DeathCause.Fall:
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause, (int)MyTeam);
+                    killBoard.KillLog("<color=red>낙사</color>");
+                    Debug.Log($"낙사");
+                    break;
+
+                case DeathCause.EnemyInk:
+                    killLogView.RPC("LogForAll", RpcTarget.All, killerName, victimName, (int)deathCause, (int)MyTeam);
+                    killBoard.KillLog("적팀 바닥은\n<color=red>아파요</color>");
+                    Debug.Log("적잉크때문에 죽음");
+                    break;
+            }
+        }
+
+        if(PhotonNetwork.LocalPlayer.NickName == killerName)//호출한사람과 킬러의 이름이 같으면
+        {
+            killBoard.KillLog($"{photonView.Owner.NickName}\n<color=red>처치</color>");
+            Debug.Log($"{photonView.Owner.NickName}처치");
+        }
+       
+
         Manager.Audio.PlayClip("Dead",transform.position);
         Instantiate(dieParticle, transform);
         // 원격으로도 죽은 처리 해줘야 함
@@ -623,6 +758,8 @@ public class PlayerController : BaseController
     {
         // 체력 초기화
         CurHp = MaxHp;
+        // 잉크 초기화
+        inkParticleGun.currentInk = inkParticleGun.maxInk;
 
         if (!photonView.IsMine)
         {
@@ -840,7 +977,7 @@ public class PlayerController : BaseController
                     // 체력이 실제로 회복되었을 때만 로그를 출력
                     if (CurHp > oldHp)
                     {
-                        Debug.Log($"아군 잉크 위에서 체력 회복 HP: {CurHp:F1}");
+                        //Debug.Log($"아군 잉크 위에서 체력 회복 HP: {CurHp:F1}");
                     }
                 }
                 break;
@@ -849,8 +986,13 @@ public class PlayerController : BaseController
                 // 데미지
                 if (stateMachine.CurrentState == highStateDic[HighState.HumanForm] && CurHp > 0)
                 {
-                    Debug.Log($"적군 잉크 위에서 데미지를 입습니다");
+                    //Debug.Log($"적군 잉크 위에서 데미지를 입습니다");
                     TakeDamage(damagePerSecondOnEnemyInk * Time.deltaTime);
+
+                    if(CurHp <= 0 && !IsDead)
+                    {
+                        EnemyInkDeath();
+                    }
                 }
                 break;
 
@@ -900,5 +1042,25 @@ public class PlayerController : BaseController
                 squidSwimBubble.Stop();
             }
         }
+    }
+
+    public void FallingDeath()
+    {
+        if (IsDead) return;
+
+        killerName = "낙사";
+        deathCause = DeathCause.Fall;
+
+        photonView.RPC("PlayerDie", RpcTarget.All, killerName, (int)deathCause);
+    }
+
+    public void EnemyInkDeath()
+    {
+        if(IsDead) return;
+
+        killerName = "적 잉크";
+        deathCause = DeathCause.EnemyInk;
+
+        photonView.RPC("PlayerDie", RpcTarget.All, killerName, (int)deathCause);
     }
 }

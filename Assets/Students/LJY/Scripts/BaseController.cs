@@ -1,8 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using Photon.Pun;
 using UnityEngine;
 
+public enum DeathCause ////// JWJ 추가
+{
+    PlayerAttack,
+    BotAttck,
+    Fall,
+    EnemyInk
+}
 public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
 {
     // 애니메이터 해시
@@ -27,7 +35,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     
     [Header("값 설정")]
     [SerializeField] public float moveSpeed = 5;
-    public const float RESPAWN_TIME = 3.0f; // 리스폰까지 걸리는 시간
+    public const float RESPAWN_TIME = 10.0f; // 리스폰까지 걸리는 시간
     
     [Header("팀 설정")]
     protected TeamColorInfo teamColorInfo;
@@ -116,6 +124,10 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
         set { isDeadState = value; }
     }
 
+    protected string killerName = "";
+    protected string victimName = "";
+    protected DeathCause deathCause; 
+
     protected virtual void Awake()
     {
         humanFace = humanModel.GetComponent<HumanFace>();
@@ -132,7 +144,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
         Manager.Audio.SetFireSound(this);
         if (!photonView.IsMine)
         {
-            fireSound.volume = 0.5f;
+            fireSound.volume = 0.75f;
         }
     }
 
@@ -145,6 +157,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
         gameManagerPhotonView.RPC("NotifyCharSpawned", RpcTarget.MasterClient); 
     }
     
+    public abstract void TakeDamage(float amount, PhotonMessageInfo info);
     public abstract void TakeDamage(float amount);
     public abstract void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info);
     
@@ -168,7 +181,7 @@ public abstract class BaseController : MonoBehaviourPunCallbacks, IPunObservable
     protected IEnumerator HitRoutine()
     {
         FaceOff(FaceType.Hit);
-        Manager.Audio.PlayEffect("TakeDamage");
+        //Manager.Audio.PlayEffect("TakeDamage");
         photonView.RPC("TriggerHitAnimation",RpcTarget.AllViaServer);
         yield return new WaitForSeconds(hitRecoveryTimer);
         StopCoroutine(hitRoutine);
