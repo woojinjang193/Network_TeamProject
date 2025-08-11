@@ -1,38 +1,47 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
-using UnityEditor;
 using UnityEngine;
 
 public class DeathState : AIBaseState
 {
     private float _deathTime = 10f;
-    private float _timer;
+    private bool _respawnScheduled = false;
+    private Coroutine routine;
 
     public DeathState(AIController controller) : base(controller) { }
 
     public override void OnEnter()
     {
-        // TODO : 애니메이터 사망모션 +딜레이시간 필요함.. 코루틴으로 생각해보기
-
-        _timer = 0f;
         _controller.col.enabled = false;
         _controller.humanModel.SetActive(false);
-        //Debug.Log("데쓰 온엔터");
+
+        if (!_respawnScheduled)
+        { 
+            routine = _controller.StartCoroutine(RespawnDelay());
+            _respawnScheduled = true; 
+        }
     }
 
-    public override void OnUpdate()
+
+    private IEnumerator RespawnDelay()
     {
-        _timer += Time.deltaTime;
-        if (_timer >= _deathTime)
-        {
-            _controller.Respawn();
-        }
-        //Debug.Log("데쓰 온업데이트");
+        yield return new WaitForSeconds(_deathTime);
+        _controller.Respawn();
     }
+
 
     public override void OnExit()
     {
         _controller.IsDeadState = false;
+        if (routine != null) 
+        { 
+            _controller.StopCoroutine(routine); 
+            routine = null; 
+        }
+        _respawnScheduled = false;
+    }
+
+    public override void OnUpdate()
+    { 
     }
 }
