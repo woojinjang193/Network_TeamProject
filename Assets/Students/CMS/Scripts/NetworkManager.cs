@@ -195,7 +195,7 @@ public class NetworkManager : SingletonPunCallbacks<NetworkManager>
     }
     public override void OnPlayerLeftRoom(Player otherPlayer) // 현재 방에서 다른 플레이어가 떠났을 때 호출
     {
-        if (Manager.Game.IsGameEnd)
+        if (Manager.Game == null || Manager.Game.IsGameEnd)
         {
             roomManager?.PlayerPanelRemove(otherPlayer);
             if (PhotonNetwork.IsMasterClient)
